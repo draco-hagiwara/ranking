@@ -21,6 +21,18 @@ array(
 );
 
 
+// 回収サイト
+$config['CUSTOMER_CM_COLLECT'] =
+array(
+		""  => " -- 選択してください -- ",
+		"1" => "月末締め当月末",
+		"2" => "月末締め翌月末",
+		"3" => "月末締め翌々月10日",
+		"4" => "月末締め翌々月15日",
+		"5" => "月末締め翌々月末",
+		"0" => "指定なし",
+);
+
 // 口座種別
 $config['CUSTOMER_CM_KIND'] =
 array(
@@ -105,7 +117,7 @@ $config['INVOICE_TAX_CAL']      = '2';
 $config['INVOICE_TAXOUT']       = '0';
 
 // 請求書発行：発行番号（接頭語）
-$config['INVOICE_ISSUE_NUM']    = 'LM';
+$config['INVOICE_ISSUE_NUM']    = 'LU';
 
 // 案件：課金方式 <- 個別作成時
 $config['INVOICE_ACCOUNTING'] =

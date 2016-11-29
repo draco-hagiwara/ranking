@@ -194,6 +194,7 @@ switch (ENVIRONMENT)
 	if (defined('STDIN'))
 	{
 		chdir(dirname(__FILE__));
+		$assign_to_config['uri_protocol'] = 'CLI';								// コマンドライン(CLI)使用可
 	}
 
 	if (($_temp = realpath($system_path)) !== FALSE)

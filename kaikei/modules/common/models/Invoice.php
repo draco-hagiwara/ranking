@@ -272,7 +272,8 @@ class Invoice extends CI_Model
 					T1.iv_branch_nm,
 					T1.iv_kind,
 					T1.iv_account_no,
-					T1.iv_account_nm
+					T1.iv_account_nm,
+					T1.iv_create_date
 
 					from tb_invoice_h AS T1
 					WHERE T1.iv_seq = ? AND T1.iv_issue_yymm = ?
@@ -301,21 +302,46 @@ class Invoice extends CI_Model
     	$query = $this->db->query($sql, $_set_values);
     	$history_list = $query->result('array');
 
-
-
-//     	print("<br><br>");
-//     	print($history_countall);
-//     	print("<br><br>");
-//     	print_r($history_list);
-//     	print("<br><br>");
-//     	exit;
-
-
-
-
-
-
     	return array($history_list[0], $history_countall);
+
+    }
+
+    /**
+     * 請求書情報データの件数を取得する
+     *
+     * @param    int
+     * @param    date
+     * @return   int
+     */
+    public function get_iv_cnt($iv_status, $date_ym)
+    {
+
+    	$set_where["iv_status"]     = $iv_status;
+    	$set_where["iv_issue_yymm"] = $date_ym;
+
+    	$query = $this->db->get_where('tb_invoice', $set_where);
+    	$invoice_count = $query->num_rows();
+
+    	return $invoice_count;
+
+    }
+
+    /**
+     * 前日日付の請求書情報データを取得する
+     *
+     * @param    date
+     * @return   array
+     */
+    public function get_iv_sales($sasles_date)
+    {
+
+    	$set_where = '`iv_status` = 1 AND iv_sales_date` = \'' . $sasles_date . '\'';
+
+    	$query = $this->db->get_where('tb_invoice', $set_where);
+
+    	$get_data = $query->result('array');
+
+    	return $get_data;
 
     }
 
@@ -334,8 +360,6 @@ class Invoice extends CI_Model
 
     	// 挿入した ID 番号を取得
     	$row_id = $this->db->insert_id();
-
-    	return $row_id;
 
     	// ログ書き込み
     	$set_data['lg_func']   = 'insert_invoice';
@@ -360,8 +384,6 @@ class Invoice extends CI_Model
 
     	// 挿入した ID 番号を取得
     	$row_id = $this->db->insert_id();
-
-    	return $row_id;
 
     	// ログ書き込み
     	$set_data['lg_func']   = 'insert_invoice_history';

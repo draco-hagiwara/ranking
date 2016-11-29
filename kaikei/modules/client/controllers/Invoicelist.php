@@ -23,10 +23,6 @@ class Invoicelist extends MY_Controller
             redirect('/login/');
         }
 
-//         $this->smarty->assign('err_clid',   FALSE);
-//          $this->smarty->assign('err_status', FALSE);
-//          $this->smarty->assign('err_mail',   FALSE);
-//         $this->smarty->assign('err_passwd', FALSE);
         $this->smarty->assign('mess', FALSE);
 
     }
@@ -194,7 +190,7 @@ class Invoicelist extends MY_Controller
     	$this->smarty->assign('info', $get_iv_data[0]);
 
     	// 明細データの取得
-    	$get_ivd_data = $this->ivd->get_iv_seq($input_post['chg_seq'], $get_iv_data[0]['iv_issue_yymm']);
+    	$get_ivd_data = $this->ivd->get_iv_seq($input_post['chg_seq'], $get_iv_data[0]['iv_issue_yymm'], $get_iv_data[0]['iv_seq_suffix']);
     	$this->smarty->assign('infodetail', $get_ivd_data);
 
     	// バリデーション設定
@@ -213,12 +209,6 @@ class Invoicelist extends MY_Controller
 
     	$input_post = $this->input->post();
 
-
-    	print_r($input_post);
-
-
-
-
     	$this->load->model('Invoice',        'iv',  TRUE);
     	$this->load->model('Invoice_detail', 'ivd', TRUE);
     	$this->load->library('commoninvoice');
@@ -228,7 +218,7 @@ class Invoicelist extends MY_Controller
     	$get_iv_data = $this->iv->get_iv_seq($input_post['iv_seq']);
 
     	// 明細データの取得
-    	$get_ivd_data = $this->ivd->get_iv_seq($input_post['iv_seq'], $get_iv_data[0]['iv_issue_yymm']);
+    	$get_ivd_data = $this->ivd->get_iv_seq($input_post['iv_seq'], $get_iv_data[0]['iv_issue_yymm'], $get_iv_data[0]['iv_seq_suffix']);
 
     	// バリデーション・チェック
     	$this->_set_validation02();
@@ -246,9 +236,13 @@ class Invoicelist extends MY_Controller
 		    if ($input_post['iv_status'] == 0)												// ステータス
 		    {
 		    	$get_iv_data[0]['iv_delflg']  = 0;
+		    	$get_iv_data[0]['iv_sales_date']  = NULL;
 		    } elseif ($input_post['iv_status'] == 1) {
 		    	$get_iv_data[0]['iv_reissue'] = $get_iv_data[0]['iv_reissue'] + 1;
 		    	$get_iv_data[0]['iv_delflg']  = 0;
+
+		    	$date = new DateTime();
+		    	$get_iv_data[0]['iv_sales_date']  = $date->format('Y-m-d');					// 売上日
 		    } elseif ($input_post['iv_status'] == 9) {
 		    	$get_iv_data[0]['iv_delflg']  = 1;
 		    }
@@ -304,12 +298,6 @@ class Invoicelist extends MY_Controller
 		    unset($get_iv_data[0]["iv_create_date"]) ;
 		    unset($get_iv_data[0]["iv_update_date"]) ;
 
-
-
-// 		    print("<br><br>");
-// 		    print_r($get_iv_data);
-
-
 		    // tb_invoice 更新
 		    $this->iv->update_invoice($get_iv_data[0]);
 
@@ -336,13 +324,6 @@ class Invoicelist extends MY_Controller
 		    	// 不要パラメータ削除
 		    	unset($val["ivd_create_date"]) ;
 		    	unset($val["ivd_update_date"]) ;
-
-
-
-
-		    	print("<br><br>");
-		    	print_r($val);
-
 
 		    	$this->ivd->update_invoice_detail($val);
 
@@ -446,6 +427,10 @@ class Invoicelist extends MY_Controller
 
     	$input_post = $this->input->post();
 
+
+    	print_r($input_post);
+
+
     	// バリデーション・チェック
     	$this->_set_validation03();
     	if ($this->form_validation->run() == FALSE)
@@ -495,9 +480,13 @@ class Invoicelist extends MY_Controller
     		{
     			$set_iv_data['iv_delflg']  = 1;
     		} elseif ($input_post['iv_status'] == 1) {
-    			$get_iv_data['iv_reissue'] = 1;
+    			$set_iv_data['iv_reissue'] = 1;
+
+    			$date = new DateTime();
+    			$set_iv_data['iv_sales_date']  = $date->format('Y-m-d');					// 売上日
     		}
     		$set_iv_data['iv_method'] = 1;                                                  // 請求書発行方式:個別発行=1
+    		$set_iv_data['iv_issue_yymm'] = $input_post['iv_issue_yymm'];                   // 発行年月
 
     		// 請求書発行番号
     		$_issue_num['issue_num']        = $this->config->item('INVOICE_ISSUE_NUM');     // 接頭語
@@ -514,7 +503,7 @@ class Invoicelist extends MY_Controller
     		}
     		$_issue_num['issue_suffix']     = $_suffix;                                     // 枝番
     		$_issue_num['issue_yymm']       = $input_post['iv_issue_yymm'];                 // 発行年月
-    		$_issue_num['issue_re']         = $get_iv_data['iv_reissue'];                   // 再発行
+    		$_issue_num['issue_re']         = $set_iv_data['iv_reissue'];                   // 再発行
 
     		$set_iv_data['iv_slip_no']   = $this->commoninvoice->issue_num($_issue_num);
 
@@ -613,8 +602,6 @@ class Invoicelist extends MY_Controller
 //     		$this->view('invoicelist/index.tpl');
     	}
 
-//     	$this->view('invoicelist/add.tpl');
-
     }
 
     // 履歴表示
@@ -683,18 +670,6 @@ class Invoicelist extends MY_Controller
     	$this->smarty->assign('countall', $history_countall);
 
     	$this->view('invoicelist/history.tpl');
-
-    }
-
-    // 請求書作成
-    public function pdf_invoice()
-    {
-
-    	// 更新対象データの取得
-    	$input_post = $this->input->post();
-
-    	print_r($input_post);
-    	exit;
 
     }
 
@@ -817,53 +792,6 @@ class Invoicelist extends MY_Controller
 
     	$this->smarty->assign('options_date_fix', $opt_date_fix);
     	$this->smarty->assign('options_date_res', $opt_date_res);
-
-    }
-
-    // 消費税計算
-    private function _tax_calculation($_subtotal)
-    {
-
-    	$this->config->load('config_comm');
-    	$_zeiritsu = $this->config->item('INVOICE_TAX');
-    	$_zeinuki  = $this->config->item('INVOICE_TAXOUT');
-    	$_hasuu    = $this->config->item('INVOICE_TAX_CAL');
-
-    	$zeigaku = $_subtotal * $_zeiritsu;
-
-    	if ($_zeinuki == 0)														// 税抜計算
-    	{
-	    	// 端数計算
-    		switch( $_hasuu )
-    		{
-    			case 0:
-
-    				// 切り上げ
-    				$tax_total = $zeigaku + 0.9;
-    				break;
-
-    			case 1:
-
-    				// 切り捨て
-    				break;
-
-    			case 2:
-    			default:
-
-    				// 四捨五入
-    				$tax_total = $zeigaku + 0.5;
-    				break;
-    		}
-
-    		$result = floor( $tax_total );
-
-    	} else {																// 税込計算
-
-    		$result = 0;
-
-    	}
-
-    	return $result;
 
     }
 
@@ -1055,6 +983,11 @@ class Invoicelist extends MY_Controller
     					'field'   => 'iv_account_nm',
     					'label'   => '口座名義',
     					'rules'   => 'trim|required|max_length[50]'
+    			),
+    			array(
+    					'field'   => 'iv_tag',
+    					'label'   => 'タグ設定',
+    					'rules'   => 'trim|max_length[50]'
     			),
     			array(
     					'field'   => 'iv_memo',

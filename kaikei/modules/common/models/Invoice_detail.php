@@ -18,10 +18,10 @@ class Invoice_detail extends CI_Model
      * @param    char
      * @return   bool
      */
-    public function get_iv_seq($seq_no, $issue_yymm)
+    public function get_iv_seq($seq_no, $issue_yymm, $seq_suffix)
     {
 
-    	$set_where = '`ivd_iv_seq` = ' . $seq_no  . ' AND `ivd_iv_issue_yymm` = ' . $issue_yymm;
+    	$set_where = '`ivd_iv_seq` = ' . $seq_no  . ' AND `ivd_iv_issue_yymm` = ' . $issue_yymm  . ' AND `ivd_seq_suffix` = ' . $seq_suffix;
 //     	$set_where = '`ivd_status` = 0 AND `ivd_iv_seq` = ' . $seq_no  . ' AND `ivd_iv_issue_yymm` = ' . $issue_yymm;
 
 		$query = $this->db->get_where('tb_invoice_detail', $set_where);
@@ -43,7 +43,7 @@ class Invoice_detail extends CI_Model
 
     	$set_where = '`ivd_iv_seq` = ' . $seq_no  . ' AND `ivd_seq_suffix` = ' . $seq_suffix;
 
-    	$query = $this->db->get_where('tb_invoice_detail', $set_where);
+    	$query = $this->db->get_where('tb_invoice_detail_h', $set_where);
     	$get_data = $query->result('array');
 
     	return $get_data;
@@ -89,8 +89,6 @@ class Invoice_detail extends CI_Model
     	// 挿入した ID 番号を取得
     	$row_id = $this->db->insert_id();
 
-    	return $row_id;
-
     	// ログ書き込み
     	$set_data['lg_func']   = 'insert_invoice_detail';
     	$set_data['lg_detail'] = 'ivd_seq = ' . $row_id . ' <= ' . $_last_sql;
@@ -114,8 +112,6 @@ class Invoice_detail extends CI_Model
 
     	// 挿入した ID 番号を取得
     	$row_id = $this->db->insert_id();
-
-    	return $row_id;
 
     	// ログ書き込み
     	$set_data['lg_func']   = 'insert_invoice_detail_history';

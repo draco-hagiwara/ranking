@@ -11,10 +11,24 @@
 {form_open('customerlist/addchk/' , 'name="clientForm" class="form-horizontal h-adr"')}
   {$mess}
   <div class="form-group">
-    <label for="ac_status" class="col-sm-3 control-label">ステータス選択<font color=red> *</font></label>
+    <label for="cm_status" class="col-sm-3 control-label">ステータス選択<font color=red> *</font></label>
     <div class="col-sm-2 btn-lg">
       {form_dropdown('cm_status', $options_cm_status, set_value('cm_status', ''))}
       {if form_error('cm_status')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_status')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_yayoi_cd" class="col-xs-3 col-md-3 control-label">顧客コード</label>
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_yayoi_cd' , set_value('cm_yayoi_cd', '') , 'class="form-control" placeholder="顧客コードを入力"')}
+      {if form_error('cm_yayoi_cd')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_yayoi_cd')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_yayoi_name" class="col-md-3 control-label">弥生名称</label>
+    <div class="col-md-8">
+      {form_input('cm_yayoi_name' , set_value('cm_yayoi_name', '') , 'class="form-control" placeholder="弥生名称を入力してください。max.50文字"')}
+      {if form_error('cm_yayoi_name')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_yayoi_name')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
@@ -22,6 +36,13 @@
     <div class="col-md-8">
       {form_input('cm_company' , set_value('cm_company', '') , 'class="form-control" placeholder="会社名を入力してください。max.50文字"')}
       {if form_error('cm_company')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_company')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_company_kana" class="col-md-3 control-label">会社名カナ</label>
+    <div class="col-md-8">
+      {form_input('cm_company_kana' , set_value('cm_company_kana', '') , 'class="form-control" placeholder="会社名カナを入力してください。max.50文字"')}
+      {if form_error('cm_company_kana')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_company_kana')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
@@ -126,9 +147,72 @@
   </div>
   <div class="form-group">
     <label for="cm_tel01" class="col-xs-3 col-md-3 control-label">代表電話番号<font color=red> *</font></label>
-    <div class="col-xs-4 col-md-4">
-      {form_input('cm_tel01' , set_value('cm_tel01', '') , 'class="form-control" placeholder="代表電話番号を入力してください"')}
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_tel01' , set_value('cm_tel01', '') , 'class="form-control" placeholder="代表電話番号を入力"')}
       {if form_error('cm_tel01')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_tel01')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_seturitu" class="col-xs-3 col-md-3 control-label">会社情報：設立年月日</label>
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_seturitu' , set_value('cm_seturitu', '') , 'class="form-control" placeholder="設立年月日を入力"')}
+      {if form_error('cm_seturitu')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_seturitu')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_capital" class="col-xs-3 col-md-3 control-label">会社情報：資本金</label>
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_capital' , set_value('cm_capital', '') , 'class="form-control" placeholder="設立年月日を入力"')}
+      {if form_error('cm_capital')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_capital')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_closingdate" class="col-xs-3 col-md-3 control-label">会社情報：決算日</label>
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_closingdate' , set_value('cm_closingdate', '') , 'class="form-control" placeholder="決算日を入力"')}
+      {if form_error('cm_closingdate')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_closingdate')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_employee" class="col-xs-3 col-md-3 control-label">会社情報：従業員数</label>
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_employee' , set_value('cm_employee', '') , 'class="form-control" placeholder="従業員数を入力"')}
+      {if form_error('cm_employee')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_employee')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_collect" class="col-sm-3 control-label">回収サイト</label>
+    <div class="col-sm-2 btn-lg">
+      {form_dropdown('cm_collect', $options_cm_collect, set_value('cm_collect', ''))}
+      {if form_error('cm_collect')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_collect')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_credit_chk" class="col-xs-3 col-md-3 control-label">与信チェック日</label>
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_credit_chk' , set_value('cm_credit_chk', '') , 'class="form-control" placeholder="与信チェック日を入力"')}
+      {if form_error('cm_credit_chk')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_credit_chk')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_antisocial_chk" class="col-xs-3 col-md-3 control-label">反社チェック日</label>
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_antisocial_chk' , set_value('cm_antisocial_chk', '') , 'class="form-control" placeholder="反社チェック日を入力"')}
+      {if form_error('cm_antisocial_chk')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_antisocial_chk')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_credit_max" class="col-xs-3 col-md-3 control-label">与信限度額</label>
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_credit_max' , set_value('cm_credit_max', '') , 'class="form-control" placeholder="与信限度額を入力"')}
+      {if form_error('cm_credit_max')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_credit_max')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_trade_no" class="col-xs-3 col-md-3 control-label">取引申請番号</label>
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_trade_no' , set_value('cm_trade_no', '') , 'class="form-control" placeholder="取引申請番号を入力"')}
+      {if form_error('cm_trade_no')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_trade_no')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
@@ -146,7 +230,7 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_department" class="col-md-3 control-label">担当所属部署</label>
+    <label for="cm_department" class="col-md-3 control-label">担当所属部署／役職</label>
     <div class="col-md-8">
       {form_input('cm_department' , set_value('cm_department', '') , 'class="form-control" placeholder="所属部署を入力してください。max.50文字"')}
       {if form_error('cm_department')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_department')}</font></label>{/if}
@@ -165,30 +249,30 @@
   </div>
   <div class="form-group">
     <label for="cm_tel02" class="col-xs-3 col-md-3 control-label">担当者電話番号<font color=red> *</font></label>
-    <div class="col-xs-4 col-md-4">
-      {form_input('cm_tel02' , set_value('cm_tel02', '') , 'class="form-control" placeholder="担当者電話番号を入力してください"')}
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_tel02' , set_value('cm_tel02', '') , 'class="form-control" placeholder="担当者電話番号を入力"')}
       {if form_error('cm_tel02')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_tel02')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
     <label for="cm_mobile" class="col-xs-3 col-md-3 control-label">担当者携帯番号</label>
-    <div class="col-xs-4 col-md-4">
-      {form_input('cm_mobile' , set_value('cm_mobile', '') , 'class="form-control" placeholder="担当者携帯番号を入力してください"')}
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_mobile' , set_value('cm_mobile', '') , 'class="form-control" placeholder="担当者携帯番号を入力"')}
       {if form_error('cm_mobile')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_mobile')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
     <label for="cm_fax" class="col-xs-3 col-md-3 control-label">FAX番号</label>
-    <div class="col-xs-4 col-md-4">
-      {form_input('cm_fax' , set_value('cm_fax', '') , 'class="form-control" placeholder="FAX番号を入力してください"')}
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_fax' , set_value('cm_fax', '') , 'class="form-control" placeholder="FAX番号を入力"')}
       {if form_error('cm_fax')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_fax')}</font></label>{/if}
     </div>
   </div>
 
   <div class="form-group">
     <label for="cm_bank_cd" class="col-xs-3 col-md-3 control-label">銀行CD<font color=red> *</font></label>
-    <div class="col-xs-4 col-md-4">
-      {form_input('cm_bank_cd' , set_value('cm_bank_cd', '') , 'class="form-control" placeholder="銀行CDを入力してください"')}
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_bank_cd' , set_value('cm_bank_cd', '') , 'class="form-control" placeholder="銀行CDを入力"')}
       {if form_error('cm_bank_cd')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_bank_cd')}</font></label>{/if}
     </div>
   </div>
@@ -201,8 +285,8 @@
   </div>
   <div class="form-group">
     <label for="cm_branch_cd" class="col-xs-3 col-md-3 control-label">支店CD<font color=red> *</font></label>
-    <div class="col-xs-4 col-md-4">
-      {form_input('cm_branch_cd' , set_value('cm_branch_cd', '') , 'class="form-control" placeholder="支店CDを入力してください"')}
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_branch_cd' , set_value('cm_branch_cd', '') , 'class="form-control" placeholder="支店CDを入力"')}
       {if form_error('cm_branch_cd')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_branch_cd')}</font></label>{/if}
     </div>
   </div>
@@ -221,9 +305,9 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_account_no" class="col-xs-3 col-md-3 control-label">口座番号<font color=red> *</font></label>
-    <div class="col-xs-4 col-md-4">
-      {form_input('cm_account_no' , set_value('cm_account_no', '') , 'class="form-control" placeholder="口座番号を入力してください"')}
+    <label for="cm_account_no" class="col-xs-3 col-md-3 control-label">口座番号</label>
+    <div class="col-xs-2 col-md-2">
+      {form_input('cm_account_no' , set_value('cm_account_no', '') , 'class="form-control" placeholder="口座番号を入力"')}
       {if form_error('cm_account_no')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_account_no')}</font></label>{/if}
     </div>
   </div>
@@ -353,7 +437,7 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_department_iv" class="col-md-3 control-label">請求書：担当所属部署</label>
+    <label for="cm_department_iv" class="col-md-3 control-label">請求書：担当所属部署／役職</label>
     <div class="col-md-8">
       {form_input('cm_department_iv' , set_value('cm_department_iv', '') , 'class="form-control" placeholder="所属部署を入力してください。max.50文字"')}
       {if form_error('cm_department_iv')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_department_iv')}</font></label>{/if}

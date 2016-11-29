@@ -4,7 +4,7 @@
 <body>
 {* ヘッダー部分　END *}
 
-<H3><p class="bg-success">　　アカウント情報　更新</p></H3>
+<H3><p class="bg-success">　　受注案件情報　更新</p></H3>
 
 {form_open('/projectlist/detailchk/' , 'name="accountDetailForm" class="form-horizontal"')}
 
@@ -124,12 +124,14 @@
   {form_hidden('pj_cm_company', $info.pj_cm_company)}
 
   <br><br>
+  {if $info.pj_status!=2}
   <!-- Button trigger modal -->
   <div class="row">
   <div class="col-sm-4 col-sm-offset-3">
     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">更新する</button>
   </div>
   </div>
+  {/if}
 
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog">

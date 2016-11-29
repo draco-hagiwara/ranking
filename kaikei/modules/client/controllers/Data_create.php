@@ -46,9 +46,9 @@ class Data_create extends MY_Controller
 
     	$input_post = $this->input->post();
 
-    	$this->load->model('Customer',       'cm', TRUE);
-    	$this->load->model('Project',        'pj', TRUE);
-    	$this->load->model('Invoice',        'iv', TRUE);
+    	$this->load->model('Customer',       'cm',  TRUE);
+    	$this->load->model('Project',        'pj',  TRUE);
+    	$this->load->model('Invoice',        'iv',  TRUE);
     	$this->load->model('Invoice_detail', 'ivd', TRUE);
     	$this->load->library('Commoninvoice');
     	$this->config->load('config_comm');
@@ -115,7 +115,7 @@ class Data_create extends MY_Controller
     				$_issue_tax['zeinuki']  = $this->config->item('INVOICE_TAXOUT');
     				$_issue_tax['hasuu']    = $this->config->item('INVOICE_TAX_CAL');
 
-    				$set_data_iv['iv_tax'] = $this->Commoninvoice->cal_tax($_subtotal, $_issue_tax);
+    				$set_data_iv['iv_tax'] = $this->commoninvoice->cal_tax($_subtotal, $_issue_tax);
 //     				$set_data_iv['iv_tax']            = $this->_tax_calculation($_subtotal);					// 税額
 
     				$set_data_iv['iv_total']          = $_subtotal + $set_data_iv['iv_tax'];					// 合計
@@ -156,6 +156,8 @@ class Data_create extends MY_Controller
     				$set_data_iv['iv_account_no']     = $value['cm_account_no'];
     				$set_data_iv['iv_account_nm']     = $value['cm_account_nm'];
 
+    				$get_iv_data[0]['iv_sales_date']  = NULL;													// 売上日
+
     				// 請求書データ : 既存データ有無のチェック
     				$_new_data = FALSE;
     				$get_iv_data = $this->iv->get_iv_cm_seq($value['cm_seq'], $input_post['iv_issue_yymm']);
@@ -174,7 +176,7 @@ class Data_create extends MY_Controller
     					$_issue_num['issue_accounting'] = 'A';													// 「通常（固定or成果）:A」のみ
     					$_issue_num['issue_suffix']     = $set_data_iv['iv_seq_suffix'];						// 枝番
     					$_issue_num['issue_yymm']       = $input_post['iv_issue_yymm'];							// 発行年月
-    					$_issue_num['issue_re']         = $get_iv_data[0]['iv_reissue'];						// 再発行
+    					$_issue_num['issue_re']         = 0;													// 再発行
 
     					$set_data_iv['iv_slip_no']      = $this->commoninvoice->issue_num($_issue_num);
 
@@ -197,7 +199,13 @@ class Data_create extends MY_Controller
     				} else {
 
     					// 請求書データ : 既存データ書き換えUPDATE
-    					$set_data_iv['iv_seq'] = $get_iv_data[0]['iv_seq'];
+    					$set_data_iv['iv_seq']        = $get_iv_data[0]['iv_seq'];
+    					$set_data_iv['iv_seq_suffix'] = $get_iv_data[0]['iv_seq_suffix'] + 1;
+    					$set_data_iv['iv_status']     = 0;
+    					if ($get_iv_data[0]['iv_status'] == 9)
+    					{
+    						$set_data_iv['iv_delflg'] = 0;
+    					}
 
     					// 請求書発行番号
     					$_issue_num['issue_num']        = $this->config->item('INVOICE_ISSUE_NUM');				// 接頭語
@@ -207,18 +215,9 @@ class Data_create extends MY_Controller
     					$_issue_num['issue_accounting'] = 'A';													// 「通常（固定or成果）:A」
     					$_issue_num['issue_suffix']     = $set_data_iv['iv_seq_suffix'];						// 枝番
     					$_issue_num['issue_yymm']       = $input_post['iv_issue_yymm'];							// 発行年月
-    					$_issue_num['issue_re']         = $get_iv_data[0]['iv_reissue'];				// 再発行
+    					$_issue_num['issue_re']         = $get_iv_data[0]['iv_reissue'];						// 再発行
 
     					$set_data_iv['iv_slip_no']      = $this->commoninvoice->issue_num($_issue_num);
-
-//     					$set_data_iv['iv_seq_suffix'] = $get_iv_data[0]['iv_seq_suffix'] + 1;					// 枝番
-//     					$set_data_iv['iv_slip_no']    = 'LM'													// 請求書発行番号
-// 						    							. $_SESSION['c_memGrp']									//* クライアントNO
-// 						    							. '-' . $value['cm_seq']								//* 顧客NO
-// 						    							. '-' . '1'												//* 一括発行=1,個別発行=2
-// 						    							. 'A'													//* 「通常（固定or成果）:A」
-// 						    							. $set_data_iv['iv_seq_suffix']							//* 枝番
-// 						    							. '-' . $input_post['iv_issue_yymm'];					//* 発行年月
 
     					$this->iv->update_invoice($set_data_iv);
 
@@ -236,6 +235,7 @@ class Data_create extends MY_Controller
 			    		$set_data_ivd['ivd_iv_seq']         = $set_data_iv['iv_seq'];
 						$set_data_ivd['ivd_pj_seq']         = $val['pj_seq'];
 						$set_data_ivd['ivd_iv_issue_yymm']  = $input_post['iv_issue_yymm'];						// 発行年月
+						$set_data_ivd['ivd_iv_accounting']  = $val['pj_accounting'];							// 課金方式
 						$set_data_ivd['ivd_item']           = $val['pj_keyword'];								// 請求項目=キーワード
 						$set_data_ivd['ivd_qty']            = 1;												// 数量
 						$set_data_ivd['ivd_price']          = $val['pj_billing'];								// 単価
@@ -273,7 +273,13 @@ class Data_create extends MY_Controller
 								// 既存：UPDATE
 								$set_data_ivd['ivd_seq']        = $get_ivd_date[0]['ivd_seq'];
 								$set_data_ivd['ivd_seq_suffix'] = $get_ivd_date[0]['ivd_seq_suffix'] + 1;
-								$set_data_ivd['ivd_status']     = $get_ivd_date[0]['ivd_status'];
+
+								if ($get_iv_data[0]['iv_status'] != 9)
+								{
+									$set_data_ivd['ivd_status'] = $get_ivd_date[0]['ivd_status'];
+								} else {
+									$set_data_ivd['ivd_status'] = 0;
+								}
 
 								$this->ivd->update_invoice_detail($set_data_ivd);
 

@@ -14,11 +14,15 @@
   </div>
 
   <div class="row">
+    <label class="col-xs-2 col-md-2 control-label">作成日時</label>
+    <div class="col-xs-10 col-md-10">{$list.iv_create_date}</div>
+  </div>
+  <div class="row">
     <label class="col-xs-2 col-md-2 control-label">ステータス選択</label>
     <div class="col-xs-9 col-md-9">
       {if $list.iv_status==0}未発行
       {elseif $list.iv_status==1}発行済
-      {elseif $list.iv_status==2}キャンセル
+      {elseif $list.iv_status==9}キャンセル
       {else}エラー
       {/if}
     </div>

@@ -92,7 +92,9 @@ function fmSubmit(formName, url, method, num) {
   {$set_pagination}
 </ul>
 
-{form_open('/invoicelist/pdf_invoice/' , 'name="detailForm" class="form-horizontal"')}
+{form_open('/pdf_create/pdf_invoice/' , 'name="detailForm" class="form-horizontal"')}
+{*form_open('/invoicelist/pdf_invoice/' , 'name="pdfForm" class="form-horizontal" target="_blank"')*}
+
   <table class="table table-striped table-hover">
     <thead>
       <tr>
@@ -110,7 +112,7 @@ function fmSubmit(formName, url, method, num) {
       <tbody>
         <tr>
           <td>
-            <input type="checkbox" name="category{$smarty.foreach.seq.iteration}" id="category" value="{$iv.iv_seq}" class="category">
+            <input type="checkbox" name="invoice{$smarty.foreach.seq.iteration}" id="invoice" value="{$iv.iv_seq}" class="invoice">
             {$iv.iv_slip_no}
           </td>
           <td>
@@ -145,9 +147,14 @@ function fmSubmit(formName, url, method, num) {
 
   </table>
 
-  <input type="checkbox" id="category_all" name="category_all">
-  <label for="category_all"> 全てチェック　</label>
-  <button type='submit' class="btn btn-warning btn-xs" name='action' value='send'>請求書PDF作成</button>
+
+
+
+  {form_hidden('iv_issue_yymm', $seach_iv_issue_yymm)}
+
+  <input type="checkbox" id="invoice_all" name="invoice_all">
+  <label for="invoice_all"> 全てチェック　</label>
+  <button type='submit' class="btn btn-warning btn-xs" name='action' value='pdf'>請求書PDF作成</button>
 
 {form_close()}
 
@@ -160,15 +167,15 @@ function fmSubmit(formName, url, method, num) {
 
 <script type="text/javascript">
 $(function() {
-  $('#category_all').on('click', function() {
-    $('.category').prop('checked', this.checked);
+  $('#invoice_all').on('click', function() {
+    $('.invoice').prop('checked', this.checked);
   });
 
-  $('.category').on('click', function() {
-    if ($('#categories :checked').length == $('#categories :input').length){
-      $('#category_all').prop('checked', 'checked');
+  $('.invoice').on('click', function() {
+    if ($('#invoices :checked').length == $('#invoices :input').length){
+      $('#invoice_all').prop('checked', 'checked');
     }else{
-      $('#category_all').prop('checked', false);
+      $('#invoice_all').prop('checked', false);
     }
   });
 });

@@ -66,12 +66,59 @@ class Project extends CI_Model
     			  pj_url,
     			  pj_accounting,
     			  pj_tax_cal,
-    			  pj_collect,
     			  pj_billing,
     			  pj_cm_seq
     			FROM ' . $tb_name
     			. ' WHERE pj_cm_seq = ' . $seq_no . ' AND pj_accounting = ' . $iv_type . ' AND pj_invoice_status = 0  AND pj_status = 0 AND pj_delflg = 0'
     			. ' ORDER BY pj_seq ASC';
+
+    	// 接続先DBを選択 ＆ クエリー実行
+    	if ($db_name == 'default')
+    	{
+
+    		$query = $this->db->query($sql);
+
+    	} else {
+
+    		$slave_db = $this->load->database($db_name, TRUE);						// 順位チェックツールDBへ接続
+
+    		$query = $slave_db->query($sql);
+
+    	}
+
+    	$projectlist = $query->result('array');
+
+    	return $projectlist;
+
+    }
+
+    /**
+     * 顧客情報SEQから情報を取得する : ステータス「解約」への変更に使用
+     *
+     * @param    int  : 顧客情報seq
+     * @param    int  : クライアントSEQ（接続先テーブルを切替）
+     * @param    char : 接続先DB
+     * @return   bool
+     */
+    public function get_pj_cm_status($seq_no, $client_no, $db_name='default')
+    {
+
+    	$tb_name = 'tb_project_' . $client_no;
+
+    	$sql = 'SELECT
+    			  pj_seq,
+    			  pj_status,
+    			  pj_invoice_status,
+    			  pj_start_date,
+    			  pj_end_date,
+    			  pj_keyword,
+    			  pj_url,
+    			  pj_accounting,
+    			  pj_tax_cal,
+    			  pj_billing,
+    			  pj_cm_seq
+    			FROM ' . $tb_name
+        			. ' WHERE pj_cm_seq = ' . $seq_no . ' ORDER BY pj_cm_seq ASC';
 
     	// 接続先DBを選択 ＆ クエリー実行
     	if ($db_name == 'default')
@@ -254,7 +301,38 @@ class Project extends CI_Model
     	return array($project_list, $project_countall);
     }
 
+    /**
+     * 受注案件情報データの件数を取得する
+     *
+     * @param    int
+     * @return   bool
+     */
+    public function get_pj_cnt($pj_status, $client_no, $db_name='default')
+    {
 
+    	$tb_name = 'tb_project_' . $client_no;
+
+    	$set_where["pj_status"] = $pj_status;
+
+    	// 接続先DBを選択 ＆ クエリー実行
+    	if ($db_name == 'default')
+    	{
+
+    		$query = $this->db->get_where($tb_name, $set_where);
+
+    	} else {
+
+    		$slave_db = $this->load->database($db_name, TRUE);						// 順位チェックツールDBへ接続
+
+    		$query = $slave_db->get_where($tb_name, $set_where);
+
+    	}
+
+    	$project_count = $query->num_rows();
+
+    	return $project_count;
+
+    }
     /**
      * 案件情報新規登録
      *

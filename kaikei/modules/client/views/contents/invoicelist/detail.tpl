@@ -8,7 +8,9 @@
 
 <H3><p class="bg-success">　　請求書情報　更新</p></H3>
 
-{form_open('/invoicelist/detailchk/' , 'name="customerDetailForm" class="form-horizontal h-adr"')}
+<!-- <form> -->
+
+{form_open('/invoicelist/detailchk/' , 'name="detailForm" class="form-horizontal h-adr"')}
 
   {$mess}
   <div class="form-group">
@@ -44,10 +46,6 @@
     <div class="col-md-8 col-md-offset-2">（{$info.iv_account_no}）{$info.iv_account_nm}</div>
   </div>
 
-
-
-
-
   <table class="table table-hover table-bordered">
     <tbody>
       <tr class="active">
@@ -60,7 +58,11 @@
       {foreach from=$infodetail item=ivd}
       <tr>
         <td class="col-md-7 input-group-sm">
-          対象キーワード：「{$ivd.ivd_item}」
+          {if $ivd.ivd_iv_accounting==0}固定：対象キーワード：
+          {elseif $ivd.ivd_iv_accounting==1}成果：対象キーワード：
+          {elseif $ivd.ivd_iv_accounting==2}固+成：対象キーワード：
+          {else}{/if}
+          「{$ivd.ivd_item}」
         </td>
         <td class="col-md-1 input-group-sm text-center">
           {$ivd.ivd_qty|number_format}
@@ -141,19 +143,17 @@
     </div>
   </div>
 
-
   {form_hidden('iv_seq', $info.iv_seq)}
 
   <!-- Button trigger modal -->
   {if $info.iv_status!=9}
   <div class="row">
   <div class="col-sm-4 col-sm-offset-2">
-    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">更新する</button>（履歴ファイルが作成されます）
-  </div>
+    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal01">更新する</button>（履歴ファイルが作成されます）
   </div>
   {/if}
 
-  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal fade" id="myModal01" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -171,9 +171,46 @@
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
 
+{form_close()}
+<!-- </form> -->
+
+
+<!-- <form> -->
+
+{form_open('/pdf_create/pdf_one/' , 'name="pdfForm" class="form-horizontal h-adr" target="_blank"')}
+
+  {form_hidden('iv_seq', $info.iv_seq)}
+
+  <!-- Button trigger modal -->
+  {if $info.iv_status!=9}
+  <div class="col-sm-2 col-sm-offset-2">
+    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal02">請求書PDF</button>
+  </div>
+  </div>
+  {/if}
+
+  <div class="modal fade" id="myModal02" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">請求書PDF　作成</h4>
+        </div>
+        <div class="modal-body">
+          <p>作成しますか。&hellip;</p>
+        </div>
+        <div class="modal-footer">
+          <button type='submit' name='submit' value='submit' class="btn btn-sm btn-primary">O  K</button>
+          <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
 
 {form_close()}
 <!-- </form> -->
+
 
 <br><br>
 {* フッター部分　START *}

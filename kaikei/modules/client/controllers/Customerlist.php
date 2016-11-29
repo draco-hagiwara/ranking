@@ -196,9 +196,52 @@ class Customerlist extends MY_Controller
 		    // 不要パラメータ削除
 		    unset($input_post["submit"]) ;
 
+		    // トランザクション・START
+		    $this->db->trans_strict(FALSE);                                 		// StrictモードをOFF
+		    $this->db->trans_start();                                       		// trans_begin
+
 		    // DB書き込み
 		    $this->cm->update_customer($input_post);
 		    $this->smarty->assign('mess',  "更新が完了しました。");
+
+		    // ステータス=「一時停止」「解約」：受注案件情報の更新
+		    if ($input_post['cm_status'] != 0)
+		    {
+
+			    $this->load->model('Project', 'pj', TRUE);
+
+			    // 受注案件情報データの有無チェック
+			    $get_pj_list = $this->pj->get_pj_cm_status($input_post['cm_seq'], $_SESSION['c_memGrp'], 'seorank');
+
+			    if (count($get_pj_list))
+			    {
+
+			    	// 更新
+			    	foreach($get_pj_list as $key => $value)
+			    	{
+
+			    		if ($input_post['cm_status'] == 1)
+			    		{
+			    			$set_pj_data["pj_status"] = 1;
+			    			$set_pj_data["pj_invoice_status"] = 1;
+			    		} else {
+			    			$set_pj_data["pj_status"] = 2;
+			    		}
+			    		$set_pj_data["pj_seq"]    = $value['pj_seq'];
+
+			    		$this->pj->update_project($set_pj_data, $_SESSION['c_memGrp'], 'seorank');
+
+			    	}
+
+			    }
+		    }
+
+		    // トランザクション・COMMIT
+		    $this->db->trans_complete();                                    		// trans_rollback & trans_commit
+		    if ($this->db->trans_status() === FALSE)
+		    {
+		    	log_message('error', 'CLIENT::[Customerlist -> detailchk()]：顧客ステータス「解約」処理 トランザクションエラー');
+		    }
 
     	}
 
@@ -283,6 +326,9 @@ class Customerlist extends MY_Controller
 	    	$_row_id = $this->cm->insert_customer($input_post);
 
     		$this->smarty->assign('mess',  "登録が完了しました。");
+
+    		redirect('/customerlist/');
+
     	}
 
     	$this->smarty->assign('tmp_pref',    $input_post['cm_pref']);
@@ -290,7 +336,6 @@ class Customerlist extends MY_Controller
     	$this->smarty->assign('tmp_memo',    $input_post['cm_memo']);
     	$this->smarty->assign('tmp_memo_iv', $input_post['cm_memo_iv']);
 
-    	//$this->view('customerlist/index.tpl');
     	$this->view('customerlist/add.tpl');
 
     }
@@ -410,6 +455,9 @@ class Customerlist extends MY_Controller
     	$this->config->load('config_comm');
     	$opt_cm_kind = $this->config->item('CUSTOMER_CM_KIND');
 
+    	// 回収サイトのセット
+    	$opt_cm_collect = $this->config->item('CUSTOMER_CM_COLLECT');
+
     	// 顧客情報ID 並び替え選択項目セット
     	$arropt_id = array (
     			''     => '-- 選択してください --',
@@ -417,9 +465,10 @@ class Customerlist extends MY_Controller
     			'ASC'  => '昇順',
     	);
 
-    	$this->smarty->assign('options_cm_status', $opt_cm_status);
-    	$this->smarty->assign('options_cm_kind',   $opt_cm_kind);
-    	$this->smarty->assign('options_orderid',   $arropt_id);
+    	$this->smarty->assign('options_cm_status',  $opt_cm_status);
+    	$this->smarty->assign('options_cm_kind',    $opt_cm_kind);
+    	$this->smarty->assign('options_cm_collect', $opt_cm_collect);
+    	$this->smarty->assign('options_orderid',    $arropt_id);
 
     }
 
@@ -469,9 +518,24 @@ class Customerlist extends MY_Controller
     					'rules'   => 'trim|required|max_length[2]'
     			),
     			array(
+    					'field'   => 'cm_yayoi_cd',
+    					'label'   => '顧客コード',
+    					'rules'   => 'trim|required|max_length[20]'
+    			),
+    			array(
+    					'field'   => 'cm_yayoi_name',
+    					'label'   => '弥生名称',
+    					'rules'   => 'trim|required|max_length[50]'
+    			),
+    			array(
     					'field'   => 'cm_company',
     					'label'   => '会社名',
     					'rules'   => 'trim|required|max_length[50]'
+    			),
+    			array(
+    					'field'   => 'cm_company_kana',
+    					'label'   => '会社名カナ',
+    					'rules'   => 'trim|max_length[50]'
     			),
     			array(
     					'field'   => 'cm_zip01',
@@ -519,6 +583,56 @@ class Customerlist extends MY_Controller
     					'rules'   => 'trim|required|regex_match[/^[0-9\-]+$/]|max_length[15]'
     			),
     			array(
+    					'field'   => 'cm_seturitu',
+    					'label'   => '設立年月日',
+    					'rules'   => 'trim|max_length[20]'
+    			),
+    			array(
+    					'field'   => 'cm_capital',
+    					'label'   => '資本金',
+    					'rules'   => 'trim|max_length[20]'
+    			),
+    			array(
+    					'field'   => 'cm_seturitu',
+    					'label'   => '設立年月日',
+    					'rules'   => 'trim|max_length[20]'
+    			),
+    			array(
+    					'field'   => 'cm_closingdate',
+    					'label'   => '決算日',
+    					'rules'   => 'trim|max_length[20]'
+    			),
+    			array(
+    					'field'   => 'cm_employee',
+    					'label'   => '従業員数',
+    					'rules'   => 'trim|max_length[10]'
+    			),
+    			array(
+    					'field'   => 'cm_collect',
+    					'label'   => '回収サイト',
+    					'rules'   => 'trim|max_length[1]'
+    			),
+    			array(
+    					'field'   => 'cm_credit_chk',
+    					'label'   => '与信チェック日',
+    					'rules'   => 'trim|max_length[20]'
+    			),
+    			array(
+    					'field'   => 'cm_antisocial_chk',
+    					'label'   => '反社チェック日',
+    					'rules'   => 'trim|max_length[20]'
+    			),
+    			array(
+    					'field'   => 'cm_credit_max',
+    					'label'   => '与信限度額',
+    					'rules'   => 'trim|max_length[20]'
+    			),
+    			array(
+    					'field'   => 'cm_trade_no',
+    					'label'   => '取引申請番号',
+    					'rules'   => 'trim|max_length[20]'
+    			),
+    			array(
     					'field'   => 'cm_mail',
     					'label'   => 'メールアドレス',
     					'rules'   => 'trim|required|max_length[100]|valid_email'
@@ -530,7 +644,7 @@ class Customerlist extends MY_Controller
     			),
     			array(
     					'field'   => 'cm_department',
-    					'label'   => '所属部署',
+    					'label'   => '担当所属部署／役職',
     					'rules'   => 'trim|max_length[50]'
     			),
     			array(
@@ -586,7 +700,7 @@ class Customerlist extends MY_Controller
     			array(
     					'field'   => 'cm_account_no',
     					'label'   => '口座番号',
-    					'rules'   => 'trim|required|max_length[10]|is_numeric'
+    					'rules'   => 'trim|max_length[10]|is_numeric'
     			),
     			array(
     					'field'   => 'cm_account_nm',

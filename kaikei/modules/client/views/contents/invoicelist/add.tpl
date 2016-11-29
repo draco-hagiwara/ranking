@@ -213,6 +213,13 @@
     </div>
   </div>
   <div class="form-group">
+    <label for="iv_tag" class="col-md-3 control-label">タグ設定</label>
+    <div class="col-md-8">
+      {form_input('iv_tag' , set_value('iv_tag', {$info.iv_tag}) , 'class="form-control" placeholder="タグを入力してください。max.50文字"')}
+      {if form_error('iv_tag')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_tag')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
     <label for="iv_memo" class="col-sm-3 control-label">メ　　モ</label>
     <div class="col-md-8">
       <textarea class="form-control input-sm" id="iv_memo" name="iv_memo" placeholder="請求書には反映されません。max.1000文字">{$tmp_memo}</textarea>

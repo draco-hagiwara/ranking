@@ -188,6 +188,25 @@ class Customer extends CI_Model
     }
 
     /**
+     * 顧客情報データの件数を取得する
+     *
+     * @param    int
+     * @return   bool
+     */
+    public function get_cm_cnt($cm_status)
+    {
+
+    	$set_where["cm_status"] = $cm_status;
+
+    	$query = $this->db->get_where('mt_customer', $set_where);
+
+    	$customer_count = $query->num_rows();
+
+    	return $customer_count;
+
+    }
+
+    /**
      * クライアント新規会員登録
      *
      * @param    array()

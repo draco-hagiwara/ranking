@@ -196,15 +196,10 @@ class Accountlist extends MY_Controller
 
     	$input_post = $this->input->post();
 
-
-    	print_r($input_post);
-
-
     	// バリデーション・チェック
     	$this->_set_validation04();
     	if ($this->form_validation->run() == TRUE)
     	{
-
 
     		// メールアドレス＆ログインIDの重複チェック
     		$this->load->model('Account', 'ac', TRUE);
@@ -240,13 +235,12 @@ class Accountlist extends MY_Controller
     		}
     	}
 
-//     	redirect('/accountlist/');
-
     	// 初期値セット
-    	$this->_item_set();
+//     	$this->_item_set();
     	//$this->_company_set();
 
-    	$this->view('accountlist/add.tpl');
+    	redirect('/accountlist/');
+//     	$this->view('accountlist/add.tpl');
 
     }
 
