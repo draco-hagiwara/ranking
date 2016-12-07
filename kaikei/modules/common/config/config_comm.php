@@ -7,8 +7,8 @@
 */
 
 // ログインメンバー
-$config['LOGIN_CLIENT']   = 'client';                     // クライアント
-$config['LOGIN_ADMIN']    = 'admin';                      // 管理者
+$config['LOGIN_CLIENT']   = 'client';                               // クライアント
+$config['LOGIN_ADMIN']    = 'admin';                                // 管理者
 
 
 
@@ -25,8 +25,8 @@ array(
 $config['CUSTOMER_CM_COLLECT'] =
 array(
 		""  => " -- 選択してください -- ",
-		"1" => "月末締め当月末",
-		"2" => "月末締め翌月末",
+		"1" => "月末締め当月末",									// 'last day of this months'
+		"2" => "月末締め翌月末",									// 'last day of next months'
 		"3" => "月末締め翌々月10日",
 		"4" => "月末締め翌々月15日",
 		"5" => "月末締め翌々月末",
@@ -40,6 +40,16 @@ array(
 		"0" => "普通",
 		"1" => "当座",
 );
+
+// クライアント 顧客データCSVアップロード
+$config['CUSTOMER_CSV_UPLOAD'] =
+array(
+		"upload_path"   => '../user_data/csv_up/',					// ドキュメントルートからの相対パス
+		"allowed_types" => 'csv',									// 許容するファイルのMIMEタイプを設定
+		"overwrite"     => TRUE,									// ファイルは上書き
+		"max_size"      => '10000',									// 許容する最大ファイルサイズをKB単位で設定
+);
+
 
 
 // 案件：消費税有無
@@ -94,12 +104,17 @@ array(
 		"2" => "ドメイン一致",
 );
 
-// 案件：回収サイクル
-$config['PROJECT_PJ_COLLECT'] =
-array(
-		""  => " -- 選択してください -- ",
-		"0" => "1ヶ月",
-);
+// // 案件：回収サイクル
+// $config['PROJECT_PJ_COLLECT'] =
+// array(
+// 		""  => " -- 選択してください -- ",
+// 		"1" => "月末締め当月末",									// 'last day of this months'
+// 		"2" => "月末締め翌月末",									// 'last day of next months'
+// 		"3" => "月末締め翌々月10日",
+// 		"4" => "月末締め翌々月15日",
+// 		"5" => "月末締め翌々月末",
+// 		"0" => "指定なし",
+// );
 
 // 請求書発行対象企業：ラベンダー固定 >> ac_cl_seq = 2
 $config['PROJECT_CL_SEQ']       = '2';
@@ -140,16 +155,28 @@ array(
 
 
 
+
+// 売上データ 表示方法
+$config['SALES_SA_DISPLINE'] =
+array(
+		"0" => "日別表示",
+		"1" => "金額集計(売上日毎)",
+		"2" => "金額集計(会社毎)",
+		"3" => "金額集計(担当営業毎)",
+);
+
+
+
 // ログイン：管理者クライアントSEQ
 $config['LOGIN_CLIENT_SEQ']       = '1';
 
 
 // ログインロック：失敗回数
-$config['LOGIN_LOCK_CNT']         = '5';									// 回数)
+$config['LOGIN_LOCK_CNT']         = '5';							// 回数
 // ログインロック：制限時間
-$config['LOGIN_LOCK_LIMITTIME']   = '120';									// 「分」指定
+$config['LOGIN_LOCK_LIMITTIME']   = '120';							// 「分」指定
 // ログインロック：解除時間
-$config['LOGIN_LOCK_RELEASETIME'] = '120';									// 「分」指定
+$config['LOGIN_LOCK_RELEASETIME'] = '120';							// 「分」指定
 
 
 
@@ -167,7 +194,7 @@ array(
 
 // Pagination 設定:1ページ当たりの表示件数
 // ※ ～/system/libraries/Pagination.php に不具合あり
-$config['PAGINATION_PER_PAGE'] = '20';
+$config['PAGINATION_PER_PAGE'] = '25';
 
 
 /* End of file config_comm.php */

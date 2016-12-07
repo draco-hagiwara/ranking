@@ -52,6 +52,7 @@ class Customer extends CI_Model
     			  cm_addr01,
     			  cm_addr02,
     			  cm_buil,
+    			  cm_collect,
     			  cm_memo_iv,
     			  cm_flg_iv,
     			  cm_company_iv,
@@ -70,7 +71,8 @@ class Customer extends CI_Model
     			  cm_branch_nm,
     			  cm_kind,
     			  cm_account_no,
-    			  cm_account_nm
+    			  cm_account_nm,
+    			  cm_salesman
     			FROM mt_customer WHERE cm_delflg = 0 AND cm_status = 0 ORDER BY cm_seq ASC';
 
     	// クエリー実行

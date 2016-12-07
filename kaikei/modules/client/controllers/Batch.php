@@ -55,7 +55,7 @@ class Batch extends MY_Controller
 
 
     /**
-     *  DB & PG のシステムバックアップ処理
+     *  日次：DB & PG のシステムバックアップ処理
      */
     private function _system_backup()
     {
@@ -82,7 +82,7 @@ class Batch extends MY_Controller
     }
 
     /**
-     *  セッション情報削除 (一か月前)
+     *  日次：セッション情報削除 (一か月前)
      */
     private function _sess_destroy()
     {
@@ -104,7 +104,7 @@ class Batch extends MY_Controller
     }
 
     /**
-     *  売上データの集計
+     *  日次：売上データの集計
      */
     private function _sales_summary()
     {
@@ -130,9 +130,12 @@ class Batch extends MY_Controller
 
 				$set_sales['sa_sales_date'] = $value['iv_sales_date'];
 				$set_sales['sa_cm_seq']     = $value['iv_cm_seq'];
+				$set_sales['sa_iv_seq']     = $value['iv_seq'];
 				$set_sales['sa_slip_no']    = $value['iv_slip_no'];
 				$set_sales['sa_total']      = $value['iv_total'];
 				$set_sales['sa_company']    = $value['iv_company'];
+				$set_sales['sa_collect']    = $value['iv_collect'];
+				$set_sales['sa_salesman']   = $value['iv_salesman'];
 
 				$this->sa->insert_sales($set_sales);
 			}

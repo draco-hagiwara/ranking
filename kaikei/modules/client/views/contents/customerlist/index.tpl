@@ -103,8 +103,15 @@ function fmSubmit(formName, url, method, num) {
           <td>
             {$cm.cm_mail}<br>{$cm.cm_mailsub}
           </td>
-          <td>
-            <button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/projectlist/add/', 'POST', '{$cm.cm_seq}', 'chg_seq');">受注登録</button>
+          <td class="text-right">
+            {if $cm.cm_status == "0"}
+              <button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/projectlist/add/', 'POST', '{$cm.cm_seq}', 'chg_seq');">受注登録</button>
+              <button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/invo_create/invoice_cm/', 'POST', '{$cm.cm_seq}', 'chg_seq');">請求書作成</button>
+            {else}
+              <button type="button" class="btn btn-default btn-xs" >受注登録</button>
+              <button type="button" class="btn btn-default btn-xs" >請求書作成</button>
+            {/if}
+
             <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/customerlist/detail/', 'POST', '{$cm.cm_seq}', 'chg_seq');">編　集</button>
             <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/customerlist/cp/', 'POST', '{$cm.cm_seq}', 'chg_seq');">コピー</button>
           </td>

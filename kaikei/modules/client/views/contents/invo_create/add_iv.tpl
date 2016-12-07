@@ -11,7 +11,7 @@
 
 <H3><p class="bg-success">　　請求書データ　新規作成</p></H3>
 
-{form_open('invoicelist/addchk/' , 'name="clientForm" class="form-horizontal h-adr"')}
+{form_open('invo_create/add_iv/' , 'name="clientForm" class="form-horizontal h-adr"')}
   {$mess}
   <div class="form-group">
     <label for="iv_status" class="col-sm-3 control-label">ステータス選択<font color=red> *</font></label>
@@ -285,6 +285,7 @@
 
   {form_hidden('iv_cm_seq',  $info.iv_cm_seq)}
   {form_hidden('iv_company', $iv_company)}
+  {form_hidden('iv_salesman', $info.iv_salesman)}
 
 
   <br>

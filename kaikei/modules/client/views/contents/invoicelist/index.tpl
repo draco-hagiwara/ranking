@@ -60,12 +60,7 @@ function fmSubmit(formName, url, method, num) {
         <td class="col-md-2  btn-md">
           {form_dropdown('iv_issue_yymm', $options_date_fix, set_value('iv_issue_yymm', {$seach_iv_issue_yymm}))}
         </td>
-        <td class="col-md-1">○○</td>
-        <td class="col-md-2  btn-md">
-        </td>
-        <td class="col-md-1">■■</td>
-        <td class="col-md-2  btn-md">
-        </td>
+        <td colspan="4" class="col-md-1"></td>
       </tr>
       <tr>
         <td class="col-md-1">ID並び替え</td>
@@ -98,12 +93,12 @@ function fmSubmit(formName, url, method, num) {
   <table class="table table-striped table-hover">
     <thead>
       <tr>
-        <th>請求書NO</th>
         <th>status</th>
-        <th></th>
+        <th>請求書NO</th>
         <th>会 社 名</th>
         <th>請求金額</th>
         <th>発 行 日</th>
+        <th>振込期日</th>
         <th></th>
       </tr>
     </thead>
@@ -113,9 +108,6 @@ function fmSubmit(formName, url, method, num) {
         <tr>
           <td>
             <input type="checkbox" name="invoice{$smarty.foreach.seq.iteration}" id="invoice" value="{$iv.iv_seq}" class="invoice">
-            {$iv.iv_slip_no}
-          </td>
-          <td>
             {if $iv.iv_status == "0"}<font color="#ffffff" style="background-color:royalblue">[ 未発行 ]</font>
             {elseif $iv.iv_status == "1"}<font color="#ffffff" style="background-color:dimgray">[ 発行済 ]</font>
             {elseif $iv.iv_status == "9"}<font color="#ffffff" style="background-color:dimgray">[ ｷｬﾝｾﾙ  ]</font>
@@ -123,7 +115,7 @@ function fmSubmit(formName, url, method, num) {
             {/if}
           </td>
           <td>
-            {$iv.iv_cm_seq}
+            {$iv.iv_slip_no}
           </td>
           <td>
             {$iv.iv_company}
@@ -134,9 +126,12 @@ function fmSubmit(formName, url, method, num) {
           <td>
             {$iv.iv_issue_date}
           </td>
+          <td>
+            {$iv.iv_pay_date}
+          </td>
           <td class="text-right">
-            <button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/invoicelist/new_invoice/', 'POST', '{$iv.iv_seq}', 'chg_seq');">個別作成</button>
-            <button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/invoicelist/historychk/', 'POST', '{$iv.iv_seq}', 'chg_seq');">履　歴</button>
+            <button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/invo_create/invoice_iv/', 'POST', '{$iv.iv_seq}', 'chg_seq');">個別作成</button>
+            <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/invoicelist/historychk/', 'POST', '{$iv.iv_seq}', 'chg_seq');">履　歴</button>
             <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/invoicelist/detail/', 'POST', '{$iv.iv_seq}', 'chg_seq');">編　集</button>
           </td>
         </tr>
@@ -154,7 +149,33 @@ function fmSubmit(formName, url, method, num) {
 
   <input type="checkbox" id="invoice_all" name="invoice_all">
   <label for="invoice_all"> 全てチェック　</label>
-  <button type='submit' class="btn btn-warning btn-xs" name='action' value='pdf'>請求書PDF作成</button>
+  {*<button type='submit' class="btn btn-warning btn-xs" name='action' value='pdf'>請求書PDF作成</button>*}
+
+
+    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#myModal">請求書PDF作成</button>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">請求書PDF　作成</h4>
+        </div>
+        <div class="modal-body">
+          <p>作成しますか。&hellip;</p>
+        </div>
+        <div class="modal-footer">
+          <button type='submit' name='_submit' value='submit' class="btn btn-sm btn-primary">O  K</button>
+          <button type='submit' name='_submit' value='cancel' class="btn btn-sm btn-primary">キャンセル</button>
+          {*<button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>*}
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+
+
+
 
 {form_close()}
 

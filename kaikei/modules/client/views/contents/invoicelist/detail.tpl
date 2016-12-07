@@ -1,7 +1,8 @@
 {* ヘッダー部分　START *}
-    {include file="../header.tpl" head_index="1"}
+  {include file="../header.tpl" head_index="1"}
 
-  <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
+  <link rel="stylesheet" type="text/css" href="{base_url()}../../css/bootstrap-datepicker.min.css">
+  <script type="text/javascript" src="{base_url()}../../js/bootstrap-datepicker.min.js"></script>
 
 <body>
 {* ヘッダー部分　END *}
@@ -14,15 +15,36 @@
 
   {$mess}
   <div class="form-group">
-    <label for="cm_status" class="col-xs-2 col-md-2 control-label">ステータス選択</label>
+    <label for="cm_status" class="col-xs-2 col-md-2 control-label">ステータス選択<font color=red> *</font></label>
     <div class="col-xs-4 col-md-2 btn-lg">
       {form_dropdown('iv_status', $options_iv_status, set_value('iv_status', $info.iv_status))}
+      {if form_error('iv_status')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_status')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
     <label for="iv_slip_no" class="col-xs-2 col-md-2 control-label">請求書NO</label>
     <div class="col-md-8">{$info.iv_slip_no}</div>
   </div>
+
+  {if $info.iv_status==0}
+    <div class="form-group">
+    <label for="iv_issue_date" class="col-xs-2 col-md-2 control-label">発効日指定<font color=red> *</font></label>
+    <div class="col-xs-4 col-md-2">
+      {form_input('iv_issue_date' , set_value('iv_issue_date', {$info.iv_issue_date}) , 'id="mydate1" class="form-control"')}
+      {if form_error('iv_issue_date')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_issue_date')}</font></label>{/if}
+    </div>
+    <div class="col-md-5">
+      <p class="redText"><small>※入力フォーマット（ yyyy/dd/mm　または　yyyy-dd-mm ）</small></p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="iv_pay_date" class="col-xs-2 col-md-2 control-label">振込期日指定<font color=red> *</font></label>
+    <div class="col-xs-4 col-md-2">
+      {form_input('iv_pay_date' , set_value('iv_pay_date', {$info.iv_pay_date}) , 'id="mydate2" class="form-control"')}
+      {if form_error('iv_pay_date')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_pay_date')}</font></label>{/if}
+    </div>
+  </div>
+  {else}
   <div class="form-group">
     <label for="iv_issue_date" class="col-xs-2 col-md-2 control-label">発行日</label>
     <div class="col-md-8">{$info.iv_issue_date}</div>
@@ -31,6 +53,10 @@
     <label for="iv_pay_date" class="col-xs-2 col-md-2 control-label">振込期日</label>
     <div class="col-md-8">{$info.iv_pay_date}</div>
   </div>
+  {form_hidden('iv_issue_date', {$info.iv_issue_date})}
+  {form_hidden('iv_pay_date',   {$info.iv_pay_date})}
+  {/if}
+
   <div class="form-group">
     <label for="iv_pay_date" class="col-xs-2 col-md-2 control-label">送付先住所</label>
     <div class="col-md-8">〒{$info.iv_zip01}-{$info.iv_zip02}</div>
@@ -76,6 +102,7 @@
       </tr>
       {/foreach}
 
+      {if $info.iv_status==0}
       <tr>
         <td class="col-md-7 input-group-sm">
           {form_input('ivd_item0' , set_value('ivd_item0','') , 'class="form-control" placeholder="キーワード文字のみ入力してください。"')}
@@ -112,6 +139,16 @@
           {if form_error('ivd_total1')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_total1')}</font></label>{/if}
         </td>
       </tr>
+      {else}
+        {form_hidden('ivd_item0' , "")}
+        {form_hidden('ivd_qty0'  , "")}
+        {form_hidden('ivd_price0', "")}
+        {form_hidden('ivd_total0', 0)}
+        {form_hidden('ivd_item1' , "")}
+        {form_hidden('ivd_qty1'  , "")}
+        {form_hidden('ivd_price1', "")}
+        {form_hidden('ivd_total1', 0)}
+      {/if}
 
       <tr>
         <td colspan="3" class="input-group-sm text-right">小計</td>
@@ -172,19 +209,40 @@
   </div><!-- /.modal -->
 
 {form_close()}
+
+<script type="text/javascript">
+$('#mydate1').datepicker({
+  format: "yyyy-mm-dd",
+  daysOfWeekHighlighted: "0",
+  todayBtn: "linked",
+  autoclose: true,
+  orientation: "bottom auto",
+  clearBtn: true
+});
+$('#mydate2').datepicker({
+  format: "yyyy-mm-dd",
+  daysOfWeekHighlighted: "0",
+  todayBtn: "linked",
+  autoclose: true,
+  orientation: "bottom auto",
+  clearBtn: true
+});
+</script>
+
 <!-- </form> -->
 
 
 <!-- <form> -->
 
-{form_open('/pdf_create/pdf_one/' , 'name="pdfForm" class="form-horizontal h-adr" target="_blank"')}
+{form_open('/pdf_create/pdf_one/' , 'name="pdfForm" class="form-horizontal h-adr"')}
+{*form_open('/pdf_create/pdf_one/' , 'name="pdfForm" class="form-horizontal h-adr" target="_blank"')*}
 
   {form_hidden('iv_seq', $info.iv_seq)}
 
   <!-- Button trigger modal -->
   {if $info.iv_status!=9}
   <div class="col-sm-2 col-sm-offset-2">
-    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal02">請求書PDF</button>
+    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal02">請求書(PDF)作成</button>
   </div>
   </div>
   {/if}
@@ -201,7 +259,8 @@
         </div>
         <div class="modal-footer">
           <button type='submit' name='submit' value='submit' class="btn btn-sm btn-primary">O  K</button>
-          <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
+          <button type='submit' name='submit' value='cancel' class="btn btn-sm btn-primary">キャンセル</button>
+          {*<button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>*}
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

@@ -67,7 +67,8 @@ class Project extends CI_Model
     			  pj_accounting,
     			  pj_tax_cal,
     			  pj_billing,
-    			  pj_cm_seq
+    			  pj_cm_seq,
+    			  pj_salesman
     			FROM ' . $tb_name
     			. ' WHERE pj_cm_seq = ' . $seq_no . ' AND pj_accounting = ' . $iv_type . ' AND pj_invoice_status = 0  AND pj_status = 0 AND pj_delflg = 0'
     			. ' ORDER BY pj_seq ASC';

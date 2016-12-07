@@ -125,6 +125,41 @@ class Account extends CI_Model
     }
 
     /**
+     * アカウントSEQから担当営業を取得する
+     *
+     * @param    int  : ac_seq
+     * @param    char : 接続先DB
+     * @return   bool
+     */
+    public function get_pj_salesman($seq_no, $db_name='default')
+    {
+
+    	$sql = 'SELECT
+    			  ac_seq,
+    			  ac_status,
+    			  ac_type,
+    			  ac_department,
+    			  ac_name01,
+    			  ac_name02
+    			FROM mt_account WHERE ac_seq = ' . $seq_no;
+
+    	// 接続先DBを選択 ＆ クエリー実行
+    	if ($db_name == 'default')
+    	{
+    		$query = $this->db->query($sql);
+    	} else {
+    		$slave_db = $this->load->database($db_name, TRUE);						// 順位チェックツールDBへ接続
+
+    		$query = $slave_db->query($sql);
+    	}
+
+    	$get_salesman = $query->result('array');
+
+    	return $get_salesman;
+
+    }
+
+    /**
      * アカウントメンバーの取得
      *
      * @param    array() : 検索項目値
@@ -212,8 +247,6 @@ class Account extends CI_Model
 
     	return array($account_list, $account_countall);
     }
-
-
 
     /**
      * 管理者新規会員登録

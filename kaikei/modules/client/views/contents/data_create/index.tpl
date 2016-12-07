@@ -23,7 +23,7 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="iv_issue_date01" class="col-xs-3 col-md-3 control-label">発効日指定<font color=red> *</font></label>
+    <label for="iv_issue_date01" class="col-xs-3 col-md-3 control-label">発行日指定<font color=red> *</font></label>
     <div class="col-xs-4 col-md-2">
       {form_input('iv_issue_date01' , set_value('iv_issue_date01', '') , 'id="mydate1" class="form-control"')}
       {if form_error('iv_issue_date01')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_issue_date01')}</font></label>{/if}
@@ -33,15 +33,9 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="iv_pay_date01" class="col-xs-3 col-md-3 control-label">振込期日指定<font color=red> *</font></label>
-    <div class="col-xs-4 col-md-2">
-      {form_input('iv_pay_date01' , set_value('iv_pay_date01', '') , 'id="mydate2" class="form-control"')}
-      {if form_error('iv_pay_date01')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_pay_date01')}</font></label>{/if}
-    </div>
-  </div>
-  <div class="form-group">
     <div class="col-xs-9 col-md-9 col-sm-offset-3">
-      <p>※毎月データを作成した後に、顧客情報や案件情報を変更しても反映されませんので注意してください。</p>
+      <p class="text-danger">※毎月データを作成した後に、顧客情報や案件情報を変更しても反映されませんので注意してください。</p>
+      <p class="text-danger">※基本毎月一度の使用とします。</p>
     </div>
   </div>
 

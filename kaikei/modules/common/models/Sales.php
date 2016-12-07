@@ -9,7 +9,407 @@ class Sales extends CI_Model
     }
 
     /**
-     * 請求書データ新規登録
+     * 売上データ情報の取得
+     *
+     * @param    array() : 検索項目値
+     * @param    int     : 1ページ当たりの表示件数(LIMIT値)
+     * @param    int     : オフセット値(ページ番号)
+     * @return   array()
+     */
+    public function get_saleslist($get_post, $tmp_per_page, $tmp_offset=0)
+    {
+
+    	// 各SQL項目へセット
+    	// WHERE
+    	$set_select_like["sa_slip_no"]  = $get_post['sa_slip_no'];
+    	$set_select_like["sa_cm_seq"]   = $get_post['sa_cm_seq'];
+    	$set_select_like["sa_company"]  = $get_post['sa_company'];
+    	$set_select_like["sa_salesman"] = $get_post['sa_salesman'];
+
+    	$set_select["sa_collect"]       = $get_post['sa_collect'];
+
+    	$set_between["sa_sales_date01"] = $get_post['sa_sales_date01'];
+    	$set_between["sa_sales_date02"] = $get_post['sa_sales_date02'];
+
+    	// ORDER BY
+    	if ($get_post['orderid'] == 'ASC')
+    	{
+    		$set_orderby["sa_sales_date"] = $get_post['orderid'];
+    	}elseif ($get_post['orderid'] == 'DESC') {
+    		$set_orderby["sa_sales_date"] = $get_post['orderid'];
+    	}else {
+    		$set_orderby["sa_sales_date"] = 'DESC';
+    	}
+    	$set_orderby["sa_cm_seq"] = 'DESC';
+
+    	$set_displine["displine"]       = $get_post['displine'];
+
+    	// 対象クアカウントメンバーの取得
+    	$sales_list = $this->_select_saleslist($set_select, $set_select_like, $set_between, $set_orderby, $set_displine, $tmp_per_page, $tmp_offset);
+
+    	return $sales_list;
+
+    }
+
+    /**
+     * 売上データ情報の取得
+     *
+     * @param    array() : WHERE句項目
+     * @param    array() : WHERE句項目
+     * @param    array() : BETWEEN句項目
+     * @param    array() : ORDER BY句項目
+     * @param    array() : 集計方法
+     * @param    int     : 1ページ当たりの表示件数
+     * @param    int     : オフセット値(ページ番号)
+     * @return   array()
+     */
+    public function _select_saleslist($set_select, $set_select_like, $set_between, $set_orderby, $set_displine, $tmp_per_page, $tmp_offset=0)
+    {
+
+    	switch( $set_displine["displine"] )
+    	{
+    		case 0:		// 通常：日別表示
+    			$sql = 'SELECT
+			    			  sa_seq,
+			    			  sa_sales_date,
+			    			  sa_cm_seq,
+			    			  sa_iv_seq,
+			    			  sa_slip_no,
+			    			  sa_total,
+			    			  sa_company,
+			    			  sa_collect,
+			    			  sa_salesman,
+			    			  sa_status
+			    		FROM tb_sales WHERE sa_status = 0 '
+    			;
+
+    			break;
+    		case 1:		// 金額集計：売上日毎
+
+    			$sql = 'SELECT
+			    			  sa_sales_date,
+    					      SUM(sa_total) as sum_total
+			    		FROM tb_sales WHERE sa_status = 0 '
+    			;
+
+    			break;
+    		case 2:		// 金額集計：会社毎
+
+    			$sql = 'SELECT
+			    			  sa_seq,
+			    			  sa_cm_seq,
+			    			  sa_company,
+			    			  sa_collect,
+			    			  sa_salesman,
+			    			  sa_status,
+    					      SUM(sa_total) as sum_total
+			    		FROM tb_sales WHERE sa_status = 0 '
+    			;
+
+    			break;
+    		case 3:		// 金額集計：担当営業毎
+    			$sql = 'SELECT
+			    			  sa_salesman,
+    					      SUM(sa_total) as sum_total
+    					FROM tb_sales WHERE sa_status = 0 '
+    			;
+
+    			break;
+    		default:
+    	}
+
+
+    	// WHERE文 作成
+    	if ($set_select["sa_collect"] != '')
+    	{
+    		$sql .= ' AND `sa_collect`  = ' . $set_select["sa_collect"];
+    	}
+
+    	// WHERE_LIKE文 作成
+    	foreach ($set_select_like as $key => $val)
+    	{
+    		if (isset($val) && $val != '')
+    		{
+    			$sql .= ' AND ' . $key . ' LIKE \'%' . $this->db->escape_like_str($val) . '%\'';
+    		}
+    	}
+
+    	// BETWEEN文 作成
+		$sql .= ' AND `sa_sales_date` BETWEEN \'' . $set_between["sa_sales_date01"] . '\' AND \'' . $set_between["sa_sales_date02"] . '\'';
+
+
+
+
+
+
+    	switch( $set_displine["displine"] )
+    	{
+    		case 0:		// 通常：日別表示
+
+    			// ORDER BY文 作成
+    			$tmp_firstitem = FALSE;
+    			foreach ($set_orderby as $key => $val)
+    			{
+    				if (isset($val) && $val != '')
+    				{
+    					if ($tmp_firstitem == FALSE)
+    					{
+    						$sql .= ' ORDER BY ' . $key . ' ' . $val;
+    						$tmp_firstitem = TRUE;
+    					} else {
+    						$sql .= ' , ' . $key . ' ' . $val;
+    					}
+    				}
+    			}
+    			if ($tmp_firstitem == FALSE)
+    			{
+    				$sql .= ' ORDER BY sa_cm_seq DESC';								// デフォルト
+    			}
+
+    			break;
+
+    		case 1:		// 金額集計：売上日毎
+
+    			$sql .= ' GROUP BY sa_sales_date';
+
+    			break;
+    		case 2:		// 金額集計：会社毎
+
+    			$sql .= ' GROUP BY sa_cm_seq';
+
+    			break;
+    		case 3:		// 金額集計：担当営業毎
+
+    			$sql .= ' GROUP BY sa_salesman';
+
+    			break;
+    		default:
+    	}
+
+
+
+
+//     	print($sql);
+//     	print("<br><br>");
+
+
+    	// 対象全件数を取得
+    	$query = $this->db->query($sql);
+    	$sales_countall = $query->num_rows();
+
+    	// LIMIT ＆ OFFSET 値をセット
+    	$sql .= ' LIMIT ' . $tmp_per_page . ' OFFSET ' . $tmp_offset;
+
+    	// クエリー実行
+    	$query = $this->db->query($sql);
+    	$sales_list = $query->result('array');
+
+    	return array($sales_list, $sales_countall);
+
+    }
+
+    /**
+     * 売上データ情報の取得
+     *
+     * @param    array() : 検索項目値
+     * @param    int     : 1ページ当たりの表示件数(LIMIT値)
+     * @param    int     : オフセット値(ページ番号)
+     * @return   array()
+     */
+    public function get_dlcsv_query($get_post, $tmp_per_page, $tmp_offset=0)
+    {
+
+    	// 各SQL項目へセット
+    	// WHERE
+    	$set_select_like["sa_slip_no"]  = $get_post['sa_slip_no'];
+    	$set_select_like["sa_cm_seq"]   = $get_post['sa_cm_seq'];
+    	$set_select_like["sa_company"]  = $get_post['sa_company'];
+    	$set_select_like["sa_salesman"] = $get_post['sa_salesman'];
+
+    	$set_select["sa_collect"]       = $get_post['sa_collect'];
+
+    	$set_between["sa_sales_date01"] = $get_post['sa_sales_date01'];
+    	$set_between["sa_sales_date02"] = $get_post['sa_sales_date02'];
+
+    	// ORDER BY
+    	if ($get_post['orderid'] == 'ASC')
+    	{
+    		$set_orderby["sa_sales_date"] = $get_post['orderid'];
+    	}elseif ($get_post['orderid'] == 'DESC') {
+    		$set_orderby["sa_sales_date"] = $get_post['orderid'];
+    	}else {
+    		$set_orderby["sa_sales_date"] = 'DESC';
+    	}
+    	$set_orderby["sa_cm_seq"] = 'DESC';
+
+    	$set_displine["displine"]       = $get_post['displine'];
+
+    	// 対象クアカウントメンバーの取得
+    	$dlcsv_query = $this->_select_dlcsv_query($set_select, $set_select_like, $set_between, $set_orderby, $set_displine, $tmp_per_page, $tmp_offset);
+
+    	return $dlcsv_query;
+
+    }
+
+    /**
+     * 売上データ情報の取得
+     *
+     * @param    array() : WHERE句項目
+     * @param    array() : WHERE句項目
+     * @param    array() : BETWEEN句項目
+     * @param    array() : ORDER BY句項目
+     * @param    array() : 集計方法
+     * @param    int     : 1ページ当たりの表示件数
+     * @param    int     : オフセット値(ページ番号)
+     * @return   array()
+     */
+    public function _select_dlcsv_query($set_select, $set_select_like, $set_between, $set_orderby, $set_displine, $tmp_per_page, $tmp_offset=0)
+    {
+
+    	switch( $set_displine["displine"] )
+    	{
+    		case 0:		// 通常：日別表示
+    			$sql = 'SELECT
+			    			  sa_seq AS `SEQ`,
+			    			  sa_sales_date AS `売上日`,
+			    			  sa_cm_seq AS `会社CD`,
+			    			  sa_company AS `会社名`,
+    						  sa_iv_seq AS `案件CD`,
+			    			  sa_slip_no AS `請求書発行NO`,
+			    			  sa_total AS `売上金額`,
+			    			  sa_collect AS `回収サイト`,
+			    			  sa_salesman AS `担当営業`,
+			    			  sa_status AS `ステータス`
+			    		FROM tb_sales WHERE sa_status = 0 '
+    					;
+
+    					break;
+    		case 1:		// 金額集計：売上日毎
+
+    			$sql = 'SELECT
+			    			  sa_sales_date AS `売上日`,
+    					      SUM(sa_total) as sum_total
+			    		FROM tb_sales WHERE sa_status = 0 '
+    					;
+
+    					break;
+    		case 2:		// 金額集計：会社毎
+
+    			$sql = 'SELECT
+			    			  sa_seq AS `SEQ`,
+			    			  sa_cm_seq AS `会社CD`,
+			    			  sa_company AS `会社名`,
+			    			  sa_collect AS `回収サイト`,
+			    			  sa_salesman AS `担当営業`,
+    					      SUM(sa_total) as sum_total
+			    		FROM tb_sales WHERE sa_status = 0 '
+    					;
+
+    					break;
+    		case 3:		// 金額集計：担当営業毎
+    			$sql = 'SELECT
+			    			  sa_salesman AS `担当営業`,
+    					      SUM(sa_total) as sum_total
+    					FROM tb_sales WHERE sa_status = 0 '
+    					;
+
+    					break;
+    		default:
+    	}
+
+
+    	// WHERE文 作成
+    	if ($set_select["sa_collect"] != '')
+    	{
+    		$sql .= ' AND `sa_collect`  = ' . $set_select["sa_collect"];
+    	}
+
+    	// WHERE_LIKE文 作成
+    	foreach ($set_select_like as $key => $val)
+    	{
+    		if (isset($val) && $val != '')
+    		{
+    			$sql .= ' AND ' . $key . ' LIKE \'%' . $this->db->escape_like_str($val) . '%\'';
+    		}
+    	}
+
+    	// BETWEEN文 作成
+    	$sql .= ' AND `sa_sales_date` BETWEEN \'' . $set_between["sa_sales_date01"] . '\' AND \'' . $set_between["sa_sales_date02"] . '\'';
+
+
+
+
+
+
+    	switch( $set_displine["displine"] )
+    	{
+    		case 0:		// 通常：日別表示
+
+    			// ORDER BY文 作成
+    			$tmp_firstitem = FALSE;
+    			foreach ($set_orderby as $key => $val)
+    			{
+    				if (isset($val) && $val != '')
+    				{
+    					if ($tmp_firstitem == FALSE)
+    					{
+    						$sql .= ' ORDER BY ' . $key . ' ' . $val;
+    						$tmp_firstitem = TRUE;
+    					} else {
+    						$sql .= ' , ' . $key . ' ' . $val;
+    					}
+    				}
+    			}
+    			if ($tmp_firstitem == FALSE)
+    			{
+    				$sql .= ' ORDER BY sa_cm_seq DESC';								// デフォルト
+    			}
+
+    			break;
+
+    		case 1:		// 金額集計：売上日毎
+
+    			$sql .= ' GROUP BY sa_sales_date';
+
+    			break;
+    		case 2:		// 金額集計：会社毎
+
+    			$sql .= ' GROUP BY sa_cm_seq';
+
+    			break;
+    		case 3:		// 金額集計：担当営業毎
+
+    			$sql .= ' GROUP BY sa_salesman';
+
+    			break;
+    		default:
+    	}
+
+
+
+
+    	    	print($sql);
+    	    	print("<br><br>");
+//     	    	exit;
+
+
+//     	// 対象全件数を取得
+//     	$query = $this->db->query($sql);
+//     	$sales_countall = $query->num_rows();
+
+    	// LIMIT ＆ OFFSET 値をセット
+    	$sql .= ' LIMIT ' . $tmp_per_page . ' OFFSET ' . $tmp_offset;
+
+    	// クエリー実行
+    	$query = $this->db->query($sql);
+//     	$sales_list = $query->result('array');
+
+    	return $query;
+
+    }
+
+    /**
+     * 売上データ新規登録
      *
      * @param    array()
      * @return   int
@@ -30,6 +430,30 @@ class Sales extends CI_Model
     	$this->insert_log($set_data);
 
     	return $row_id;
+    }
+
+    /**
+     * 売上データのレコード削除
+     *
+     * @param    int
+     * @return   int
+     */
+    public function delete_sales($iv_seq)
+    {
+
+    	$where = array(
+    			'sa_iv_seq' => $iv_seq
+    	);
+
+    	$result = $this->db->delete('tb_sales', $where);
+    	$_last_sql = $this->db->last_query();
+
+    	// ログ書き込み
+    	$set_data['lg_func']   = 'delete_sales';
+    	$set_data['lg_detail'] = $_last_sql;
+    	$this->insert_log($set_data);
+
+    	return $result;
     }
 
     /**

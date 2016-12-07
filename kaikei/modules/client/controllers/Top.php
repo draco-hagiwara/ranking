@@ -68,7 +68,7 @@ class Top extends MY_Controller
 
     	$_iv_cnt_enable  = $this->iv->get_iv_cnt(0, $_date_ym);
     	$_iv_cnt_pause   = $this->iv->get_iv_cnt(1, $_date_ym);
-    	$_iv_cnt_disable = $this->iv->get_iv_cnt(2, $_date_ym);
+    	$_iv_cnt_disable = $this->iv->get_iv_cnt(9, $_date_ym);
 
     	$this->smarty->assign('iv_date_fix',    $_date_fix);
     	$this->smarty->assign('iv_cnt_enable',  $_iv_cnt_enable);

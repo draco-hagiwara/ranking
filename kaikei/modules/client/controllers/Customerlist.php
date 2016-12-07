@@ -176,6 +176,9 @@ class Customerlist extends MY_Controller
     	// 初期値セット
     	$this->_item_set();
 
+    	// 担当営業セット
+    	$this->_sales_item_set();
+
         $this->view('customerlist/detail.tpl');
 
     }
@@ -248,6 +251,9 @@ class Customerlist extends MY_Controller
     	// 初期値セット
     	$this->_item_set();
 
+    	// 担当営業セット
+    	$this->_sales_item_set();
+
     	// 請求書の別住所有無フラグの判定
     	if (isset($input_post['chkinvoice']))
     	{
@@ -271,6 +277,9 @@ class Customerlist extends MY_Controller
     	// 初期値セット
     	$this->_item_set();
 
+    	// 担当営業セット
+    	$this->_sales_item_set();
+
     	$this->smarty->assign('tmp_pref',    NULL);
     	$this->smarty->assign('tmp_pref_iv', NULL);
     	$this->smarty->assign('tmp_memo',    NULL);
@@ -288,6 +297,9 @@ class Customerlist extends MY_Controller
 
     	// 初期値セット
     	$this->_item_set();
+
+    	// 担当営業セット
+    	$this->_sales_item_set();
 
     	// バリデーション・チェック
     	$this->_set_validation03();
@@ -489,6 +501,26 @@ class Customerlist extends MY_Controller
 
     	$this->smarty->assign('options_cm_status', $opt_cm_status);
         $this->smarty->assign('options_orderid',   $arropt_id);
+
+    }
+
+    // 担当営業セット
+    private function _sales_item_set()
+    {
+
+    	// 請求書発行対象企業
+    	$this->config->load('config_comm');
+    	$opt_cl_seq = $this->config->item('PROJECT_CL_SEQ');
+
+    	$this->load->model('Account', 'ac', TRUE);
+    	$salesman_list = $this->ac->get_salesman($opt_cl_seq, 'seorank');		// 「ラベンダー」固定 : ac_cl_seq = 2
+
+    	foreach ($salesman_list as $key => $val)
+    	{
+    		$opt_cm_salesman[$val['ac_seq']] = $val['ac_name01'] . ' ' . $val['ac_name02'];
+    	}
+
+    	$this->smarty->assign('options_cm_salesman', $opt_cm_salesman);
 
     }
 

@@ -18,6 +18,13 @@
     </div>
   </div>
   <div class="form-group">
+    <label for="cm_salesman" class="col-md-3 control-label">担当営業<font color=red> *</font></label>
+    <div class="col-md-2 btn-lg">
+      {form_dropdown('cm_salesman', $options_cm_salesman, set_value('cm_salesman', ''))}
+      {if form_error('cm_salesman')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_salesman')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
     <label for="cm_yayoi_cd" class="col-xs-3 col-md-3 control-label">顧客コード</label>
     <div class="col-xs-2 col-md-2">
       {form_input('cm_yayoi_cd' , set_value('cm_yayoi_cd', '') , 'class="form-control" placeholder="顧客コードを入力"')}

@@ -37,7 +37,6 @@ class Data_create extends MY_Controller
 
     	$this->view('data_create/index.tpl');
 
-
     }
 
     // 月額請求書データ 手動作成：固定
@@ -47,6 +46,7 @@ class Data_create extends MY_Controller
     	$input_post = $this->input->post();
 
     	$this->load->model('Customer',       'cm',  TRUE);
+    	$this->load->model('Account',        'ac',  TRUE);
     	$this->load->model('Project',        'pj',  TRUE);
     	$this->load->model('Invoice',        'iv',  TRUE);
     	$this->load->model('Invoice_detail', 'ivd', TRUE);
@@ -114,13 +114,45 @@ class Data_create extends MY_Controller
     				$_issue_tax['zeiritsu'] = $this->config->item('INVOICE_TAX');
     				$_issue_tax['zeinuki']  = $this->config->item('INVOICE_TAXOUT');
     				$_issue_tax['hasuu']    = $this->config->item('INVOICE_TAX_CAL');
-
-    				$set_data_iv['iv_tax'] = $this->commoninvoice->cal_tax($_subtotal, $_issue_tax);
-//     				$set_data_iv['iv_tax']            = $this->_tax_calculation($_subtotal);					// 税額
+    				$set_data_iv['iv_tax'] = $this->commoninvoice->cal_tax($_subtotal, $_issue_tax);			// 税額
 
     				$set_data_iv['iv_total']          = $_subtotal + $set_data_iv['iv_tax'];					// 合計
     				$set_data_iv['iv_issue_date']     = $input_post['iv_issue_date01'];							// 発行日
-    				$set_data_iv['iv_pay_date']       = $input_post['iv_pay_date01'];							// 振込期日
+    				$set_data_iv['iv_collect']        = $value['cm_collect'];									// 回収サイト
+
+    				$date = new DateTime($input_post['iv_issue_date01']);
+    				switch( $value['cm_collect'] ){																// 振込期日 ← 発行日基準
+    					case 0:
+    						// 指定なし　→　月末締め翌月末
+    						$set_data_iv['iv_pay_date'] = $date->modify('last day of next months')->format('Y-m-d');
+    						break;
+    					case 1:
+    						// 月末締め当月末
+    						$set_data_iv['iv_pay_date'] = $date->modify('last day of this months')->format('Y-m-d');
+    						break;
+    					case 2:
+    						// 月末締め翌月末
+    						$set_data_iv['iv_pay_date'] = $date->modify('last day of next months')->format('Y-m-d');
+    						break;
+    					case 3:
+    						// 月末締め翌々月10日
+    						$set_data_iv['iv_pay_date'] = $date->modify('+2 months')->format('Y-m-10');
+    						break;
+    					case 4:
+    						// 月末締め翌々月15日
+    						$set_data_iv['iv_pay_date'] = $date->modify('+2 months')->format('Y-m-15');
+    						break;
+    					case 5:
+    						// 月末締め翌々月末
+    						$_date_y = $date->modify('+3 months')->format('Y');
+    						$_date_m = $date->format('m');
+    						$_lastdate = new DateTime(date('Y-m-d', mktime(0, 0, 0, $_date_m, 0 , $_date_y)));
+    						$set_data_iv['iv_pay_date'] = $_lastdate->format('Y-m-d');
+    						break;
+    					default:
+    						// エラー　→　月末締め翌月末
+    						$set_data_iv['iv_pay_date'] = $date->modify('last day of next months')->format('Y-m-d');
+    				}
 
     				if ($value['cm_flg_iv'] == 0)																// 発行先住所
     				{
@@ -158,6 +190,11 @@ class Data_create extends MY_Controller
 
     				$get_iv_data[0]['iv_sales_date']  = NULL;													// 売上日
 
+    				// 担当営業名を取得
+    				$get_salesman = $this->ac->get_pj_salesman($value['cm_salesman'], 'seorank');
+    				$set_data_iv['iv_salesman']       = $get_salesman[0]['ac_name01'] . '　' . $get_salesman[0]['ac_name02'];
+
+
     				// 請求書データ : 既存データ有無のチェック
     				$_new_data = FALSE;
     				$get_iv_data = $this->iv->get_iv_cm_seq($value['cm_seq'], $input_post['iv_issue_yymm']);
@@ -179,14 +216,6 @@ class Data_create extends MY_Controller
     					$_issue_num['issue_re']         = 0;													// 再発行
 
     					$set_data_iv['iv_slip_no']      = $this->commoninvoice->issue_num($_issue_num);
-
-//     					$set_data_iv['iv_slip_no']    = 'LM'
-//     													. $_SESSION['c_memGrp']									// クライアントNO
-//     													. '-' . $value['cm_seq']								// 顧客NO
-//     													. '-' . '1'												// 一括発行=1,個別発行=2
-//     													. 'A'													// 「通常（固定or成果）:A」
-//     													. $set_data_iv['iv_seq_suffix']							// 枝番
-//     													. '-' . $input_post['iv_issue_yymm'];					// 発行年月
 
     					$get_iv_seq = $this->iv->insert_invoice($set_data_iv);
 
@@ -240,6 +269,11 @@ class Data_create extends MY_Controller
 						$set_data_ivd['ivd_qty']            = 1;												// 数量
 						$set_data_ivd['ivd_price']          = $val['pj_billing'];								// 単価
 						$set_data_ivd['ivd_total']          = $val['pj_billing'];								// 金額
+
+						// 担当営業名を取得
+						$set_data_ivd['ivd_pj_salesman']       = $val['pj_salesman'];
+// 						$get_salesman = $this->ac->get_pj_salesman($val['pj_salesman'], 'seorank');
+// 						$set_data_ivd['ivd_salesman']       = $get_salesman[0]['ac_name01'] . '　' . $get_salesman[0]['ac_name02'];
 
 						if ($_new_data == TRUE)
 						{
@@ -424,11 +458,6 @@ class Data_create extends MY_Controller
     			array(
     					'field'   => 'iv_issue_date01',
     					'label'   => '発効日指定',
-    					'rules'   => 'trim|required|regex_match[/^\d{4}\-|\/\d{1,2}\-|\/\d{1,2}+$/]|max_length[10]'
-    			),
-    			array(
-    					'field'   => 'iv_pay_date01',
-    					'label'   => '振込期日指定',
     					'rules'   => 'trim|required|regex_match[/^\d{4}\-|\/\d{1,2}\-|\/\d{1,2}+$/]|max_length[10]'
     			),
     	);

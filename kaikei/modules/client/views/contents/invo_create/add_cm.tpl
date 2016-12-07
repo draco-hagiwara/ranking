@@ -11,7 +11,7 @@
 
 <H3><p class="bg-success">　　請求書データ　新規作成</p></H3>
 
-{form_open('invoicelist/addchk/' , 'name="clientForm" class="form-horizontal h-adr"')}
+{form_open('invo_create/add_cm/' , 'name="clientForm" class="form-horizontal h-adr"')}
   {$mess}
   <div class="form-group">
     <label for="iv_status" class="col-sm-3 control-label">ステータス選択<font color=red> *</font></label>
@@ -30,7 +30,7 @@
   <div class="form-group">
     <label for="iv_issue_yymm" class="col-sm-3 control-label">発行年月選択</label>
     <div class="col-sm-2 input-lg">
-      {form_dropdown('iv_issue_yymm', $options_date_fix, set_value('iv_issue_yymm', {$info.iv_issue_yymm}))}
+      {form_dropdown('iv_issue_yymm', $options_date_fix, set_value('iv_issue_yymm', ''))}
       {if form_error('iv_issue_yymm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_issue_yymm')}</font></label>{/if}
     </div>
   </div>
@@ -54,24 +54,24 @@
   <div class="form-group">
     <label for="iv_collect" class="col-sm-3 control-label">回収サイト</label>
     <div class="col-sm-2 btn-lg">
-      {form_dropdown('iv_collect', $options_iv_collect, set_value('iv_collect', $info.iv_collect))}
+      {form_dropdown('iv_collect', $options_iv_collect, set_value('iv_collect', $info.cm_collect))}
       {if form_error('iv_collect')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_collect')}</font></label>{/if}
     </div>
   </div>
 
   <div class="form-group">
     <label for="iv_company" class="col-md-3 control-label">会社名<font color=red> *</font></label>
-    <div class="col-md-8">{$iv_company}</div>
+    <div class="col-md-8">{$info.cm_company}</div>
   </div>
   <div class="form-group">
     <label for="iv_zip" class="col-xs-3 col-md-3 control-label">郵便番号<font color=red> *</font></label>
     <div class="col-xs-3 col-md-2">
       <span class="p-country-name" style="display:none;">Japan</span>
-      {form_input('iv_zip01' , set_value('iv_zip01', {$info.iv_zip01}) , 'class="form-control p-postal-code" placeholder="郵便番号（3ケタ）"')}
+      {form_input('iv_zip01' , set_value('iv_zip01', {$info.cm_zip01}) , 'class="form-control p-postal-code" placeholder="郵便番号（3ケタ）"')}
       {if form_error('iv_zip01')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_zip01')}</font></label>{/if}
     </div>
     <div class="col-xs-3 col-md-2">
-      {form_input('iv_zip02' , set_value('iv_zip02', {$info.iv_zip02}) , 'class="form-control p-postal-code" placeholder="郵便番号（4ケタ）"')}
+      {form_input('iv_zip02' , set_value('iv_zip02', {$info.cm_zip02}) , 'class="form-control p-postal-code" placeholder="郵便番号（4ケタ）"')}
       {if form_error('iv_zip02')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_zip02')}</font></label>{/if}
     </div>
   </div>
@@ -80,53 +80,53 @@
     <div class="col-xs-3 col-md-2 btn-lg">
         <select name="iv_pref" class="p-region">
             <option value=""> -- 選択してください -- </option>
-            <option value="北海道" {if $info.iv_pref=="北海道"}selected{/if}>北海道</option>
-            <option value="青森県" {if $info.iv_pref=="青森県"}selected{/if}>青森県</option>
-            <option value="岩手県" {if $info.iv_pref=="岩手県"}selected{/if}>岩手県</option>
-            <option value="宮城県" {if $info.iv_pref=="宮城県"}selected{/if}>宮城県</option>
-            <option value="秋田県" {if $info.iv_pref=="秋田県"}selected{/if}>秋田県</option>
-            <option value="山形県" {if $info.iv_pref=="山形県"}selected{/if}>山形県</option>
-            <option value="福島県" {if $info.iv_pref=="福島県"}selected{/if}>福島県</option>
-            <option value="茨城県" {if $info.iv_pref=="茨城県"}selected{/if}>茨城県</option>
-            <option value="栃木県" {if $info.iv_pref=="栃木県"}selected{/if}>栃木県</option>
-            <option value="群馬県" {if $info.iv_pref=="群馬県"}selected{/if}>群馬県</option>
-            <option value="埼玉県" {if $info.iv_pref=="埼玉県"}selected{/if}>埼玉県</option>
-            <option value="千葉県" {if $info.iv_pref=="千葉県"}selected{/if}>千葉県</option>
-            <option value="東京都" {if $info.iv_pref=="東京都"}selected{/if}>東京都</option>
-            <option value="神奈川県" {if $info.iv_pref=="神奈川県"}selected{/if}>神奈川県</option>
-            <option value="新潟県" {if $info.iv_pref=="新潟県"}selected{/if}>新潟県</option>
-            <option value="富山県" {if $info.iv_pref=="富山県"}selected{/if}>富山県</option>
-            <option value="石川県" {if $info.iv_pref=="石川県"}selected{/if}>石川県</option>
-            <option value="福井県" {if $info.iv_pref=="福井県"}selected{/if}>福井県</option>
-            <option value="山梨県" {if $info.iv_pref=="山梨県"}selected{/if}>山梨県</option>
-            <option value="長野県" {if $info.iv_pref=="長野県"}selected{/if}>長野県</option>
-            <option value="岐阜県" {if $info.iv_pref=="岐阜県"}selected{/if}>岐阜県</option>
-            <option value="静岡県" {if $info.iv_pref=="静岡県"}selected{/if}>静岡県</option>
-            <option value="愛知県" {if $info.iv_pref=="愛知県"}selected{/if}>愛知県</option>
-            <option value="三重県" {if $info.iv_pref=="三重県"}selected{/if}>三重県</option>
-            <option value="滋賀県" {if $info.iv_pref=="滋賀県"}selected{/if}>滋賀県</option>
-            <option value="京都府" {if $info.iv_pref=="京都府"}selected{/if}>京都府</option>
-            <option value="大阪府" {if $info.iv_pref=="大阪府"}selected{/if}>大阪府</option>
-            <option value="兵庫県" {if $info.iv_pref=="兵庫県"}selected{/if}>兵庫県</option>
-            <option value="奈良県" {if $info.iv_pref=="奈良県"}selected{/if}>奈良県</option>
-            <option value="和歌山県" {if $info.iv_pref=="和歌山県"}selected{/if}>和歌山県</option>
-            <option value="鳥取県" {if $info.iv_pref=="鳥取県"}selected{/if}>鳥取県</option>
-            <option value="島根県" {if $info.iv_pref=="島根県"}selected{/if}>島根県</option>
-            <option value="岡山県" {if $info.iv_pref=="岡山県"}selected{/if}>岡山県</option>
-            <option value="広島県" {if $info.iv_pref=="広島県"}selected{/if}>広島県</option>
-            <option value="山口県" {if $info.iv_pref=="山口県"}selected{/if}>山口県</option>
-            <option value="徳島県" {if $info.iv_pref=="徳島県"}selected{/if}>徳島県</option>
-            <option value="香川県" {if $info.iv_pref=="香川県"}selected{/if}>香川県</option>
-            <option value="愛媛県" {if $info.iv_pref=="愛媛県"}selected{/if}>愛媛県</option>
-            <option value="高知県" {if $info.iv_pref=="高知県"}selected{/if}>高知県</option>
-            <option value="福岡県" {if $info.iv_pref=="福岡県"}selected{/if}>福岡県</option>
-            <option value="佐賀県" {if $info.iv_pref=="佐賀県"}selected{/if}>佐賀県</option>
-            <option value="長崎県" {if $info.iv_pref=="長崎県"}selected{/if}>長崎県</option>
-            <option value="熊本県" {if $info.iv_pref=="熊本県"}selected{/if}>熊本県</option>
-            <option value="大分県" {if $info.iv_pref=="大分県"}selected{/if}>大分県</option>
-            <option value="宮崎県" {if $info.iv_pref=="宮崎県"}selected{/if}>宮崎県</option>
-            <option value="鹿児島県" {if $info.iv_pref=="鹿児島県"}selected{/if}>鹿児島県</option>
-            <option value="沖縄県" {if $info.iv_pref=="沖縄県"}selected{/if}>沖縄県</option>
+            <option value="北海道" {if $info.cm_pref=="北海道"}selected{/if}>北海道</option>
+            <option value="青森県" {if $info.cm_pref=="青森県"}selected{/if}>青森県</option>
+            <option value="岩手県" {if $info.cm_pref=="岩手県"}selected{/if}>岩手県</option>
+            <option value="宮城県" {if $info.cm_pref=="宮城県"}selected{/if}>宮城県</option>
+            <option value="秋田県" {if $info.cm_pref=="秋田県"}selected{/if}>秋田県</option>
+            <option value="山形県" {if $info.cm_pref=="山形県"}selected{/if}>山形県</option>
+            <option value="福島県" {if $info.cm_pref=="福島県"}selected{/if}>福島県</option>
+            <option value="茨城県" {if $info.cm_pref=="茨城県"}selected{/if}>茨城県</option>
+            <option value="栃木県" {if $info.cm_pref=="栃木県"}selected{/if}>栃木県</option>
+            <option value="群馬県" {if $info.cm_pref=="群馬県"}selected{/if}>群馬県</option>
+            <option value="埼玉県" {if $info.cm_pref=="埼玉県"}selected{/if}>埼玉県</option>
+            <option value="千葉県" {if $info.cm_pref=="千葉県"}selected{/if}>千葉県</option>
+            <option value="東京都" {if $info.cm_pref=="東京都"}selected{/if}>東京都</option>
+            <option value="神奈川県" {if $info.cm_pref=="神奈川県"}selected{/if}>神奈川県</option>
+            <option value="新潟県" {if $info.cm_pref=="新潟県"}selected{/if}>新潟県</option>
+            <option value="富山県" {if $info.cm_pref=="富山県"}selected{/if}>富山県</option>
+            <option value="石川県" {if $info.cm_pref=="石川県"}selected{/if}>石川県</option>
+            <option value="福井県" {if $info.cm_pref=="福井県"}selected{/if}>福井県</option>
+            <option value="山梨県" {if $info.cm_pref=="山梨県"}selected{/if}>山梨県</option>
+            <option value="長野県" {if $info.cm_pref=="長野県"}selected{/if}>長野県</option>
+            <option value="岐阜県" {if $info.cm_pref=="岐阜県"}selected{/if}>岐阜県</option>
+            <option value="静岡県" {if $info.cm_pref=="静岡県"}selected{/if}>静岡県</option>
+            <option value="愛知県" {if $info.cm_pref=="愛知県"}selected{/if}>愛知県</option>
+            <option value="三重県" {if $info.cm_pref=="三重県"}selected{/if}>三重県</option>
+            <option value="滋賀県" {if $info.cm_pref=="滋賀県"}selected{/if}>滋賀県</option>
+            <option value="京都府" {if $info.cm_pref=="京都府"}selected{/if}>京都府</option>
+            <option value="大阪府" {if $info.cm_pref=="大阪府"}selected{/if}>大阪府</option>
+            <option value="兵庫県" {if $info.cm_pref=="兵庫県"}selected{/if}>兵庫県</option>
+            <option value="奈良県" {if $info.cm_pref=="奈良県"}selected{/if}>奈良県</option>
+            <option value="和歌山県" {if $info.cm_pref=="和歌山県"}selected{/if}>和歌山県</option>
+            <option value="鳥取県" {if $info.cm_pref=="鳥取県"}selected{/if}>鳥取県</option>
+            <option value="島根県" {if $info.cm_pref=="島根県"}selected{/if}>島根県</option>
+            <option value="岡山県" {if $info.cm_pref=="岡山県"}selected{/if}>岡山県</option>
+            <option value="広島県" {if $info.cm_pref=="広島県"}selected{/if}>広島県</option>
+            <option value="山口県" {if $info.cm_pref=="山口県"}selected{/if}>山口県</option>
+            <option value="徳島県" {if $info.cm_pref=="徳島県"}selected{/if}>徳島県</option>
+            <option value="香川県" {if $info.cm_pref=="香川県"}selected{/if}>香川県</option>
+            <option value="愛媛県" {if $info.cm_pref=="愛媛県"}selected{/if}>愛媛県</option>
+            <option value="高知県" {if $info.cm_pref=="高知県"}selected{/if}>高知県</option>
+            <option value="福岡県" {if $info.cm_pref=="福岡県"}selected{/if}>福岡県</option>
+            <option value="佐賀県" {if $info.cm_pref=="佐賀県"}selected{/if}>佐賀県</option>
+            <option value="長崎県" {if $info.cm_pref=="長崎県"}selected{/if}>長崎県</option>
+            <option value="熊本県" {if $info.cm_pref=="熊本県"}selected{/if}>熊本県</option>
+            <option value="大分県" {if $info.cm_pref=="大分県"}selected{/if}>大分県</option>
+            <option value="宮崎県" {if $info.cm_pref=="宮崎県"}selected{/if}>宮崎県</option>
+            <option value="鹿児島県" {if $info.cm_pref=="鹿児島県"}selected{/if}>鹿児島県</option>
+            <option value="沖縄県" {if $info.cm_pref=="沖縄県"}selected{/if}>沖縄県</option>
         </select>
       {if form_error('iv_pref')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_pref')}</font></label>{/if}
     </div>
@@ -134,39 +134,39 @@
   <div class="form-group">
     <label for="iv_addr01" class="col-md-3 control-label">市区町村<font color=red> *</font></label>
     <div class="col-md-8">
-      {form_input('iv_addr01' , set_value('iv_addr01', {$info.iv_addr01}) , 'class="form-control p-locality" placeholder="市区町村を入力してください。 max.100文字"')}
+      {form_input('iv_addr01' , set_value('iv_addr01', {$info.cm_addr01}) , 'class="form-control p-locality" placeholder="市区町村を入力してください。 max.100文字"')}
       {if form_error('iv_addr01')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_addr01')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
     <label for="iv_addr02" class="col-md-3 control-label">町名・番地<font color=red> *</font></label>
     <div class="col-md-8">
-      {form_input('iv_addr02' , set_value('iv_addr02', {$info.iv_addr02}) , 'class="form-control p-street-address" placeholder="町名・番地を入力してください。 max.100文字"')}
+      {form_input('iv_addr02' , set_value('iv_addr02', {$info.cm_addr02}) , 'class="form-control p-street-address" placeholder="町名・番地を入力してください。 max.100文字"')}
       {if form_error('iv_addr02')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_addr02')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
     <label for="iv_buil" class="col-md-3 control-label">ビル・マンション名など</label>
     <div class="col-md-8">
-      {form_input('iv_buil' , set_value('iv_buil', {$info.iv_buil}) , 'class="form-control p-extended-address" placeholder="ビル・マンション名などを入力してください。 max.100文字"')}
+      {form_input('iv_buil' , set_value('iv_buil', {$info.cm_buil}) , 'class="form-control p-extended-address" placeholder="ビル・マンション名などを入力してください。 max.100文字"')}
       {if form_error('iv_buil')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_buil')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
     <label for="iv_department" class="col-md-3 control-label">担当所属部署</label>
     <div class="col-md-8">
-      {form_input('iv_department' , set_value('iv_department', {$info.iv_department}) , 'class="form-control" placeholder="所属部署を入力してください。max.50文字"')}
+      {form_input('iv_department' , set_value('iv_department', {$info.cm_department}) , 'class="form-control" placeholder="所属部署を入力してください。max.50文字"')}
       {if form_error('iv_department')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_department')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
     <label for="iv_person" class="col-md-3 control-label">担当者<font color=red> *</font></label>
     <div class="col-md-4">
-      {form_input('iv_person01' , set_value('iv_person01', {$info.iv_person01}) , 'class="form-control" placeholder="担当者姓を入力してください。max.50文字"')}
+      {form_input('iv_person01' , set_value('iv_person01', {$info.cm_person01}) , 'class="form-control" placeholder="担当者姓を入力してください。max.50文字"')}
       {if form_error('iv_person01')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_person01')}</font></label>{/if}
     </div>
     <div class="col-md-4">
-      {form_input('iv_person02' , set_value('iv_person02', {$info.iv_person02}) , 'class="form-control" placeholder="担当者名を入力してください。max.50文字"')}
+      {form_input('iv_person02' , set_value('iv_person02', {$info.cm_person02}) , 'class="form-control" placeholder="担当者名を入力してください。max.50文字"')}
       {if form_error('iv_person02')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_person02')}</font></label>{/if}
     </div>
   </div>
@@ -181,47 +181,47 @@
   <div class="form-group">
     <label for="iv_bank_cd" class="col-xs-3 col-md-3 control-label">銀　　　　行<font color=red> *</font></label>
     <div class="col-xs-2 col-md-2">
-      {form_input('iv_bank_cd' , set_value('iv_bank_cd', {$info.iv_bank_cd}) , 'class="form-control" placeholder="銀行CDを入力してください"')}
+      {form_input('iv_bank_cd' , set_value('iv_bank_cd', {$info.cm_bank_cd}) , 'class="form-control" placeholder="銀行CDを入力してください"')}
       {if form_error('iv_bank_cd')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_bank_cd')}</font></label>{/if}
     </div>
     <div class="col-xs-4 col-md-4">
-      {form_input('iv_bank_nm' , set_value('iv_bank_nm', {$info.iv_bank_nm}) , 'class="form-control" placeholder="銀行名を入力してください"')}
+      {form_input('iv_bank_nm' , set_value('iv_bank_nm', {$info.cm_bank_nm}) , 'class="form-control" placeholder="銀行名を入力してください"')}
       {if form_error('iv_bank_nm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_bank_nm')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
     <label for="iv_branch_cd" class="col-xs-3 col-md-3 control-label">支　　　　店<font color=red> *</font></label>
     <div class="col-xs-2 col-md-2">
-      {form_input('iv_branch_cd' , set_value('iv_branch_cd', {$info.iv_branch_cd}) , 'class="form-control" placeholder="支店CDを入力してください"')}
+      {form_input('iv_branch_cd' , set_value('iv_branch_cd', {$info.cm_branch_cd}) , 'class="form-control" placeholder="支店CDを入力してください"')}
       {if form_error('iv_branch_cd')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_branch_cd')}</font></label>{/if}
     </div>
     <div class="col-xs-4 col-md-4">
-      {form_input('iv_branch_nm' , set_value('iv_branch_nm', {$info.iv_branch_nm}) , 'class="form-control" placeholder="支店名を入力してください"')}
+      {form_input('iv_branch_nm' , set_value('iv_branch_nm', {$info.cm_branch_nm}) , 'class="form-control" placeholder="支店名を入力してください"')}
       {if form_error('iv_branch_nm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_branch_nm')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
     <label for="iv_kind" class="col-sm-3 control-label">口座種別選択<font color=red> *</font></label>
     <div class="col-sm-2 btn-lg">
-      {form_dropdown('iv_kind', $options_iv_kind, set_value('iv_kind', {$info.iv_kind}))}
+      {form_dropdown('iv_kind', $options_iv_kind, set_value('iv_kind', {$info.cm_kind}))}
       {if form_error('iv_kind')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_kind')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
     <label for="iv_account_no" class="col-xs-3 col-md-3 control-label">口　　　　座<font color=red> *</font></label>
     <div class="col-xs-2 col-md-2">
-      {form_input('iv_account_no' , set_value('iv_account_no', {$info.iv_account_no}) , 'class="form-control" placeholder="口座番号を入力してください"')}
+      {form_input('iv_account_no' , set_value('iv_account_no', {$info.cm_account_no}) , 'class="form-control" placeholder="口座番号を入力してください"')}
       {if form_error('iv_account_no')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_account_no')}</font></label>{/if}
     </div>
     <div class="col-xs-4 col-md-4">
-      {form_input('iv_account_nm' , set_value('iv_account_nm', {$info.iv_account_nm}) , 'class="form-control" placeholder="口座名義を入力してください"')}
+      {form_input('iv_account_nm' , set_value('iv_account_nm', {$info.cm_account_nm}) , 'class="form-control" placeholder="口座名義を入力してください"')}
       {if form_error('iv_account_nm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_account_nm')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
     <label for="iv_tag" class="col-md-3 control-label">タグ設定</label>
     <div class="col-md-8">
-      {form_input('iv_tag' , set_value('iv_tag', {$info.iv_tag}) , 'class="form-control" placeholder="タグを入力してください。max.50文字"')}
+      {form_input('iv_tag' , set_value('iv_tag', '') , 'class="form-control" placeholder="タグを入力してください。max.50文字"')}
       {if form_error('iv_tag')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_tag')}</font></label>{/if}
     </div>
   </div>
@@ -283,9 +283,9 @@
     </tbody>
   </table>
 
-  {form_hidden('iv_cm_seq',  $info.iv_cm_seq)}
-  {form_hidden('iv_company', $iv_company)}
-
+  {form_hidden('iv_seq',      $info.cm_seq)}
+  {form_hidden('iv_company',  $info.cm_company)}
+  {form_hidden('iv_salesman', $info.cm_salesman)}
 
   <br>
   <!-- Button trigger modal -->

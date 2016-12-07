@@ -31,86 +31,8 @@ class Pdf_create extends MY_Controller
 
     	$input_post = $this->input->post();
 
-    	$this->load->model('Invoice',        'iv',  TRUE);
-    	$this->load->model('Invoice_detail', 'ivd', TRUE);
-    	$this->load->library('Commoninvoice');
-    	$this->config->load('config_comm');
-
-    	// 請求書データの取得
-    	$get_iv_data = $this->iv->get_iv_seq($input_post['iv_seq']);
-
-    	// 明細データの取得
-    	$get_ivd_data = $this->ivd->get_iv_seq($input_post['iv_seq'], $get_iv_data[0]['iv_issue_yymm'], $get_iv_data[0]['iv_seq_suffix']);
-
-    	// バリデーション・チェック
-    	$this->_set_validation();
-
-
-    	// トランザクション・START
-    	$this->db->trans_strict(FALSE);                                 		// StrictモードをOFF
-    	$this->db->trans_start();                                       		// trans_begin
-
-    	// tb_invoice 更新 + 履歴作成
-    	$_slip_no = $this->_chg_invoice($get_iv_data[0], $get_ivd_data);
-    	$get_iv_data[0]['iv_slip_no'] = $_slip_no;
-
-
-
-
-
-
-
-
-
-    	// 売上データの更新
-
-
-
-
-
-
-
-
-
-
-    	// トランザクション・COMMIT
-    	$this->db->trans_complete();                                    		// trans_rollback & trans_commit
-    	if ($this->db->trans_status() === FALSE)
-    	{
-    		log_message('error', 'CLIENT::[Pdf_create -> pdf_one()]：請求書PDF 個別作成処理 トランザクションエラー');
-    	}
-
-    	// 雛形PDFのパス取得
-    	$this->load->helper('path');
-    	$list_path = '../public/images/pdf/receipt_list.pdf';
-    	$pdflist_path = set_realpath($list_path);
-
-    	// インストールパスを取得 :: /var/www/kaikei
-    	$list_path = '../';
-    	$base_path = set_realpath($list_path);
-
-    	// PDFライブラリ呼出
-    	$this->load->library('pdf');
-    	$this->pdf->pdf_one($get_iv_data[0], $get_ivd_data, $pdflist_path, $base_path);
-
-    	// 初期値セット
-    	$this->_item_set();
-
-    	$this->smarty->assign('info', $get_iv_data[0]);
-    	$this->smarty->assign('infodetail', $get_ivd_data);
-
-    	$this->view('invoicelist/detail.tpl');
-
-    }
-
-    // 請求書一括作成
-    public function pdf_invoice()
-    {
-
-    	// 更新対象データの取得
-    	$input_post = $this->input->post();
-
-    	if (count($input_post) >= 3)
+    	// 「キャンセル」ボタンで更新＆一覧表示！
+    	if ($input_post['submit'] == 'submit')
     	{
 
 	    	$this->load->model('Invoice',        'iv',  TRUE);
@@ -118,57 +40,49 @@ class Pdf_create extends MY_Controller
 	    	$this->load->library('Commoninvoice');
 	    	$this->config->load('config_comm');
 
-	    	// 不要パラメータ削除
-	    	unset($input_post["iv_issue_yymm"]) ;
-	    	unset($input_post["invoice_all"]) ;
-	    	unset($input_post["action"]) ;
+	    	// 請求書データの取得
+	    	$get_iv_data = $this->iv->get_iv_seq($input_post['iv_seq']);
 
-	    	$list_cnt = count($input_post);
-	    	$i = 0;
-	    	foreach ($input_post as $key => $val)
-	    	{
-
-		    	// 請求書データの取得
-		    	$get_iv_data[$i] = $this->iv->get_iv_seq($val);
-
-		    	// 明細データの取得
-		    	$get_ivd_data[$i] = $this->ivd->get_iv_seq($val, $get_iv_data[$i][0]['iv_issue_yymm'], $get_iv_data[$i][0]['iv_seq_suffix']);
-
-		    	// トランザクション・START
-		    	$this->db->trans_strict(FALSE);                                 		// StrictモードをOFF
-		    	$this->db->trans_start();                                       		// trans_begin
-
-		    	// tb_invoice 更新 + 履歴作成
-		    	$_slip_no = $this->_chg_invoice($get_iv_data[$i][0], $get_ivd_data[$i]);
-		    	$get_iv_data[$i][0]['iv_slip_no'] = $_slip_no;
-
-
-
-
-
-
-
-		    	// 売上データの更新
-
-
-
-
-
-
-
-		    	// トランザクション・COMMIT
-		    	$this->db->trans_complete();                                    		// trans_rollback & trans_commit
-		    	if ($this->db->trans_status() === FALSE)
-		    	{
-		    		log_message('error', 'CLIENT::[Pdf_create -> pdf_one()]：請求書PDF 個別作成処理 トランザクションエラー');
-		    	}
-
-				$i++;
-
-	    	}
+	    	// 明細データの取得
+	    	$get_ivd_data = $this->ivd->get_iv_seq($input_post['iv_seq'], $get_iv_data[0]['iv_issue_yymm'], $get_iv_data[0]['iv_seq_suffix']);
 
 	    	// バリデーション・チェック
 	    	$this->_set_validation();
+
+
+	    	// トランザクション・START
+	    	$this->db->trans_strict(FALSE);                                 		// StrictモードをOFF
+	    	$this->db->trans_start();                                       		// trans_begin
+
+	    	// tb_invoice 更新 + 履歴作成
+	    	$_slip_no = $this->_chg_invoice($get_iv_data[0], $get_ivd_data);
+	    	$get_iv_data[0]['iv_slip_no'] = $_slip_no;
+
+
+
+
+
+
+
+
+
+	    	// 売上データの更新
+
+
+
+
+
+
+
+
+
+
+	    	// トランザクション・COMMIT
+	    	$this->db->trans_complete();                                    		// trans_rollback & trans_commit
+	    	if ($this->db->trans_status() === FALSE)
+	    	{
+	    		log_message('error', 'CLIENT::[Pdf_create -> pdf_one()]：請求書PDF 個別作成処理 トランザクションエラー');
+	    	}
 
 	    	// 雛形PDFのパス取得
 	    	$this->load->helper('path');
@@ -181,14 +95,110 @@ class Pdf_create extends MY_Controller
 
 	    	// PDFライブラリ呼出
 	    	$this->load->library('pdf');
-    		$this->pdf->pdf_batch($get_iv_data, $get_ivd_data, $pdflist_path, $base_path, $page_add = TRUE);
+	    	$this->pdf->pdf_one($get_iv_data[0], $get_ivd_data, $pdflist_path, $base_path);
+
+// 	    	// 初期値セット
+// 	    	$this->_item_set();
+
+// 	    	$this->smarty->assign('info', $get_iv_data[0]);
+// 	    	$this->smarty->assign('infodetail', $get_ivd_data);
+
+// 	    	$this->view('invoicelist/detail.tpl');
 
     	} else {
-
     		redirect('/invoicelist/');
-
     	}
 
+    }
+
+    // 請求書一括作成
+    public function pdf_invoice()
+    {
+
+    	// 更新対象データの取得
+    	$input_post = $this->input->post();
+
+    	// 「キャンセル」ボタンで更新＆一覧表示！
+    	if ($input_post['_submit'] == 'submit')
+    	{
+
+	    	if (count($input_post) >= 3)
+	    	{
+
+		    	$this->load->model('Invoice',        'iv',  TRUE);
+		    	$this->load->model('Invoice_detail', 'ivd', TRUE);
+		    	$this->load->library('Commoninvoice');
+		    	$this->config->load('config_comm');
+
+		    	// 不要パラメータ削除
+		    	unset($input_post["iv_issue_yymm"]) ;
+		    	unset($input_post["invoice_all"]) ;
+		    	unset($input_post["_submit"]) ;
+
+		    	$list_cnt = count($input_post);
+		    	$i = 0;
+		    	foreach ($input_post as $key => $val)
+		    	{
+
+			    	// 請求書データの取得
+			    	$get_iv_data[$i] = $this->iv->get_iv_seq($val);
+
+			    	// 明細データの取得
+			    	$get_ivd_data[$i] = $this->ivd->get_iv_seq($val, $get_iv_data[$i][0]['iv_issue_yymm'], $get_iv_data[$i][0]['iv_seq_suffix']);
+
+			    	// トランザクション・START
+			    	$this->db->trans_strict(FALSE);                                 		// StrictモードをOFF
+			    	$this->db->trans_start();                                       		// trans_begin
+
+			    	// tb_invoice 更新 + 履歴作成
+			    	$_slip_no = $this->_chg_invoice($get_iv_data[$i][0], $get_ivd_data[$i]);
+			    	$get_iv_data[$i][0]['iv_slip_no'] = $_slip_no;
+
+
+
+
+
+
+
+			    	// 売上データの更新
+
+
+
+
+
+
+
+			    	// トランザクション・COMMIT
+			    	$this->db->trans_complete();                                    		// trans_rollback & trans_commit
+			    	if ($this->db->trans_status() === FALSE)
+			    	{
+			    		log_message('error', 'CLIENT::[Pdf_create -> pdf_one()]：請求書PDF 個別作成処理 トランザクションエラー');
+			    	}
+
+					$i++;
+
+		    	}
+
+		    	// バリデーション・チェック
+		    	$this->_set_validation();
+
+		    	// 雛形PDFのパス取得
+		    	$this->load->helper('path');
+		    	$list_path = '../public/images/pdf/receipt_list.pdf';
+		    	$pdflist_path = set_realpath($list_path);
+
+		    	// インストールパスを取得 :: /var/www/kaikei
+		    	$list_path = '../';
+		    	$base_path = set_realpath($list_path);
+
+		    	// PDFライブラリ呼出
+		    	$this->load->library('pdf');
+	    		$this->pdf->pdf_batch($get_iv_data, $get_ivd_data, $pdflist_path, $base_path, $page_add = TRUE);
+
+	    	}
+    	}
+
+    	redirect('/invoicelist/');
 
     }
 
@@ -215,12 +225,13 @@ class Pdf_create extends MY_Controller
     	$_issue_num['issue_num']      = $this->config->item('INVOICE_ISSUE_NUM');				// 接頭語
     	$_issue_num['client_no']      = $_SESSION['c_memGrp'];									// クライアントNO
     	$_issue_num['customer_no']    = $set_data_iv['iv_cm_seq'];								// 顧客NO
-    	if ($get_iv_data['iv_method'] == 0)                                          			// 一括発行=1,個別発行=2
-    	{
-    		$_issue_num['issue_class']  = 1;
-    	} else {
-    		$_issue_num['issue_class']  = 2;
-    	}
+    	$_issue_num['issue_class']    = $get_iv_data['iv_method'];                        		// 一括発行=1,個別発行=2
+//     	if ($get_iv_data['iv_method'] == 0)                                          			// 一括発行=1,個別発行=2
+//     	{
+//     		$_issue_num['issue_class']  = 1;
+//     	} else {
+//     		$_issue_num['issue_class']  = 2;
+//     	}
     	if ($get_iv_data['iv_accounting'] == 0)
     	{
     		$_issue_num['issue_accounting'] = 'A';												// 「通常（固定or成果）:A」/「前受取:B」/「赤伝票:C」
