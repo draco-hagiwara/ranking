@@ -3,6 +3,10 @@
 class Accountlist extends MY_Controller
 {
 
+	/*
+	 *  アカウント一覧
+	 */
+
     public function __construct()
     {
         parent::__construct();

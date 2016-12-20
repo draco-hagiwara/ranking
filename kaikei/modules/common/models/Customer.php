@@ -27,7 +27,6 @@ class Customer extends CI_Model
 
     }
 
-
     /**
      * 「有効」：顧客情報の取得
      *
@@ -205,6 +204,30 @@ class Customer extends CI_Model
     	$customer_count = $query->num_rows();
 
     	return $customer_count;
+
+    }
+
+    /**
+     * 口座名義カナの重複チェック
+     *
+     * @param    int
+     * @return   bool
+     */
+    public function get_cm_account_nm($account_nm, $cm_seq=NULL)
+    {
+
+    	if ($cm_seq == NULL)
+    	{
+    		$set_where["cm_account_nm"] = $account_nm;
+    	} else {
+    		$set_where = '`cm_seq` <> ' . $cm_seq . ' AND `cm_account_nm` = \'' . $account_nm . '\'';
+    	}
+
+    	$query = $this->db->get_where('mt_customer', $set_where);
+
+    	$account_nm_count = $query->num_rows();
+
+    	return $account_nm_count;
 
     }
 

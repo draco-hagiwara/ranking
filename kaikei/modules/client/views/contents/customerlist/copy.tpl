@@ -12,20 +12,26 @@
 
   {$mess}
   <div class="form-group">
-    <label for="cm_status" class="col-xs-3 col-md-3 control-label">ステータス選択</label>
+    <label for="cm_status" class="col-xs-3 col-md-3 control-label">ステータス選択<font color=red> *</font></label>
     <div class="col-xs-4 col-md-2 btn-lg">
       {form_dropdown('cm_status', $options_cm_status, set_value('cm_status', $info.cm_status))}
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_yayoi_cd" class="col-xs-3 col-md-3 control-label">顧客コード</label>
+    <label for="cm_salesman" class="col-xs-3 col-md-3 control-label">担当営業<font color=red> *</font></label>
+    <div class="col-xs-4 col-md-2 btn-lg">
+      {form_dropdown('cm_salesman', $options_cm_salesman, set_value('cm_salesman', $info.cm_salesman))}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_yayoi_cd" class="col-xs-3 col-md-3 control-label">顧客コード<font color=red> *</font></label>
     <div class="col-xs-2 col-md-2">
       {form_input('cm_yayoi_cd' , set_value('cm_yayoi_cd', $info.cm_yayoi_cd) , 'class="form-control" placeholder="顧客コードを入力"')}
       {if form_error('cm_yayoi_cd')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_yayoi_cd')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_yayoi_name" class="col-md-3 control-label">弥生名称</label>
+    <label for="cm_yayoi_name" class="col-md-3 control-label">弥生名称<font color=red> *</font></label>
     <div class="col-md-8">
       {form_input('cm_yayoi_name' , set_value('cm_yayoi_name', $info.cm_yayoi_name) , 'class="form-control" placeholder="弥生名称を入力してください。max.50文字"')}
       {if form_error('cm_yayoi_name')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_yayoi_name')}</font></label>{/if}
@@ -305,16 +311,16 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_account_no" class="col-xs-3 col-md-3 control-label">口座番号<font color=red> *</font></label>
+    <label for="cm_account_no" class="col-xs-3 col-md-3 control-label">口座番号</label>
     <div class="col-xs-4 col-md-4">
       {form_input('cm_account_no' , set_value('cm_account_no', $info.cm_account_no) , 'class="form-control" placeholder="口座番号を入力"')}
       {if form_error('cm_account_no')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_account_no')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_account_nm" class="col-xs-3 col-md-3 control-label">口座名義<font color=red> *</font></label>
+    <label for="cm_account_nm" class="col-xs-3 col-md-3 control-label">口座名義(半角カナ)<font color=red> *</font></label>
     <div class="col-xs-4 col-md-4">
-      {form_input('cm_account_nm' , set_value('cm_account_nm', $info.cm_account_nm) , 'class="form-control" placeholder="口座名義を入力してください"')}
+      {form_input('cm_account_nm' , set_value('cm_account_nm', $info.cm_account_nm) , 'class="form-control" placeholder="口座名義(半角カナ)を入力してください"')}
       {if form_error('cm_account_nm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_account_nm')}</font></label>{/if}
     </div>
   </div>

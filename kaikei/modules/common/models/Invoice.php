@@ -90,6 +90,7 @@ class Invoice extends CI_Model
     		$set_orderby["iv_cm_seq"]     = $get_post['orderid'];
     	}else {
     		$set_orderby["iv_issue_date"] = 'DESC';
+    		$set_orderby["iv_status"]     = 'ASC';
     		$set_orderby["iv_cm_seq"]     = 'DESC';
     	}
 
@@ -169,7 +170,7 @@ class Invoice extends CI_Model
     	}
     	if ($tmp_firstitem == FALSE)
     	{
-    		$sql .= ' ORDER BY iv_issue_date , iv_seq DESC';						// デフォルト
+    		$sql .= ' ORDER BY iv_issue_date DESC, iv_status ASC, iv_seq DESC';						// デフォルト
     	}
 
     	// 対象全件数を取得
@@ -266,13 +267,6 @@ class Invoice extends CI_Model
 					T1.iv_buil,
 					T1.iv_remark,
 					T1.iv_memo,
-					T1.iv_bank_cd,
-					T1.iv_bank_nm,
-					T1.iv_branch_cd,
-					T1.iv_branch_nm,
-					T1.iv_kind,
-					T1.iv_account_no,
-					T1.iv_account_nm,
 					T1.iv_create_date
 
 					from tb_invoice_h AS T1
@@ -280,6 +274,13 @@ class Invoice extends CI_Model
 					  ORDER BY T1.iv_seq_suffix DESC
 				';
 
+					//T1.iv_bank_cd,
+					//T1.iv_bank_nm,
+					//T1.iv_branch_cd,
+					//T1.iv_branch_nm,
+					//T1.iv_kind,
+					//T1.iv_account_no,
+					//T1.iv_account_nm,
 // 		    		from tb_invoice_h AS T1
 // 		    			LEFT JOIN tb_invoice_detail_h AS T2 ON T1.iv_seq = T2.ivd_iv_seq AND T1.iv_seq_suffix = T2.ivd_seq_suffix
 // 		    		WHERE T1.iv_seq = ? AND T1.iv_issue_yymm = ?
@@ -347,6 +348,26 @@ class Invoice extends CI_Model
     }
 
     /**
+     * 日付範囲指定時の請求書情報データを取得する
+     *
+     * @param    date
+     * @param    date
+     * @return   array
+     */
+    public function get_iv_sales2($sasles_date1, $sasles_date2)
+    {
+
+    	$set_where = '`iv_status` = 1 AND `iv_sales_date` BETWEEN \'' . $sasles_date1 . '\' AND \'' . $sasles_date2 . '\' ORDER BY iv_cm_seq ASC';
+
+    	$query = $this->db->get_where('tb_invoice', $set_where);
+
+    	$get_data = $query->result('array');
+
+    	return $get_data;
+
+    }
+
+    /**
      * 請求書データ新規登録
      *
      * @param    array()
@@ -381,15 +402,15 @@ class Invoice extends CI_Model
 
     	// データ追加
     	$query = $this->db->insert('tb_invoice_h', $setdata);
-    	$_last_sql = $this->db->last_query();
+//     	$_last_sql = $this->db->last_query();
 
     	// 挿入した ID 番号を取得
     	$row_id = $this->db->insert_id();
 
-    	// ログ書き込み
-    	$set_data['lg_func']   = 'insert_invoice_history';
-    	$set_data['lg_detail'] = 'iv_seq = ' . $row_id . ' <= ' . $_last_sql;
-    	$this->insert_log($set_data);
+//     	// ログ書き込み
+//     	$set_data['lg_func']   = 'insert_invoice_history';
+//     	$set_data['lg_detail'] = 'iv_seq = ' . $row_id . ' <= ' . $_last_sql;
+//     	$this->insert_log($set_data);
 
     	return $row_id;
     }
@@ -411,8 +432,8 @@ class Invoice extends CI_Model
     	$_last_sql = $this->db->last_query();
 
     	// ログ書き込み
-    	$set_data['lg_func']      = 'update_invoice';
-    	$set_data['lg_detail']    = 'iv_seq = ' . $setdata['iv_seq'] . ' <= ' . $_last_sql;
+    	$set_data['lg_func']   = 'update_invoice';
+    	$set_data['lg_detail'] = 'iv_seq = ' . $setdata['iv_seq'] . ' <= ' . $_last_sql;
     	$this->insert_log($set_data);
 
     	return $result;
@@ -429,11 +450,11 @@ class Invoice extends CI_Model
     {
 
         if (isset($_SESSION['a_memSeq'])) {
-    		$setData['lg_user_id']   = $_SESSION['a_memSeq'];
+    		$setData['lg_user_id'] = $_SESSION['a_memSeq'];
     	} elseif (isset($_SESSION['c_memSeq'])) {
-    		$setData['lg_user_id']   = $_SESSION['c_memSeq'];
+    		$setData['lg_user_id'] = $_SESSION['c_memSeq'];
     	} else {
-    		$setData['lg_user_id']   = "";
+    		$setData['lg_user_id'] = "";
     	}
 
     	$setData['lg_type'] = 'Invoice.php';

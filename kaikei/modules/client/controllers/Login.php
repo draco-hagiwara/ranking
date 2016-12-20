@@ -6,6 +6,7 @@ class Login extends MY_Controller
     /*
      * ADMIN管理者 LOGINページ
     */
+
     public function __construct()
     {
         parent::__construct();

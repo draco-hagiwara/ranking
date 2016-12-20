@@ -90,7 +90,7 @@ function fmSubmit(formName, url, method, num) {
           <td>
             {if $cm.cm_status == "0"}<font color="#ffffff" style="background-color:royalblue">[ 有効 ]</font>
             {elseif $cm.cm_status == "1"}<font color="#ffffff" style="background-color:gray">[ 停止 ]</font>
-            {elseif $cm.cm_status == "2"}<font color="#ffffff" style="background-color:gray">[ 無効 ]</font>
+            {elseif $cm.cm_status == "2"}<font color="#ffffff" style="background-color:gray">[ 解約 ]</font>
             {else}エラー
             {/if}
           </td>
@@ -109,11 +109,11 @@ function fmSubmit(formName, url, method, num) {
               <button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/invo_create/invoice_cm/', 'POST', '{$cm.cm_seq}', 'chg_seq');">請求書作成</button>
             {else}
               <button type="button" class="btn btn-default btn-xs" >受注登録</button>
-              <button type="button" class="btn btn-default btn-xs" >請求書作成</button>
+              <button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/invo_create/invoice_cm/', 'POST', '{$cm.cm_seq}', 'chg_seq');">請求書作成</button>
             {/if}
 
             <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/customerlist/detail/', 'POST', '{$cm.cm_seq}', 'chg_seq');">編　集</button>
-            <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/customerlist/cp/', 'POST', '{$cm.cm_seq}', 'chg_seq');">コピー</button>
+            {*<button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/customerlist/cp/', 'POST', '{$cm.cm_seq}', 'chg_seq');">コピー</button>*}
           </td>
         </tr>
       </tbody>

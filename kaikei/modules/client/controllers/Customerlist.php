@@ -3,6 +3,10 @@
 class Customerlist extends MY_Controller
 {
 
+	/*
+	 *  顧客情報処理
+	 */
+
     public function __construct()
     {
         parent::__construct();
@@ -194,58 +198,65 @@ class Customerlist extends MY_Controller
     	if ($this->form_validation->run() == TRUE)
     	{
 
-    		$this->load->model('Customer', 'cm', TRUE);
+ 		$this->load->model('Customer', 'cm', TRUE);
 
-		    // 不要パラメータ削除
-		    unset($input_post["submit"]) ;
+ 		// 口座名義カナの重複チェック
+ 		$_account_cnt = $this->cm->get_cm_account_nm($input_post['cm_account_nm'], $input_post['cm_seq']);
+ 		if ($_account_cnt == 0)
+ 		{
 
-		    // トランザクション・START
-		    $this->db->trans_strict(FALSE);                                 		// StrictモードをOFF
-		    $this->db->trans_start();                                       		// trans_begin
+			// 不要パラメータ削除
+			unset($input_post["submit"]) ;
 
-		    // DB書き込み
-		    $this->cm->update_customer($input_post);
-		    $this->smarty->assign('mess',  "更新が完了しました。");
+			// トランザクション・START
+			$this->db->trans_strict(FALSE);                                 		// StrictモードをOFF
+			$this->db->trans_start();                                       		// trans_begin
 
-		    // ステータス=「一時停止」「解約」：受注案件情報の更新
-		    if ($input_post['cm_status'] != 0)
-		    {
+			// DB書き込み
+			$this->cm->update_customer($input_post);
+			$this->smarty->assign('mess',  "更新が完了しました。");
 
-			    $this->load->model('Project', 'pj', TRUE);
+			// ステータス=「一時停止」「解約」：受注案件情報の更新
+			if ($input_post['cm_status'] != 0)
+			{
 
-			    // 受注案件情報データの有無チェック
-			    $get_pj_list = $this->pj->get_pj_cm_status($input_post['cm_seq'], $_SESSION['c_memGrp'], 'seorank');
+				$this->load->model('Project', 'pj', TRUE);
 
-			    if (count($get_pj_list))
-			    {
+				// 受注案件情報データの有無チェック
+				$get_pj_list = $this->pj->get_pj_cm_status($input_post['cm_seq'], $_SESSION['c_memGrp'], 'seorank');
 
-			    	// 更新
-			    	foreach($get_pj_list as $key => $value)
-			    	{
+				if (count($get_pj_list))
+				{
 
-			    		if ($input_post['cm_status'] == 1)
-			    		{
-			    			$set_pj_data["pj_status"] = 1;
-			    			$set_pj_data["pj_invoice_status"] = 1;
-			    		} else {
-			    			$set_pj_data["pj_status"] = 2;
-			    		}
-			    		$set_pj_data["pj_seq"]    = $value['pj_seq'];
+					// 更新
+				    foreach($get_pj_list as $key => $value)
+				    {
 
-			    		$this->pj->update_project($set_pj_data, $_SESSION['c_memGrp'], 'seorank');
+				    	if ($input_post['cm_status'] == 1)
+				    	{
+				    		$set_pj_data["pj_status"] = 1;
+				    		$set_pj_data["pj_invoice_status"] = 1;
+				    	} else {
+				    		$set_pj_data["pj_status"] = 2;
+				    	}
+				    	$set_pj_data["pj_seq"]    = $value['pj_seq'];
 
-			    	}
+				    	$this->pj->update_project($set_pj_data, $_SESSION['c_memGrp'], 'seorank');
 
-			    }
-		    }
+				    }
+				}
+			}
 
-		    // トランザクション・COMMIT
-		    $this->db->trans_complete();                                    		// trans_rollback & trans_commit
-		    if ($this->db->trans_status() === FALSE)
-		    {
-		    	log_message('error', 'CLIENT::[Customerlist -> detailchk()]：顧客ステータス「解約」処理 トランザクションエラー');
-		    }
+			// トランザクション・COMMIT
+			$this->db->trans_complete();                                    		// trans_rollback & trans_commit
+			if ($this->db->trans_status() === FALSE)
+			{
+				log_message('error', 'CLIENT::[Customerlist -> detailchk()]：顧客ステータス「解約」処理 トランザクションエラー');
+			}
 
+ 		} else {
+ 			$this->smarty->assign('mess',  "<font color=red>口座名義カナ は既に登録されています。</font>");
+ 		}
     	}
 
     	// 初期値セット
@@ -331,16 +342,22 @@ class Customerlist extends MY_Controller
 
     		$this->load->model('Customer', 'cm', TRUE);
 
-	    	// 不要パラメータ削除
-	    	unset($input_post["_submit"]) ;
+    		// 口座名義カナの重複チェック
+    		$_account_cnt = $this->cm->get_cm_account_nm($input_post['cm_account_nm']);
+    		if ($_account_cnt == 0)
+    		{
+		    	// 不要パラメータ削除
+		    	unset($input_post["_submit"]) ;
 
-	    	// DB書き込み
-	    	$_row_id = $this->cm->insert_customer($input_post);
+		    	// DB書き込み
+		    	$_row_id = $this->cm->insert_customer($input_post);
 
-    		$this->smarty->assign('mess',  "登録が完了しました。");
+	    		$this->smarty->assign('mess',  "登録が完了しました。");
 
-    		redirect('/customerlist/');
-
+	    		redirect('/customerlist/');
+    		} else {
+    			$this->smarty->assign('mess',  "<font color=red>口座名義カナ は既に登録されています。</font>");
+    		}
     	}
 
     	$this->smarty->assign('tmp_pref',    $input_post['cm_pref']);
@@ -370,6 +387,9 @@ class Customerlist extends MY_Controller
     	// 初期値セット
     	$this->_item_set();
 
+    	// 担当営業セット
+    	$this->_sales_item_set();
+
     	$this->view('customerlist/copy.tpl');
 
     }
@@ -382,6 +402,9 @@ class Customerlist extends MY_Controller
 
     	// 初期値セット
     	$this->_item_set();
+
+    	// 担当営業セット
+    	$this->_sales_item_set();
 
     	// バリデーション・チェック
     	$this->_set_validation03();
@@ -737,7 +760,7 @@ class Customerlist extends MY_Controller
     			array(
     					'field'   => 'cm_account_nm',
     					'label'   => '口座名義',
-    					'rules'   => 'trim|required|max_length[50]'
+    					'rules'   => 'trim|required|max_length[48]|single_katakana'
     			),
     			array(
     					'field'   => 'cm_memo',
@@ -815,9 +838,24 @@ class Customerlist extends MY_Controller
     					'rules'   => 'trim|required|max_length[2]'
     			),
     			array(
+    					'field'   => 'cm_yayoi_cd',
+    					'label'   => '顧客コード',
+    					'rules'   => 'trim|required|max_length[20]'
+    			),
+    			array(
+    					'field'   => 'cm_yayoi_name',
+    					'label'   => '弥生名称',
+    					'rules'   => 'trim|required|max_length[50]'
+    			),
+    			array(
     					'field'   => 'cm_company',
     					'label'   => '会社名',
     					'rules'   => 'trim|required|max_length[50]'
+    			),
+    			array(
+    					'field'   => 'cm_company_kana',
+    					'label'   => '会社名カナ',
+    					'rules'   => 'trim|max_length[50]'
     			),
     			array(
     					'field'   => 'cm_zip01',
@@ -932,12 +970,12 @@ class Customerlist extends MY_Controller
     			array(
     					'field'   => 'cm_account_no',
     					'label'   => '口座番号',
-    					'rules'   => 'trim|required|max_length[10]|is_numeric'
+    					'rules'   => 'trim|max_length[10]|is_numeric'
     			),
     			array(
     					'field'   => 'cm_account_nm',
     					'label'   => '口座名義',
-    					'rules'   => 'trim|required|max_length[50]'
+    					'rules'   => 'trim|required|max_length[48]|single_katakana'
     			),
     			array(
     					'field'   => 'cm_memo',

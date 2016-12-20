@@ -3,6 +3,13 @@
 class System extends MY_Controller
 {
 
+	/*
+	 *  システム関連
+	 *
+	 *    > DB & System バックアップ
+	 *    > セッション情報削除
+	 */
+
     public function __construct()
     {
         parent::__construct();

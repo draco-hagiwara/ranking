@@ -41,7 +41,7 @@ class Commoninvoice
 
 		$zeigaku = $_subtotal * $_issue_tax['zeiritsu'];
 
-		if ($_issue_tax['zeinuki'] == 0)														// 税抜計算
+		if ($_issue_tax['zeinuki'] == 0)										// 税抜計算
 		{
 			// 端数計算
 			switch( $_issue_tax['hasuu'] )
@@ -76,19 +76,5 @@ class Commoninvoice
 		return $result;
 
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

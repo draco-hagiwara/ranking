@@ -47,12 +47,15 @@
     <div class="col-md-8 col-md-offset-2">{$list.iv_department}</div><br>
     <div class="col-md-8 col-md-offset-2">{$list.iv_person01} {$list.iv_person02}</div>
   </div>
+
+{*
   <div class="row">
     <label for="iv_bank_cd" class="col-xs-2 col-md-2 control-label">銀行情報</label>
     <div class="col-md-8">（{$list.iv_bank_cd}）{$list.iv_bank_nm}</div>
     <div class="col-md-8">（{$list.iv_branch_cd}）{$list.iv_branch_nm}</div>
     <div class="col-md-8 col-md-offset-2">（{$list.iv_account_no}）{$list.iv_account_nm}</div>
   </div>
+*}
 
 
 <hr>

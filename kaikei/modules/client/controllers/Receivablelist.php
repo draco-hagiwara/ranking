@@ -1,6 +1,6 @@
 <?php
 
-class Saleslist extends MY_Controller
+class Receivablelist extends MY_Controller
 {
 
 	/*
@@ -26,9 +26,6 @@ class Saleslist extends MY_Controller
 
             redirect('/login/');
         }
-
-        $this->smarty->assign('mess', FALSE);
-
     }
 
     // 売上データ一覧TOP
@@ -61,28 +58,28 @@ class Saleslist extends MY_Controller
             $_date_ymd = $date->modify('first day of this months')->format('Y-m-d');
 
 			$tmp_inputpost = array(
-								'sa_slip_no'      => '',
-								'sa_cm_seq'       => '',
-								'sa_company'      => '',
-								'sa_salesman'     => '',
-								'sa_sales_date01' => $_date_ymd,
-								'sa_sales_date02' => '',
-								'sa_collect'      => '',
-								'displine'        => 0,
-								'orderid'         => '',
+								'rv_cm_seq'        => '',
+								'rv_company'       => '',
+								'rv_salesman'      => '',
+								'rv_total01'       => '',
+								'rv_total02'       => '',
+								'rv_create_date01' => $_date_ymd,
+								'rv_create_date02' => '',
+								'displine'         => 0,
+								'orderid'          => '',
 			);
 
 			// セッションをフラッシュデータとして保存
 			$data = array(
-								'c_sa_slip_no'      => '',
-								'c_sa_cm_seq'       => '',
-								'c_sa_company'      => '',
-								'c_sa_salesman'     => '',
-								'c_sa_sales_date01' => $_date_ymd,
-								'c_sa_sales_date02' => '',
-								'c_sa_collect'      => '',
-								'c_displine'        => 0,
-								'c_orderid'         => '',
+								'c_rv_cm_seq'        => '',
+								'c_rv_company'       => '',
+								'c_rv_salesman'      => '',
+								'c_rv_total01'       => '',
+								'c_rv_total02'       => '',
+								'c_rv_create_date01' => $_date_ymd,
+								'c_rv_create_date02' => '',
+								'c_displine'         => 0,
+								'c_orderid'          => '',
 			);
 			$this->session->set_userdata($data);
         }
@@ -92,23 +89,23 @@ class Saleslist extends MY_Controller
         // Pagination 設定
         $set_pagination = $this->_get_Pagination(0, $tmp_per_page);
 
-        // 初期値セット
+        // 検索項目 初期値セット
         $this->_search_set();
 
         $this->smarty->assign('set_pagination', $set_pagination['page_link']);
         $this->smarty->assign('countall', 0);
 
-        $this->smarty->assign('seach_sa_slip_no',      $tmp_inputpost['sa_slip_no']);
-        $this->smarty->assign('seach_sa_cm_seq',       $tmp_inputpost['sa_cm_seq']);
-        $this->smarty->assign('seach_sa_company',      $tmp_inputpost['sa_company']);
-        $this->smarty->assign('seach_sa_salesman',     $tmp_inputpost['sa_salesman']);
-        $this->smarty->assign('seach_sa_sales_date01', $tmp_inputpost['sa_sales_date01']);
-        $this->smarty->assign('seach_sa_sales_date02', $tmp_inputpost['sa_sales_date02']);
-        $this->smarty->assign('seach_sa_collect',      $tmp_inputpost['sa_collect']);
-        $this->smarty->assign('seach_displine',        $tmp_inputpost['displine']);
-        $this->smarty->assign('seach_orderid',         $tmp_inputpost['orderid']);
+        $this->smarty->assign('seach_rv_cm_seq',        $tmp_inputpost['rv_cm_seq']);
+        $this->smarty->assign('seach_rv_company',       $tmp_inputpost['rv_company']);
+        $this->smarty->assign('seach_rv_salesman',      $tmp_inputpost['rv_salesman']);
+        $this->smarty->assign('seach_rv_total01',       $tmp_inputpost['rv_total01']);
+        $this->smarty->assign('seach_rv_total02',       $tmp_inputpost['rv_total02']);
+        $this->smarty->assign('seach_rv_create_date01', $tmp_inputpost['rv_create_date01']);
+        $this->smarty->assign('seach_rv_create_date02', $tmp_inputpost['rv_create_date02']);
+        $this->smarty->assign('seach_displine',         $tmp_inputpost['displine']);
+        $this->smarty->assign('seach_orderid',          $tmp_inputpost['orderid']);
 
-        $this->view('saleslist/index.tpl');
+        $this->view('receivablelist/index.tpl');
 
     }
 
@@ -133,8 +130,8 @@ class Saleslist extends MY_Controller
         		// Pagination 設定
         		$set_pagination = $this->_get_Pagination(0, 0);
 
-        		$input_post['sa_sales_date01'] = $this->input->post('sa_sales_date01');
-        		$input_post['sa_sales_date02'] = $this->input->post('sa_sales_date02');
+        		$input_post['rv_create_date01'] = $this->input->post('rv_create_date01');
+        		$input_post['rv_create_date02'] = $this->input->post('rv_create_date02');
 
         		$this->smarty->assign('list', NULL);
         		$this->smarty->assign('set_pagination', $set_pagination['page_link']);
@@ -143,37 +140,37 @@ class Saleslist extends MY_Controller
         	} else {
 
 	            // セッションをフラッシュデータとして保存
-	            $data = array(
-	                    		'c_sa_slip_no'      => $this->input->post('sa_slip_no'),
-	                    		'c_sa_cm_seq'       => $this->input->post('sa_cm_seq'),
-	                    		'c_sa_company'      => $this->input->post('sa_company'),
-	                    		'c_sa_salesman'     => $this->input->post('sa_salesman'),
-	                    		'c_sa_sales_date01' => $this->input->post('sa_sales_date01'),
-	                    		'c_sa_sales_date02' => $this->input->post('sa_sales_date02'),
-	                    		'c_sa_collect'      => $this->input->post('sa_collect'),
-	                    		'c_displine'        => $this->input->post('displine'),
-	            				'c_orderid'         => $this->input->post('orderid'),
-	            );
+        		$data = array(
+        				'c_rv_cm_seq'        => $this->input->post('rv_cm_seq'),
+        				'c_rv_company'       => $this->input->post('rv_company'),
+        				'c_rv_salesman'      => $this->input->post('rv_salesman'),
+        				'c_rv_total01'       => $this->input->post('rv_total01'),
+        				'c_rv_total02'       => $this->input->post('rv_total02'),
+        				'c_rv_create_date01' => $this->input->post('rv_create_date01'),
+        				'c_rv_create_date02' => $this->input->post('rv_create_date02'),
+        				'c_displine'         => $this->input->post('displine'),
+        				'c_orderid'          => $this->input->post('orderid'),
+        		);
 	            $this->session->set_userdata($data);
 
 	            $tmp_inputpost = $this->input->post();
 
-	            $input_post['sa_sales_date01'] = $this->input->post('sa_sales_date01');
-	            $input_post['sa_sales_date02'] = $this->input->post('sa_sales_date02');
+	            $input_post['rv_create_date01'] = $this->input->post('rv_create_date01');
+	            $input_post['rv_create_date02'] = $this->input->post('rv_create_date02');
 
 	            unset($tmp_inputpost["submit"]);
 
 	            // 売上日指定を整形
-	            $date = new DateTime($tmp_inputpost['sa_sales_date01']);
-	            $tmp_inputpost['sa_sales_date01'] = $date->format('Y-m-d 00:00:00');
+	            $date = new DateTime($tmp_inputpost['rv_create_date01']);
+	            $tmp_inputpost['rv_create_date01'] = $date->format('Y-m-d 00:00:00');
 
-	            if ($tmp_inputpost['sa_sales_date02'] == '')
+	            if ($tmp_inputpost['rv_create_date02'] == '')
 	            {
 	            	$date = new DateTime();
-	            	$tmp_inputpost['sa_sales_date02'] = $date->format('Y-m-d 23:59:59');
+	            	$tmp_inputpost['rv_create_date02'] = $date->format('Y-m-d 23:59:59');
 	            } else {
-	            	$date = new DateTime($tmp_inputpost['sa_sales_date02']);
-	            	$tmp_inputpost['sa_sales_date02'] = $date->format('Y-m-d 23:59:59');
+	            	$date = new DateTime($tmp_inputpost['rv_create_date02']);
+	            	$tmp_inputpost['rv_create_date02'] = $date->format('Y-m-d 23:59:59');
 	            }
         	}
 
@@ -181,40 +178,38 @@ class Saleslist extends MY_Controller
 
 	        // バリデーション・チェック
 	        $this->_set_validation();												// バリデーション設定
-// 	        $this->form_validation->run();
 
             // セッションからフラッシュデータ読み込み
-            $tmp_inputpost['sa_slip_no']      = $_SESSION['c_sa_slip_no'];
-            $tmp_inputpost['sa_cm_seq']       = $_SESSION['c_sa_cm_seq'];
-            $tmp_inputpost['sa_company']      = $_SESSION['c_sa_company'];
-            $tmp_inputpost['sa_salesman']     = $_SESSION['c_sa_salesman'];
-            $tmp_inputpost['sa_sales_date01'] = $_SESSION['c_sa_sales_date01'];
-            $tmp_inputpost['sa_sales_date02'] = $_SESSION['c_sa_sales_date02'];
-            $tmp_inputpost['sa_collect']      = $_SESSION['c_sa_collect'];
-            $tmp_inputpost['displine']        = $_SESSION['c_displine'];
-            $tmp_inputpost['orderid']         = $_SESSION['c_orderid'];
+            $tmp_inputpost['rv_cm_seq']        = $_SESSION['c_rv_cm_seq'];
+            $tmp_inputpost['rv_company']       = $_SESSION['c_rv_company'];
+            $tmp_inputpost['rv_salesman']      = $_SESSION['c_rv_salesman'];
+            $tmp_inputpost['rv_total01']       = $_SESSION['c_rv_total01'];
+            $tmp_inputpost['rv_total02']       = $_SESSION['c_rv_total02'];
+            $tmp_inputpost['rv_create_date01'] = $_SESSION['c_rv_create_date01'];
+            $tmp_inputpost['rv_create_date02'] = $_SESSION['c_rv_create_date02'];
+            $tmp_inputpost['displine']         = $_SESSION['c_displine'];
+            $tmp_inputpost['orderid']          = $_SESSION['c_orderid'];
 
-            $input_post['sa_sales_date01'] = $_SESSION['c_sa_sales_date01'];
-            $input_post['sa_sales_date02'] = $_SESSION['c_sa_sales_date02'];
+            $input_post['rv_create_date01'] = $_SESSION['c_rv_create_date01'];
+            $input_post['rv_create_date02'] = $_SESSION['c_rv_create_date02'];
 
             // 売上日指定を整形
-            $date = new DateTime($tmp_inputpost['sa_sales_date01']);
-            $tmp_inputpost['sa_sales_date01'] = $date->format('Y-m-d 00:00:00');
+            $date = new DateTime($tmp_inputpost['rv_create_date01']);
+            $tmp_inputpost['rv_create_date01'] = $date->format('Y-m-d 00:00:00');
 
-            if ($tmp_inputpost['sa_sales_date02'] == '')
+            if ($tmp_inputpost['rv_create_date02'] == '')
             {
             	$date = new DateTime();
-            	$tmp_inputpost['sa_sales_date02'] = $date->format('Y-m-d 23:59:59');
+            	$tmp_inputpost['rv_create_date02'] = $date->format('Y-m-d 23:59:59');
             } else {
             	$date = new DateTime($tmp_inputpost['sa_sales_date02']);
-            	$tmp_inputpost['sa_sales_date02'] = $date->format('Y-m-d 23:59:59');
+            	$tmp_inputpost['rv_create_date02'] = $date->format('Y-m-d 23:59:59');
             }
 
         }
 
         if ($_form_err == FALSE)
         {
-
 	        // Pagination 現在ページ数の取得：：URIセグメントの取得
 	        $segments = $this->uri->segment_array();
 	        if (isset($segments[3]))
@@ -226,36 +221,36 @@ class Saleslist extends MY_Controller
 
 	        // 1ページ当たりの表示件数
 	        $tmp_per_page = 50;
-	//         $this->config->load('config_comm');
-	//         $tmp_per_page = $this->config->item('PAGINATION_PER_PAGE');
+// 	        $this->config->load('config_comm');
+// 	        $tmp_per_page = $this->config->item('PAGINATION_PER_PAGE');
 
-	        // 売上データの取得
-	        $this->load->model('Sales', 'sa', TRUE);
-	        list($sales_list, $sales_countall) = $this->sa->get_saleslist($tmp_inputpost, $tmp_per_page, $tmp_offset);
+	        // 債権データの取得
+	        $this->load->model('Receivable', 'rv', TRUE);
+	        list($receivable_list, $receivable_countall) = $this->rv->get_receivablelist($tmp_inputpost, $tmp_per_page, $tmp_offset);
 
-	        $this->smarty->assign('list', $sales_list);
+	        $this->smarty->assign('list', $receivable_list);
 
 	        // Pagination 設定
-	        $set_pagination = $this->_get_Pagination($sales_countall, $tmp_per_page);
+	        $set_pagination = $this->_get_Pagination($receivable_countall, $tmp_per_page);
 
 	        $this->smarty->assign('set_pagination', $set_pagination['page_link']);
-	        $this->smarty->assign('countall', $sales_countall);
+	        $this->smarty->assign('countall',       $receivable_countall);
         }
 
-        // 初期値セット
+        // 検索項目 初期値セット
         $this->_search_set();
 
-    	$this->smarty->assign('seach_sa_slip_no',      $tmp_inputpost['sa_slip_no']);
-        $this->smarty->assign('seach_sa_cm_seq',       $tmp_inputpost['sa_cm_seq']);
-        $this->smarty->assign('seach_sa_company',      $tmp_inputpost['sa_company']);
-        $this->smarty->assign('seach_sa_salesman',     $tmp_inputpost['sa_salesman']);
-        $this->smarty->assign('seach_sa_sales_date01', $input_post['sa_sales_date01']);
-        $this->smarty->assign('seach_sa_sales_date02', $input_post['sa_sales_date02']);
-        $this->smarty->assign('seach_sa_collect',      $tmp_inputpost['sa_collect']);
-        $this->smarty->assign('seach_displine',        $tmp_inputpost['displine']);
-        $this->smarty->assign('seach_orderid',         $tmp_inputpost['orderid']);
+        $this->smarty->assign('seach_rv_cm_seq',        $tmp_inputpost['rv_cm_seq']);
+        $this->smarty->assign('seach_rv_company',       $tmp_inputpost['rv_company']);
+        $this->smarty->assign('seach_rv_salesman',      $tmp_inputpost['rv_salesman']);
+        $this->smarty->assign('seach_rv_total01',       $tmp_inputpost['rv_total01']);
+        $this->smarty->assign('seach_rv_total02',       $tmp_inputpost['rv_total02']);
+        $this->smarty->assign('seach_rv_create_date01', $input_post['rv_create_date01']);
+        $this->smarty->assign('seach_rv_create_date02', $input_post['rv_create_date02']);
+        $this->smarty->assign('seach_displine',         $tmp_inputpost['displine']);
+        $this->smarty->assign('seach_orderid',          $tmp_inputpost['orderid']);
 
-    	$this->view('saleslist/index.tpl');
+    	$this->view('receivablelist/index.tpl');
 
     }
 
@@ -264,36 +259,36 @@ class Saleslist extends MY_Controller
     {
 
     	// セッションからフラッシュデータ読み込み
-    	$tmp_inputpost['sa_slip_no']      = $_SESSION['c_sa_slip_no'];
-    	$tmp_inputpost['sa_cm_seq']       = $_SESSION['c_sa_cm_seq'];
-    	$tmp_inputpost['sa_company']      = $_SESSION['c_sa_company'];
-    	$tmp_inputpost['sa_salesman']     = $_SESSION['c_sa_salesman'];
-    	$tmp_inputpost['sa_sales_date01'] = $_SESSION['c_sa_sales_date01'];
-    	$tmp_inputpost['sa_sales_date02'] = $_SESSION['c_sa_sales_date02'];
-    	$tmp_inputpost['sa_collect']      = $_SESSION['c_sa_collect'];
-    	$tmp_inputpost['displine']        = $_SESSION['c_displine'];
-    	$tmp_inputpost['orderid']         = $_SESSION['c_orderid'];
+    	$tmp_inputpost['rv_cm_seq']        = $_SESSION['c_rv_cm_seq'];
+    	$tmp_inputpost['rv_company']       = $_SESSION['c_rv_company'];
+    	$tmp_inputpost['rv_salesman']      = $_SESSION['c_rv_salesman'];
+    	$tmp_inputpost['rv_total01']       = $_SESSION['c_rv_total01'];
+    	$tmp_inputpost['rv_total02']       = $_SESSION['c_rv_total02'];
+    	$tmp_inputpost['rv_create_date01'] = $_SESSION['c_rv_create_date01'];
+    	$tmp_inputpost['rv_create_date02'] = $_SESSION['c_rv_create_date02'];
+    	$tmp_inputpost['displine']         = $_SESSION['c_displine'];
+    	$tmp_inputpost['orderid']          = $_SESSION['c_orderid'];
 
     	// 売上日指定を整形
-    	$date = new DateTime($tmp_inputpost['sa_sales_date01']);
-    	$tmp_inputpost['sa_sales_date01'] = $date->format('Y-m-d 00:00:00');
+    	$date = new DateTime($tmp_inputpost['rv_create_date01']);
+    	$tmp_inputpost['rv_create_date01'] = $date->format('Y-m-d 00:00:00');
 
-    	if ($tmp_inputpost['sa_sales_date02'] == '')
+    	if ($tmp_inputpost['rv_create_date02'] == '')
     	{
     		$date = new DateTime();
-    		$tmp_inputpost['sa_sales_date02'] = $date->format('Y-m-d 23:59:59');
+    		$tmp_inputpost['rv_create_date02'] = $date->format('Y-m-d 23:59:59');
     	} else {
-    		$date = new DateTime($tmp_inputpost['sa_sales_date02']);
-    		$tmp_inputpost['sa_sales_date02'] = $date->format('Y-m-d 23:59:59');
+    		$date = new DateTime($tmp_inputpost['rv_create_date02']);
+    		$tmp_inputpost['rv_create_date02'] = $date->format('Y-m-d 23:59:59');
     	}
 
-    	// 請求リスト＆件数(max1000件)を取得
+    	// 債権リスト＆件数(max1000件)を取得
     	$tmp_offset = 0;
     	$tmp_per_page = 1000;
 
-    	// 売上データの取得
-    	$this->load->model('Sales', 'sa', TRUE);
-    	$query = $this->sa->get_dlcsv_query($tmp_inputpost, $tmp_per_page, $tmp_offset, '0');
+    	// 債権データの取得
+    	$this->load->model('Receivable', 'rv', TRUE);
+    	$query = $this->rv->get_dlcsv_query($tmp_inputpost, $tmp_per_page, $tmp_offset, '0');
 
     	// 作成したヘルパーを読み込む
     	$this->load->helper(array('download', 'csvdata'));
@@ -301,7 +296,7 @@ class Saleslist extends MY_Controller
     	// ヘルパーに追加した関数を呼び出し、CSVデータ取得
     	$get_dl_csv = csv_from_result($query);
 
-    	$file_name = 'dlcsv_saleslist_' . date('YmdHis') . '.csv';
+    	$file_name = 'dlcsv_receivable_' . date('YmdHis') . '.csv';
     	force_download($file_name, $get_dl_csv);
 
     }
@@ -310,7 +305,7 @@ class Saleslist extends MY_Controller
     private function _get_Pagination($countall, $tmp_per_page)
     {
 
-    	$config['base_url']       = base_url() . '/saleslist/search/';			// ページの基本URIパス。「/コントローラクラス/アクションメソッド/」
+    	$config['base_url']       = base_url() . '/receivablelist/search/';		// ページの基本URIパス。「/コントローラクラス/アクションメソッド/」
     	$config['per_page']       = $tmp_per_page;								// 1ページ当たりの表示件数。
     	$config['total_rows']     = $countall;									// 総件数。where指定するか？
     	//$config['uri_segment']    = 4;										// オフセット値がURIパスの何セグメント目とするか設定
@@ -358,12 +353,9 @@ class Saleslist extends MY_Controller
     private function _search_set()
     {
 
-        // 回収サイト 選択項目セット
+        // 表示方法 選択項目セット
     	$this->config->load('config_comm');
-    	$opt_sa_collect = $this->config->item('CUSTOMER_CM_COLLECT');
-
-    	// 売上データ 表示単位
-    	$opt_displine = $this->config->item('SALES_SA_DISPLINE');
+    	$opt_displine = $this->config->item('RECEIVABLE_RV_DISPLINE');
 
     	// ID 並び替え選択項目セット
         $opt_orderid = array (
@@ -372,7 +364,6 @@ class Saleslist extends MY_Controller
                 'ASC'  => '昇順',
         );
 
-    	$this->smarty->assign('options_sa_collect', $opt_sa_collect);
     	$this->smarty->assign('options_displine',   $opt_displine);
     	$this->smarty->assign('options_orderid',    $opt_orderid);
 
@@ -394,39 +385,39 @@ class Saleslist extends MY_Controller
     {
     	$rule_set = array(
     			array(
-    					'field'   => 'sa_slip_no',
-    					'label'   => '請求書NO',
-    					'rules'   => 'trim|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'sa_cm_seq',
+    					'field'   => 'rv_cm_seq',
     					'label'   => '顧客CD',
     					'rules'   => 'trim|is_numeric'
     			),
     			array(
-    					'field'   => 'sa_company',
+    					'field'   => 'rv_company',
     					'label'   => '会社名',
     					'rules'   => 'trim|max_length[50]'
     			),
     			array(
-    					'field'   => 'sa_salesman',
+    					'field'   => 'rv_salesman',
     					'label'   => '担当営業',
     					'rules'   => 'trim|max_length[40]'
     			),
     			array(
-    					'field'   => 'sa_sales_date01',
+    					'field'   => 'rv_total01',								// +,- あり
+    					'label'   => ' ',
+    					'rules'   => 'trim|numeric|max_length[10]'
+    			),
+    			array(
+    					'field'   => 'rv_total02',
+    					'label'   => ' ',
+    					'rules'   => 'trim|numeric|max_length[10]'
+    			),
+    			array(
+    					'field'   => 'rv_create_date01',
     					'label'   => ' ',
     					'rules'   => 'trim|regex_match[/^\d{4}\-|\/\d{1,2}\-|\/\d{1,2}+$/]|max_length[10]'
     			),
     			array(
-    					'field'   => 'sa_sales_date02',
+    					'field'   => 'rv_create_date02',
     					'label'   => ' ',
     					'rules'   => 'trim|regex_match[/^\d{4}\-|\/\d{1,2}\-|\/\d{1,2}+$/]|max_length[10]'
-    			),
-    			array(
-    					'field'   => 'sa_collect',
-    					'label'   => '回収サイト',
-    					'rules'   => 'trim|max_length[1]'
     			),
     			array(
     					'field'   => 'displine',

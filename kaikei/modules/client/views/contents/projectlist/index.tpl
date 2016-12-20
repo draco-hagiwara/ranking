@@ -105,6 +105,7 @@ function fmSubmit(formName, url, method, num) {
         <th>CD</th>
         <th>会 社 名</th>
         <th>契約期間</th>
+        <th>固定金額</th>
         <th>担当営業</th>
         <th></th>
       </tr>
@@ -120,7 +121,7 @@ function fmSubmit(formName, url, method, num) {
           <td>
             {if $pj.pj_status == "0"}<font color="#ffffff" style="background-color:royalblue">[ 有効 ]</font>
             {elseif $pj.pj_status == "1"}<font color="#ffffff" style="background-color:dimgray">[ 停止 ]</font>
-            {elseif $pj.pj_status == "2"}<font color="#ffffff" style="background-color:dimgray">[ 無効 ]</font>
+            {elseif $pj.pj_status == "2"}<font color="#ffffff" style="background-color:dimgray">[ 解約 ]</font>
             {else}エラー
             {/if}
           </td>
@@ -145,6 +146,9 @@ function fmSubmit(formName, url, method, num) {
           </td>
           <td>
             {$pj.pj_start_date} ～ {$pj.pj_end_date}
+          </td>
+          <td>
+            {$pj.pj_billing|number_format} 円
           </td>
           <td>
             {$options_pj_salesman[$pj.pj_salesman]}

@@ -252,7 +252,7 @@ class Sales extends CI_Model
     }
 
     /**
-     * 売上データ情報の取得
+     * 売上データ情報のCSVダウンロード
      *
      * @param    array() : WHERE句項目
      * @param    array() : WHERE句項目
@@ -317,7 +317,6 @@ class Sales extends CI_Model
     		default:
     	}
 
-
     	// WHERE文 作成
     	if ($set_select["sa_collect"] != '')
     	{
@@ -335,11 +334,6 @@ class Sales extends CI_Model
 
     	// BETWEEN文 作成
     	$sql .= ' AND `sa_sales_date` BETWEEN \'' . $set_between["sa_sales_date01"] . '\' AND \'' . $set_between["sa_sales_date02"] . '\'';
-
-
-
-
-
 
     	switch( $set_displine["displine"] )
     	{
@@ -385,14 +379,6 @@ class Sales extends CI_Model
     		default:
     	}
 
-
-
-
-    	    	print($sql);
-    	    	print("<br><br>");
-//     	    	exit;
-
-
 //     	// 対象全件数を取得
 //     	$query = $this->db->query($sql);
 //     	$sales_countall = $query->num_rows();
@@ -405,6 +391,74 @@ class Sales extends CI_Model
 //     	$sales_list = $query->result('array');
 
     	return $query;
+
+    }
+
+    /**
+     * 売上データ情報の取得
+     *
+     * @param    date : 売上日（開始）
+     * @param    date : 売上日（終了）
+     * @return   int
+     */
+    public function get_sales_monthly($start_date, $end_day)
+    {
+
+		$sql = 'SELECT
+					sa_seq,
+					SUM(sa_total) as sum_total
+					FROM tb_sales WHERE sa_status = 0 '
+				;
+
+		// BETWEEN文 作成
+		$sql .= ' AND `sa_sales_date` BETWEEN \'' . $start_date . '\' AND \'' . $end_day . '\'';
+
+	    	// クエリー実行
+	    	$query = $this->db->query($sql);
+	    	$sales_list = $query->result('array');
+
+		if ($sales_list[0]['sum_total'] == 0)
+		{
+			return 0;
+		} else {
+			return $sales_list[0]['sum_total'];
+		}
+
+    }
+
+    /**
+     * 売上データ情報の取得
+     *
+     * @param    int
+     * @param    date : 売上日（開始）
+     * @param    date : 売上日（終了）
+     * @return   int
+     */
+    public function get_sales_salesman($ac_seq, $start_date, $end_day)
+    {
+
+    	$sql = 'SELECT
+				sa_seq,
+				SUM(sa_total) as sum_total
+				FROM tb_sales WHERE sa_status = 0 '
+    			;
+
+    	// WHERE文 作成
+		$sql .= ' AND `sa_salesman_id` = ' . $ac_seq;
+
+    	// BETWEEN文 作成
+    	$sql .= ' AND `sa_sales_date` BETWEEN \'' . $start_date . '\' AND \'' . $end_day . '\'';
+
+    	// クエリー実行
+    	$query = $this->db->query($sql);
+    	$sales_list = $query->result('array');
+
+    	if ($sales_list[0]['sum_total'] == 0)
+    	{
+    		return 0;
+    	} else {
+    		return $sales_list[0]['sum_total'];
+    	}
 
     }
 

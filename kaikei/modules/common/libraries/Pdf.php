@@ -94,7 +94,7 @@ class Pdf extends TCPDF {
 
 		$format = 'Y-m-d';
 		$date = DateTime::createFromFormat($format, $iv_data["iv_issue_date"]);
-		$pdf->Text(155, 15, "発効日:" . $date->format('Y年m月d日'));
+		$pdf->Text(155, 15, "発行日:" . $date->format('Y年m月d日'));
 
 		$pdf->Text(25, 10, "〒" . $iv_data["iv_zip01"] . '-' . $iv_data["iv_zip02"]);
 		$pdf->Text(25, 15, $iv_data["iv_pref"] . $iv_data["iv_addr01"] . $iv_data["iv_addr02"] . $iv_data["iv_buil"]);
@@ -217,15 +217,26 @@ class Pdf extends TCPDF {
 		$pdf->SetFont($font1, '', 9);
 		$pdf->SetDrawColor(0, 0, 0);
 
-        // 複数ページ処理 : 明細20行位がmaxか？
-		if (count($ivd_data) >= 10 && count($ivd_data) <= 20)
-		{
-			$pdf->AddPage();                                                        // 空のページを追加
-		}
-
+		// 複数ページ処理 : 明細20行位がmax？
+		/*
+		 * 一括作成でその中に１ページでも改ページ処理がはいると全てのページに反映されてしまう。
+		 * 自動改ページ指定にすると「振込指定」欄が崩れる。
+		 * 現状、この場合該当ページのみ個別でPDF作成を行ってもらう？
+		 * 「備考」欄はmax５行まで考慮。
+		 */
 		if ($iv_data["iv_remark"] != '')
 		{
+			if (count($ivd_data) >= 10 && count($ivd_data) <= 20)
+			{
+				$pdf->AddPage();                                                        // 空のページを追加
+			}
+
 			$pdf->MultiCell(185, 10, "【備　考　】\n" . $iv_data["iv_remark"], 1, 'L', 0);
+		} else {
+			if (count($ivd_data) >= 15 && count($ivd_data) <= 20)
+			{
+				$pdf->AddPage();                                                        // 空のページを追加
+			}
 		}
 
 		$pdf->SetFont($font1, '', 8);
@@ -329,7 +340,7 @@ class Pdf extends TCPDF {
 
 				$format = 'Y-m-d';
 				$date = DateTime::createFromFormat($format, $val["iv_issue_date"]);
-				$pdf->Text(155, 15, "発効日:" . $date->format('Y年m月d日'));
+				$pdf->Text(155, 15, "発行日:" . $date->format('Y年m月d日'));
 
 				$pdf->Text(25, 10, "〒" . $val["iv_zip01"] . '-' . $val["iv_zip02"]);
 				$pdf->Text(25, 15, $val["iv_pref"] . $val["iv_addr01"] . $val["iv_addr02"] . $val["iv_buil"]);
@@ -452,15 +463,26 @@ class Pdf extends TCPDF {
 				$pdf->SetFont($font1, '', 9);
 				$pdf->SetDrawColor(0, 0, 0);
 
-				// 複数ページ処理 : 明細20行位がmaxか？
-				if (count($ivd_data) >= 10 && count($ivd_data) <= 20)
-				{
-					$pdf->AddPage();                                                        // 空のページを追加
-				}
-
+				// 複数ページ処理 : 明細20行位がmax？
+				/*
+				 * 一括作成でその中に１ページでも改ページ処理がはいると全てのページに反映されてしまう。
+				 * 自動改ページ指定にすると「振込指定」欄が崩れる。
+				 * 現状、この場合該当ページのみ個別でPDF作成を行ってもらう？
+				 * 「備考」欄はmax５行まで考慮。
+				 */
 				if ($val["iv_remark"] != '')
 				{
+					if (count($ivd_data) >= 10 && count($ivd_data) <= 20)
+					{
+						$pdf->AddPage();                                                        // 空のページを追加
+					}
+
 					$pdf->MultiCell(185, 10, "【備　考　】\n" . $val["iv_remark"], 1, 'L', 0);
+				} else {
+					if (count($ivd_data) >= 15 && count($ivd_data) <= 20)
+					{
+						$pdf->AddPage();                                                        // 空のページを追加
+					}
 				}
 
 				$pdf->SetFont($font1, '', 8);

@@ -35,6 +35,17 @@
     </div>
   </div>
   <div class="form-group">
+    <label for="pj_orders_ymd" class="col-xs-3 col-md-3 control-label">受注年月日<font color=red> *</font></label>
+    <div class="col-xs-4 col-md-2">
+      {form_input('pj_orders_ymd' , set_value('pj_orders_ymd', '') , 'id="mydate3" class="form-control" placeholder="受注年月日"')}
+      {if form_error('pj_orders_ymd')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_orders_ymd')}</font></label>{/if}
+    </div>
+    <div class="col-md-5 col-md-offset-2">
+      <p class="redText"><small>※入力フォーマット（ yyyy/dd/mm　または　yyyy-dd-mm ）</small></p>
+      {if $err_date==TRUE}<span class="label label-danger">Error : </span><label><font color=red>「契約期間」欄で入力した日付が不整合です。</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
     <label for="pj_contract" class="col-xs-3 col-md-3 control-label">契約期間<font color=red> *</font></label>
     <div class="col-xs-4 col-md-2">
       {form_input('pj_start_date' , set_value('pj_start_date', '') , 'id="mydate1" class="form-control" placeholder="開始日"')}
@@ -105,7 +116,7 @@
   <div class="form-group">
     <label for="pj_salesman" class="col-md-3 control-label">担当営業<font color=red> *</font></label>
     <div class="col-md-2 btn-lg">
-      {form_dropdown('pj_salesman', $options_pj_salesman, set_value('pj_salesman', ''))}
+      {form_dropdown('pj_salesman', $options_pj_salesman, set_value('pj_salesman', $pj_salesman))}
       {if form_error('pj_salesman')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_salesman')}</font></label>{/if}
     </div>
   </div>
@@ -171,6 +182,15 @@ $('#mydate2').datepicker({
   format: "yyyy-mm-dd",
   //language: "ja",
   startView: 1,
+  daysOfWeekHighlighted: "0",
+  todayBtn: "linked",
+  autoclose: true,
+  orientation: "bottom auto",
+  clearBtn: true
+});
+$('#mydate3').datepicker({
+  format: "yyyy-mm-dd",
+  //language: "ja",
   daysOfWeekHighlighted: "0",
   todayBtn: "linked",
   autoclose: true,

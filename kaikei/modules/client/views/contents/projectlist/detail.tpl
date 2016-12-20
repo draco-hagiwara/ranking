@@ -23,10 +23,21 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="pj_invoice_status" class="col-sm-3 control-label">請求書発行ステータス選択<font color=red> *</font></label>
+    <label for="pj_invoice_status" class="col-sm-3 control-label">請求書一括発行<font color=red> *</font></label>
     <div class="col-sm-2 btn-lg">
       {form_dropdown('pj_invoice_status', $options_pj_iv_type, set_value('pj_invoice_status', $info.pj_invoice_status))}
       {if form_error('pj_invoice_status')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_invoice_status')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="pj_orders_ymd" class="col-xs-3 col-md-3 control-label">受注年月日<font color=red> *</font></label>
+    <div class="col-xs-4 col-md-2">
+      {form_input('pj_orders_ymd' , set_value('pj_orders_ymd', $info.pj_orders_ymd) , 'id="mydate3" class="form-control" placeholder="受注年月日"')}
+      {if form_error('pj_orders_ymd')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_orders_ymd')}</font></label>{/if}
+    </div>
+    <div class="col-md-5 col-md-offset-2">
+      <p class="redText"><small>※入力フォーマット（ yyyy/dd/mm　または　yyyy-dd-mm ）</small></p>
+      {if $err_date==TRUE}<span class="label label-danger">Error : </span><label><font color=red>「契約期間」欄で入力した日付が不整合です。</font></label>{/if}
     </div>
   </div>
   <div class="form-group">

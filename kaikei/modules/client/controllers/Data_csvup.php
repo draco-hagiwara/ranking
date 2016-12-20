@@ -3,6 +3,10 @@
 class Data_csvup extends MY_Controller
 {
 
+	/*
+	 *  ＣＳＶアップロード処理
+	 */
+
     public function __construct()
     {
         parent::__construct();

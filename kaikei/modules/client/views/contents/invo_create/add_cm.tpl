@@ -171,13 +171,14 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="iv_memo_iv" class="col-sm-3 control-label">備　考　欄</label>
+    <label for="iv_memo_iv" class="col-sm-3 control-label">備　考　欄<br>(max.5行)</label>
     <div class="col-md-8">
       <textarea class="form-control input-sm" id="iv_remark" name="iv_remark" placeholder="max.100文字">{$tmp_remark}</textarea>
       {if form_error('iv_remark')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_remark')}</font></label>{/if}
     </div>
   </div>
 
+{*
   <div class="form-group">
     <label for="iv_bank_cd" class="col-xs-3 col-md-3 control-label">銀　　　　行<font color=red> *</font></label>
     <div class="col-xs-2 col-md-2">
@@ -218,6 +219,8 @@
       {if form_error('iv_account_nm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_account_nm')}</font></label>{/if}
     </div>
   </div>
+*}
+
   <div class="form-group">
     <label for="iv_tag" class="col-md-3 control-label">タグ設定</label>
     <div class="col-md-8">
@@ -244,44 +247,34 @@
         <td class="col-md-1 text-center">金 額（円）</td>
       </tr>
 
+      {foreach from=$info_ivd item=ivd name="id"}
       <tr>
         <td class="col-md-7 input-group-sm">
-          {form_input('ivd_item0' , set_value('ivd_item0','') , 'class="form-control" placeholder="キーワード文字のみ入力してください。"')}
-          {if form_error('ivd_item0')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_item0')}</font></label>{/if}
+          {form_input("ivd_item{$smarty.foreach.id.index}" , set_value("ivd_item{$smarty.foreach.id.index}", $ivd.pj_keyword) , 'class="form-control" placeholder="キーワード文字のみ入力してください。"')}
+          {if form_error("ivd_item{$smarty.foreach.id.index}")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("ivd_item{$smarty.foreach.id.index}")}</font></label>{/if}
         </td>
         <td class="col-md-1 input-group-sm">
-          {form_input('ivd_qty0' , set_value('ivd_qty0', 0) , 'class="form-control text-center"')}
-          {if form_error('ivd_qty0')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_qty0')}</font></label>{/if}
+          {form_input("ivd_qty{$smarty.foreach.id.index}" , set_value('ivd_qty{$smarty.foreach.id.index}', $ivd.qty) , 'class="form-control text-center"')}
+          {if form_error("ivd_qty{$smarty.foreach.id.index}")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("ivd_qty{$smarty.foreach.id.index}")}</font></label>{/if}
         </td>
         <td class="col-md-1 input-group-sm">
-          {form_input('ivd_price0' , set_value('ivd_price0', 0) , 'class="form-control text-right"')}
-          {if form_error('ivd_price0')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_price0')}</font></label>{/if}
+          {form_input("ivd_price{$smarty.foreach.id.index}" , set_value("ivd_price{$smarty.foreach.id.index}", $ivd.price) , 'class="form-control text-right"')}
+          {if form_error("ivd_price{$smarty.foreach.id.index}")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("ivd_price{$smarty.foreach.id.index}")}</font></label>{/if}
         </td>
         <td class="col-md-1 input-group-sm">
-          {form_input('ivd_total0' , set_value('ivd_total0', 0) , 'class="form-control text-right"')}
-          {if form_error('ivd_total0')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_total0')}</font></label>{/if}
+          {form_input("ivd_total{$smarty.foreach.id.index}" , set_value("ivd_total{$smarty.foreach.id.index}", $ivd.pj_billing) , 'class="form-control text-right"')}
+          {if form_error("ivd_total{$smarty.foreach.id.index}")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("ivd_total{$smarty.foreach.id.index}")}</font></label>{/if}
         </td>
       </tr>
-      <tr>
-        <td class="col-md-7 input-group-sm">
-          {form_input('ivd_item1' , set_value('ivd_item1','') , 'class="form-control" placeholder="キーワード文字のみ入力してください。"')}
-          {if form_error('ivd_item1')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_item1')}</font></label>{/if}
-        </td>
-        <td class="col-md-1 input-group-sm">
-          {form_input('ivd_qty1' , set_value('ivd_qty1', 0) , 'class="form-control text-center"')}
-          {if form_error('ivd_qty1')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_qty1')}</font></label>{/if}
-        </td>
-        <td class="col-md-1 input-group-sm">
-          {form_input('ivd_price1' , set_value('ivd_price1', 0) , 'class="form-control text-right"')}
-          {if form_error('ivd_price1')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_price1')}</font></label>{/if}
-        </td>
-        <td class="col-md-1 input-group-sm">
-          {form_input('ivd_total1' , set_value('ivd_total1', 0) , 'class="form-control text-right"')}
-          {if form_error('ivd_total1')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_total1')}</font></label>{/if}
-        </td>
-      </tr>
+      {/foreach}
     </tbody>
   </table>
+
+  <div class="form-group">
+    <div class="col-md-8">
+      <p>※空行は詰めて入力してください。</p>
+    </div>
+  </div>
 
   {form_hidden('iv_seq',      $info.cm_seq)}
   {form_hidden('iv_company',  $info.cm_company)}

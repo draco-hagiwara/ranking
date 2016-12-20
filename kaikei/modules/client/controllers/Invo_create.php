@@ -3,6 +3,13 @@
 class Invo_create extends MY_Controller
 {
 
+	/*
+	 *  個別請求書データの作成処理
+	 *
+	 *    > 顧客情報一覧から作成
+	 *    > 請求書一覧から作成
+	 */
+
     public function __construct()
     {
         parent::__construct();
@@ -67,7 +74,7 @@ class Invo_create extends MY_Controller
     	if ($this->form_validation->run() == FALSE)
     	{
 
-    		$this->smarty->assign('iv_company',    $input_post['iv_company']);
+    		$this->smarty->assign('iv_company', $input_post['iv_company']);
 
     		$this->smarty->assign('tmp_remark', $input_post['iv_remark']);
     		$this->smarty->assign('tmp_memo',   $input_post['iv_memo']);
@@ -126,6 +133,9 @@ class Invo_create extends MY_Controller
     	$input_post = $this->input->post();
 
     	$this->load->model('Customer', 'cm', TRUE);
+    	$this->load->model('Project',  'pj', TRUE);
+
+    	// 顧客情報を取得
     	$get_cm_data = $this->cm->get_cm_seq($input_post['chg_seq']);
 
     	// 請求書住所が別の場合
@@ -144,6 +154,55 @@ class Invo_create extends MY_Controller
     	}
 
     	$this->smarty->assign('info', $get_cm_data[0]);
+
+    	// 受注案件情報を取得
+    	$_iv_type = 0;														// 課金方式：：固定=0/成果=1/固+成=2
+    	$get_pj_list = $this->pj->get_pj_cm_seq($input_post['chg_seq'], $_iv_type, $_SESSION['c_memGrp'], 'seorank');
+
+	    $cnt = 0;
+    	if (count($get_pj_list) >= 1)
+    	{
+	    	$list_detail = array();
+	    	$_subtotal = 0;
+	    	foreach($get_pj_list as $key => $val)
+	    	{
+
+	    		// 契約期間チェック
+	    		$date_now = new DateTime();
+	    		$date_now = $date_now->modify('first day of last months')->format('Y-m-d');		// 請求データ作成の指定年月の前月1日
+	    		$date_str = new DateTime($val['pj_start_date']);
+	    		$date_str = $date_str->format('Y-m-d');
+	    		$date_end = new DateTime($val['pj_end_date']);
+	    		$date_end = $date_end->format('Y-m-d');
+
+	    		if (($date_str <= $date_now) && ($date_now <= $date_end))
+	    		{
+
+	    			// 対象データの一時保管
+	    			$set_pj_data[$cnt]['pj_keyword'] = $val['pj_keyword'];
+	    			$set_pj_data[$cnt]['qty']        = 1;
+	    			$set_pj_data[$cnt]['price']      = $val['pj_billing'];
+	    			$set_pj_data[$cnt]['pj_billing'] = $val['pj_billing'];
+
+	    			$cnt++;
+
+	    		}
+	    	}
+    	}
+
+    	// 空データ作成。2行分
+    	for ($i=0; $i<=1; $i++)
+    	{
+    		// 対象データの一時保管
+    		$set_pj_data[$cnt]['pj_keyword'] = "";
+    		$set_pj_data[$cnt]['qty']        = 0;
+    		$set_pj_data[$cnt]['price']      = 0;
+    		$set_pj_data[$cnt]['pj_billing'] = 0;
+
+    		$cnt++;
+    	}
+
+    	$this->smarty->assign('info_ivd', $set_pj_data);
 
     	// バリデーション・チェック
     	$this->_set_validation();
@@ -170,6 +229,7 @@ class Invo_create extends MY_Controller
     	if ($this->form_validation->run() == FALSE)
     	{
 
+    		// 顧客情報セット
     		$this->smarty->assign('tmp_remark', $input_post['iv_remark']);
     		$this->smarty->assign('tmp_memo',   $input_post['iv_memo']);
 
@@ -190,6 +250,18 @@ class Invo_create extends MY_Controller
     		}
 
     		$this->smarty->assign('info', $_set_input_post);
+
+
+    		// 受注案件情報セット
+    		for ($i=0; $input_post["ivd_item" . $i] != ""; $i++)
+    		{
+    			$set_pj_data[$i]['pj_keyword'] = $input_post["ivd_item" .  $i];
+    			$set_pj_data[$i]['qty']        = $input_post["ivd_qty" .   $i];
+    			$set_pj_data[$i]['price']      = $input_post["ivd_price" . $i];
+    			$set_pj_data[$i]['pj_billing'] = $input_post["ivd_total" . $i];
+    		}
+
+    		$this->smarty->assign('info_ivd', $set_pj_data);
 
     		// 初期値セット
     		$this->_item_set();
@@ -332,14 +404,14 @@ class Invo_create extends MY_Controller
     	$set_iv_data['iv_remark']     = $input_post['iv_remark'];                       // 備考
     	$set_iv_data['iv_memo']       = $input_post['iv_memo'];                         // メモ
 
+    	// 小計の計算
+    	/*
+    	 * 請求項目にスペースが入っている行以下は無視！
+    	 */
     	$set_iv_data['iv_subtotal'] = 0;
-    	if ($input_post['ivd_total0'] != 0)                                             // 小計
+    	for ($i=0; $input_post["ivd_item" . $i] != ""; $i++)
     	{
-    		$set_iv_data['iv_subtotal'] = $set_iv_data['iv_subtotal'] + $input_post['ivd_total0'];
-    	}
-    	if ($input_post['ivd_total1'] != 0)
-    	{
-    		$set_iv_data['iv_subtotal'] = $set_iv_data['iv_subtotal'] + $input_post['ivd_total1'];
+    		$set_iv_data['iv_subtotal'] = $set_iv_data['iv_subtotal'] + $input_post["ivd_total" . $i];
     	}
 
     	// 消費税計算
@@ -356,20 +428,20 @@ class Invo_create extends MY_Controller
     	if (ctype_digit($input_post['iv_salesman']))
     	{
     		$get_salesman = $this->ac->get_pj_salesman($input_post['iv_salesman'], 'seorank');
-    		$set_iv_data['iv_salesman']       = $get_salesman[0]['ac_name01'] . '　' . $get_salesman[0]['ac_name02'];
+    		$set_iv_data['iv_salesman']    = $get_salesman[0]['ac_name01'] . '　' . $get_salesman[0]['ac_name02'];
+    		$set_iv_data['iv_salesman_id'] = $input_post['iv_salesman'];
     	}
 
     	// 不要パラメータ削除
     	unset($set_iv_data["iv_seq"]);
-    	unset($set_iv_data["ivd_item0"]);
-    	unset($set_iv_data["ivd_qty0"]);
-    	unset($set_iv_data["ivd_price0"]);
-    	unset($set_iv_data["ivd_total0"]);
-    	unset($set_iv_data["ivd_item1"]);
-    	unset($set_iv_data["ivd_qty1"]);
-    	unset($set_iv_data["ivd_price1"]);
-    	unset($set_iv_data["ivd_total1"]);
     	unset($set_iv_data["_submit"]);
+    	for ($i=0; isset($input_post["ivd_item" . $i]); $i++)
+    	{
+    		unset($set_iv_data["ivd_item"  . $i]);
+    		unset($set_iv_data["ivd_qty"   . $i]);
+    		unset($set_iv_data["ivd_price" . $i]);
+    		unset($set_iv_data["ivd_total" . $i]);
+    	}
 
     	// tb_invoice 更新
     	$get_iv_seq = $this->iv->insert_invoice($set_iv_data);
@@ -379,7 +451,7 @@ class Invo_create extends MY_Controller
     	$this->iv->insert_invoice_history($set_iv_data);
 
     	// 明細データ新規レコードの追加
-    	if ($input_post['ivd_total0'] != 0)
+    	for ($i=0; $input_post["ivd_item" . $i] != ""; $i++)
     	{
 
     		$set_ivd_data = array();
@@ -387,29 +459,10 @@ class Invo_create extends MY_Controller
     		$set_ivd_data['ivd_iv_seq']        = $set_iv_data['iv_seq'];
     		$set_ivd_data['ivd_pj_seq']        = 0;                                        // 案件SEQ=「0」
     		$set_ivd_data['ivd_iv_issue_yymm'] = $set_iv_data['iv_issue_yymm'];
-    		$set_ivd_data['ivd_item']          = $input_post['ivd_item0'];
-    		$set_ivd_data['ivd_qty']           = $input_post['ivd_qty0'];
-    		$set_ivd_data['ivd_price']         = $input_post['ivd_price0'];
-    		$set_ivd_data['ivd_total']         = $input_post['ivd_total0'];
-
-    		$row_id = $this->ivd->insert_invoice_detail($set_ivd_data);
-
-    		$set_ivd_data['ivd_seq']           = $row_id;
-    		$this->ivd->insert_invoice_detail_history($set_ivd_data);
-    	}
-
-    	if ($input_post['ivd_total1'] != 0)
-    	{
-
-    		$set_ivd_data = array();
-    		$set_ivd_data['ivd_seq_suffix']    = $_suffix;
-    		$set_ivd_data['ivd_iv_seq']        = $set_iv_data['iv_seq'];
-    		$set_ivd_data['ivd_pj_seq']        = 0;                                        // 案件SEQ=「0」
-    		$set_ivd_data['ivd_iv_issue_yymm'] = $set_iv_data['iv_issue_yymm'];
-    		$set_ivd_data['ivd_item']          = $input_post['ivd_item1'];
-    		$set_ivd_data['ivd_qty']           = $input_post['ivd_qty1'];
-    		$set_ivd_data['ivd_price']         = $input_post['ivd_price1'];
-    		$set_ivd_data['ivd_total']         = $input_post['ivd_total1'];
+    		$set_ivd_data['ivd_item']          = $input_post["ivd_item" . $i];
+    		$set_ivd_data['ivd_qty']           = $input_post["ivd_qty" . $i];
+    		$set_ivd_data['ivd_price']         = $input_post["ivd_price" . $i];
+    		$set_ivd_data['ivd_total']         = $input_post["ivd_total" . $i];
 
     		$row_id = $this->ivd->insert_invoice_detail($set_ivd_data);
 
@@ -417,7 +470,6 @@ class Invo_create extends MY_Controller
     		$this->ivd->insert_invoice_detail_history($set_ivd_data);
 
     	}
-
     }
 
     // フォーム・バリデーションチェック : クライアント追加
@@ -504,41 +556,41 @@ class Invo_create extends MY_Controller
     					'label'   => '担当者名',
     					'rules'   => 'trim|required|max_length[20]'
     			),
-    			array(
-    					'field'   => 'iv_bank_cd',
-    					'label'   => '銀行CD',
-    					'rules'   => 'trim|required|max_length[4]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'iv_bank_nm',
-    					'label'   => '銀行名',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'iv_branch_cd',
-    					'label'   => '支店CD',
-    					'rules'   => 'trim|required|max_length[3]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'iv_branch_nm',
-    					'label'   => '支店名',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'iv_kind',
-    					'label'   => '口座種別(普通/当座)',
-    					'rules'   => 'trim|required|max_length[1]'
-    			),
-    			array(
-    					'field'   => 'iv_account_no',
-    					'label'   => '口座番号',
-    					'rules'   => 'trim|required|max_length[10]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'iv_account_nm',
-    					'label'   => '口座名義',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
+//     			array(
+//     					'field'   => 'iv_bank_cd',
+//     					'label'   => '銀行CD',
+//     					'rules'   => 'trim|required|max_length[4]|is_numeric'
+//     			),
+//     			array(
+//     					'field'   => 'iv_bank_nm',
+//     					'label'   => '銀行名',
+//     					'rules'   => 'trim|required|max_length[50]'
+//     			),
+//     			array(
+//     					'field'   => 'iv_branch_cd',
+//     					'label'   => '支店CD',
+//     					'rules'   => 'trim|required|max_length[3]|is_numeric'
+//     			),
+//     			array(
+//     					'field'   => 'iv_branch_nm',
+//     					'label'   => '支店名',
+//     					'rules'   => 'trim|required|max_length[50]'
+//     			),
+//     			array(
+//     					'field'   => 'iv_kind',
+//     					'label'   => '口座種別(普通/当座)',
+//     					'rules'   => 'trim|required|max_length[1]'
+//     			),
+//     			array(
+//     					'field'   => 'iv_account_no',
+//     					'label'   => '口座番号',
+//     					'rules'   => 'trim|required|max_length[10]|is_numeric'
+//     			),
+//     			array(
+//     					'field'   => 'iv_account_nm',
+//     					'label'   => '口座名義',
+//     					'rules'   => 'trim|required|max_length[50]'
+//     			),
     			array(
     					'field'   => 'iv_tag',
     					'label'   => 'タグ設定',

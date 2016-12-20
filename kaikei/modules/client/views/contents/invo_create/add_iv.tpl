@@ -171,13 +171,14 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="iv_memo_iv" class="col-sm-3 control-label">備　考　欄</label>
+    <label for="iv_memo_iv" class="col-sm-3 control-label">備　考　欄<br>(max.5行)</label>
     <div class="col-md-8">
       <textarea class="form-control input-sm" id="iv_remark" name="iv_remark" placeholder="max.100文字">{$tmp_remark}</textarea>
       {if form_error('iv_remark')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_remark')}</font></label>{/if}
     </div>
   </div>
 
+{*
   <div class="form-group">
     <label for="iv_bank_cd" class="col-xs-3 col-md-3 control-label">銀　　　　行<font color=red> *</font></label>
     <div class="col-xs-2 col-md-2">
@@ -218,6 +219,8 @@
       {if form_error('iv_account_nm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_account_nm')}</font></label>{/if}
     </div>
   </div>
+*}
+
   <div class="form-group">
     <label for="iv_tag" class="col-md-3 control-label">タグ設定</label>
     <div class="col-md-8">

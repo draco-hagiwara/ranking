@@ -63,7 +63,7 @@ function fmSubmit(formName, url, method, num) {
         <td colspan="4" class="col-md-1"></td>
       </tr>
       <tr>
-        <td class="col-md-1">ID並び替え</td>
+        <td class="col-md-1">会社CD並替</td>
         <td class="col-md-2  btn-md">
           {form_dropdown('orderid', $options_orderid, set_value('orderid', {$seach_orderid}))}
         </td>

@@ -28,7 +28,7 @@
 
   {if $info.iv_status==0}
     <div class="form-group">
-    <label for="iv_issue_date" class="col-xs-2 col-md-2 control-label">発効日指定<font color=red> *</font></label>
+    <label for="iv_issue_date" class="col-xs-2 col-md-2 control-label">発行日指定<font color=red> *</font></label>
     <div class="col-xs-4 col-md-2">
       {form_input('iv_issue_date' , set_value('iv_issue_date', {$info.iv_issue_date}) , 'id="mydate1" class="form-control"')}
       {if form_error('iv_issue_date')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_issue_date')}</font></label>{/if}
@@ -65,12 +65,15 @@
     <div class="col-md-8 col-md-offset-2">{$info.iv_department}</div><br>
     <div class="col-md-8 col-md-offset-2">{$info.iv_person01} {$info.iv_person02}</div>
   </div>
+
+{*
   <div class="form-group">
     <label for="iv_bank_cd" class="col-xs-2 col-md-2 control-label">銀行情報</label>
     <div class="col-md-8">（{$info.iv_bank_cd}）{$info.iv_bank_nm}</div>
     <div class="col-md-8">（{$info.iv_branch_cd}）{$info.iv_branch_nm}</div>
     <div class="col-md-8 col-md-offset-2">（{$info.iv_account_no}）{$info.iv_account_nm}</div>
   </div>
+*}
 
   <table class="table table-hover table-bordered">
     <tbody>
@@ -166,7 +169,7 @@
   </table>
 
   <div class="form-group">
-    <label for="iv_remark" class="col-sm-2 control-label">請求書：備考</label>
+    <label for="iv_remark" class="col-sm-2 control-label">請求書：備考<br>(max.5行)</label>
     <div class="col-md-8">
       <textarea class="form-control input-sm" id="iv_remark" name="iv_remark" placeholder="max.100文字">{$info.iv_remark}</textarea>
       {if form_error('iv_remark')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_remark')}</font></label>{/if}

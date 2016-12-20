@@ -3,6 +3,10 @@
 class Data_create extends MY_Controller
 {
 
+    /*
+     *  請求書データの一括作成処理
+     */
+
     public function __construct()
     {
         parent::__construct();
@@ -40,6 +44,11 @@ class Data_create extends MY_Controller
     }
 
     // 月額請求書データ 手動作成：固定
+    /*
+     *
+     *  ※成果報酬を始まると、ここは一括で処理しないといけない？
+     *
+     */
     public function fix_cal()
     {
 
@@ -81,7 +90,8 @@ class Data_create extends MY_Controller
 					// 契約期間チェック
 					$_create_date = substr($input_post['iv_issue_yymm'], 0, 4) . '-' . substr($input_post['iv_issue_yymm'], 4, 2);
 	    			$date_now = new DateTime($_create_date);
-	    			$date_now = $date_now->modify('last day of last months')->format('Y-m-d');		// 請求データ作成の指定年月の前月末日
+	    			$date_now = $date_now->modify('first day of last months')->format('Y-m-d');		// 請求データ作成の指定年月の前月1日
+// 	    			$date_now = $date_now->modify('last day of last months')->format('Y-m-d');		// 請求データ作成の指定年月の前月末日
 	    			$date_str = new DateTime($val['pj_start_date']);
 	    			$date_str = $date_str->format('Y-m-d');
 	    			$date_end = new DateTime($val['pj_end_date']);
@@ -180,20 +190,20 @@ class Data_create extends MY_Controller
     				}
     				$set_data_iv['iv_remark']         = $value['cm_memo_iv'];									// 備考欄
 
-    				$set_data_iv['iv_bank_cd']        = $value['cm_bank_cd'];									// 入金銀行情報
-    				$set_data_iv['iv_bank_nm']        = $value['cm_bank_nm'];
-    				$set_data_iv['iv_branch_cd']      = $value['cm_branch_cd'];
-    				$set_data_iv['iv_branch_nm']      = $value['cm_branch_nm'];
-    				$set_data_iv['iv_kind']           = $value['cm_kind'];
-    				$set_data_iv['iv_account_no']     = $value['cm_account_no'];
-    				$set_data_iv['iv_account_nm']     = $value['cm_account_nm'];
+//     				$set_data_iv['iv_bank_cd']        = $value['cm_bank_cd'];									// 入金銀行情報
+//     				$set_data_iv['iv_bank_nm']        = $value['cm_bank_nm'];
+//     				$set_data_iv['iv_branch_cd']      = $value['cm_branch_cd'];
+//     				$set_data_iv['iv_branch_nm']      = $value['cm_branch_nm'];
+//     				$set_data_iv['iv_kind']           = $value['cm_kind'];
+//     				$set_data_iv['iv_account_no']     = $value['cm_account_no'];
+//     				$set_data_iv['iv_account_nm']     = $value['cm_account_nm'];
 
     				$get_iv_data[0]['iv_sales_date']  = NULL;													// 売上日
 
     				// 担当営業名を取得
     				$get_salesman = $this->ac->get_pj_salesman($value['cm_salesman'], 'seorank');
     				$set_data_iv['iv_salesman']       = $get_salesman[0]['ac_name01'] . '　' . $get_salesman[0]['ac_name02'];
-
+    				$set_data_iv['iv_salesman_id']   = $value['cm_salesman'];
 
     				// 請求書データ : 既存データ有無のチェック
     				$_new_data = FALSE;
@@ -271,7 +281,7 @@ class Data_create extends MY_Controller
 						$set_data_ivd['ivd_total']          = $val['pj_billing'];								// 金額
 
 						// 担当営業名を取得
-						$set_data_ivd['ivd_pj_salesman']       = $val['pj_salesman'];
+						$set_data_ivd['ivd_pj_salesman']    = $val['pj_salesman'];
 // 						$get_salesman = $this->ac->get_pj_salesman($val['pj_salesman'], 'seorank');
 // 						$set_data_ivd['ivd_salesman']       = $get_salesman[0]['ac_name01'] . '　' . $get_salesman[0]['ac_name02'];
 
@@ -391,53 +401,6 @@ class Data_create extends MY_Controller
     	$this->smarty->assign('options_date_res', $opt_date_res);
 
     }
-
-    // 消費税計算
-//     private function _tax_calculation($_subtotal)
-//     {
-
-//     	$this->config->load('config_comm');
-//     	$_zeiritsu = $this->config->item('INVOICE_TAX');
-//     	$_zeinuki  = $this->config->item('INVOICE_TAXOUT');
-//     	$_hasuu    = $this->config->item('INVOICE_TAX_CAL');
-
-//     	$zeigaku = $_subtotal * $_zeiritsu;
-
-//     	if ($_zeinuki == 0)														// 税抜計算
-//     	{
-// 	    	// 端数計算
-//     		switch( $_hasuu )
-//     		{
-//     			case 0:
-
-//     				// 切り上げ
-//     				$tax_total = $zeigaku + 0.9;
-//     				break;
-
-//     			case 1:
-
-//     				// 切り捨て
-//     				break;
-
-//     			case 2:
-//     			default:
-
-//     				// 四捨五入
-//     				$tax_total = $zeigaku + 0.5;
-//     				break;
-//     		}
-
-//     		$result = floor( $tax_total );
-
-//     	} else {																// 税込計算
-
-//     		$result = 0;
-
-//     	}
-
-//     	return $result;
-
-//     }
 
     // フォーム・バリデーションチェック
     private function _set_validation()

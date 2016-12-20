@@ -3,6 +3,10 @@
 class Projectlist extends MY_Controller
 {
 
+	/*
+	 *  受注案件情報
+	 */
+
     public function __construct()
     {
         parent::__construct();
@@ -277,6 +281,7 @@ class Projectlist extends MY_Controller
 
     	$this->smarty->assign('pj_cm_seq',     $input_post['chg_seq']);
     	$this->smarty->assign('pj_cm_company', $cm_data[0]['cm_company']);
+    	$this->smarty->assign('pj_salesman',   $cm_data[0]['cm_salesman']);
     	$this->smarty->assign('tmp_memo',      NULL);
 
     	$this->view('projectlist/add.tpl');
@@ -322,6 +327,7 @@ class Projectlist extends MY_Controller
 
     	$this->smarty->assign('pj_cm_seq',     $input_post['pj_cm_seq']);
     	$this->smarty->assign('pj_cm_company', $input_post['pj_cm_company']);
+    	$this->smarty->assign('pj_salesman',   $input_post['pj_salesman']);
     	$this->smarty->assign('tmp_memo',      $input_post['pj_memo']);
 
     	$this->view('projectlist/add.tpl');
@@ -460,6 +466,11 @@ class Projectlist extends MY_Controller
     					'field'   => 'pj_invoice_status',
     					'label'   => '請求書発行ステータス選択',
     					'rules'   => 'trim|required|max_length[1]|is_numeric'
+    			),
+    			array(
+    					'field'   => 'pj_orders_ymd',
+    					'label'   => '受注年月日',
+    					'rules'   => 'trim|required|regex_match[/^\d{4}\-|\/\d{1,2}\-|\/\d{1,2}+$/]|max_length[10]'
     			),
     			array(
     					'field'   => 'pj_start_date',

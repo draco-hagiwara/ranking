@@ -3,6 +3,10 @@
 class Invoicelist extends MY_Controller
 {
 
+	/*
+	 *  請求書一覧
+	 */
+
     public function __construct()
     {
         parent::__construct();
@@ -238,6 +242,7 @@ class Invoicelist extends MY_Controller
 		    {
 			    switch( $get_iv_data[0]['iv_status'] ){
 			    	case 0:		// 「未発行」→「未発行」
+			    		$get_iv_data[0]['iv_sales_date']  = NULL;
 			    		break;
 			    	case 1:		// 「発行済み」→「未発行」
 
@@ -258,14 +263,13 @@ class Invoicelist extends MY_Controller
 		    	switch( $get_iv_data[0]['iv_status'] ){
 		    		case 0:		// 「未発行」→「発行済み」
 		    			$get_iv_data[0]['iv_reissue'] = $get_iv_data[0]['iv_reissue'] + 1;
-		    			$get_iv_data[0]['iv_delflg']  = 0;
 
 		    			$date = new DateTime();
 		    			$get_iv_data[0]['iv_sales_date']  = $date->format('Y-m-d');
 
 		    			break;
 		    		case 1:		// 「発行済み」→「発行済み」
-// 		    			$get_iv_data[0]['iv_reissue'] = $get_iv_data[0]['iv_reissue'] + 1;
+		    			$get_iv_data[0]['iv_reissue'] = $get_iv_data[0]['iv_reissue'] + 1;
 
 		    			break;
 		    		default:
@@ -303,19 +307,15 @@ class Invoicelist extends MY_Controller
 		    $_issue_num['client_no']        = $_SESSION['c_memGrp'];						// クライアントNO
 		    $_issue_num['customer_no']      = $get_iv_data[0]['iv_cm_seq'];					// 顧客NO
 		    $_issue_num['issue_class']      = $get_iv_data[0]['iv_method'];                 // 一括発行=1,個別発行=2
-// 		    if ($get_iv_data[0]['iv_method'] == 0)                                          // 一括発行=1,個別発行=2
-// 		    {
-// 		    	$_issue_num['issue_class']  = 1;
-// 		    } else {
-// 		    	$_issue_num['issue_class']  = 2;
-// 		    }
-    		if ($get_iv_data[0]['iv_accounting'] == 1)                                      // 「通常（固定or成果）:A」/「前受:B」/「赤伝:C」
+    		if ($get_iv_data[0]['iv_accounting'] == 0)                                      // 「通常（固定or成果）:A」/「前受:B」/「赤伝:C」
 		    {
+		    	$_issue_num['issue_accounting'] = 'A';
+		    } elseif ($get_iv_data[0]['iv_accounting'] == 1) {
 		    	$_issue_num['issue_accounting'] = 'B';
 		    } elseif ($get_iv_data[0]['iv_accounting'] == 2) {
 		    	$_issue_num['issue_accounting'] = 'C';
 		    } else {
-		    	$_issue_num['issue_accounting'] = 'A';
+		    	$_issue_num['issue_accounting'] = 'x';
     	    }
 		    $_issue_num['issue_suffix']     = $get_iv_data[0]['iv_seq_suffix'];				// 枝番
 		    $_issue_num['issue_yymm']       = $get_iv_data[0]['iv_issue_yymm'];				// 発行年月
