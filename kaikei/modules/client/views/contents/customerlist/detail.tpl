@@ -48,9 +48,9 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_company_kana" class="col-md-3 control-label">会社名カナ</label>
-    <div class="col-md-8">
-      {form_input('cm_company_kana' , set_value('cm_company_kana', $info.cm_company_kana) , 'class="form-control" placeholder="会社名カナを入力してください。max.50文字"')}
+    <label for="cm_company_kana" class="col-md-3 control-label">会社名全角カナ（弥生）<font color=red> *</font></label>
+    <div class="col-md-2">
+      {form_input('cm_company_kana' , set_value('cm_company_kana', $info.cm_company_kana) , 'class="form-control" placeholder="max.4文字"')}
       {if form_error('cm_company_kana')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_company_kana')}</font></label>{/if}
     </div>
   </div>

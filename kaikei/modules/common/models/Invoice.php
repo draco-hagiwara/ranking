@@ -75,9 +75,9 @@ class Invoice extends CI_Model
 
     	// 各SQL項目へセット
     	// WHERE
-    	$set_select_like["iv_slip_no"] = $get_post['iv_slip_no'];
-    	$set_select_like["iv_cm_seq"]  = $get_post['iv_cm_seq'];
-    	$set_select_like["iv_company"] = $get_post['iv_company'];
+    	$set_select_like["iv_slip_no"]    = $get_post['iv_slip_no'];
+    	$set_select_like["iv_cm_seq"]     = $get_post['iv_cm_seq'];
+    	$set_select_like["iv_company_cm"] = $get_post['iv_company'];
 
     	$set_select["iv_status"]       = $get_post['iv_status'];
     	$set_select["iv_issue_yymm"]   = $get_post['iv_issue_yymm'];
@@ -124,6 +124,7 @@ class Invoice extends CI_Model
     			  iv_total,
     			  iv_issue_date,
     			  iv_pay_date,
+    			  iv_company_cm,
     			  iv_company
     			FROM tb_invoice WHERE ';
 
@@ -336,8 +337,8 @@ class Invoice extends CI_Model
     public function get_iv_sales($sasles_date)
     {
 
-    	// 課金方式が「1:前受」以外
-    	$set_where = '`iv_status` = 1 AND iv_sales_date` = \'' . $sasles_date . '\' AND `iv_accounting` != 1';
+    	// 課金方式が「8:前受」以外
+    	$set_where = '`iv_status` = 1 AND iv_sales_date` = \'' . $sasles_date . '\' AND `iv_accounting` != 8';
 
     	$query = $this->db->get_where('tb_invoice', $set_where);
 

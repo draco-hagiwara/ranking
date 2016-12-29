@@ -78,7 +78,7 @@
   <table class="table table-hover table-bordered">
     <tbody>
       <tr class="active">
-        <td class="col-md-7 text-center">請　求　項　目</td>
+        <td class="col-md-7 text-center">請　求　項　目　（下段：対象URL）</td>
         <td class="col-md-1 text-center">数 量</td>
         <td class="col-md-1 text-center">単 価（円）</td>
         <td class="col-md-1 text-center">金 額（円）</td>
@@ -103,12 +103,18 @@
           {$ivd.ivd_total|number_format}
         </td>
       </tr>
+      <tr>
+        <td class="col-md-7 input-group-sm">
+          {$ivd.ivd_item_url}
+        </td>
+        <td colspan="3" class="col-md-1"></td>
+      </tr>
       {/foreach}
 
       {if $info.iv_status==0}
       <tr>
         <td class="col-md-7 input-group-sm">
-          {form_input('ivd_item0' , set_value('ivd_item0','') , 'class="form-control" placeholder="キーワード文字のみ入力してください。"')}
+          {form_input('ivd_item0' , set_value('ivd_item0','') , 'class="form-control" placeholder="追加キーワード文字を入力してください。"')}
           {if form_error('ivd_item0')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_item0')}</font></label>{/if}
         </td>
         <td class="col-md-1 input-group-sm">
@@ -124,9 +130,18 @@
           {if form_error('ivd_total0')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_total0')}</font></label>{/if}
         </td>
       </tr>
+
       <tr>
         <td class="col-md-7 input-group-sm">
-          {form_input('ivd_item1' , set_value('ivd_item1','') , 'class="form-control" placeholder="キーワード文字のみ入力してください。"')}
+          {form_input("ivd_item_url0" , set_value("ivd_item_url0", '') , 'class="form-control" placeholder="追加対象URLを入力してください。"')}
+          {if form_error("ivd_item_url0")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("ivd_item_url0")}</font></label>{/if}
+        </td>
+        <td colspan="3" class="col-md-1"></td>
+      </tr>
+
+      <tr>
+        <td class="col-md-7 input-group-sm">
+          {form_input('ivd_item1' , set_value('ivd_item1','') , 'class="form-control" placeholder="追加キーワード文字を入力してください。"')}
           {if form_error('ivd_item1')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_item1')}</font></label>{/if}
         </td>
         <td class="col-md-1 input-group-sm">
@@ -142,15 +157,24 @@
           {if form_error('ivd_total1')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_total1')}</font></label>{/if}
         </td>
       </tr>
+      <tr>
+        <td class="col-md-7 input-group-sm">
+          {form_input("ivd_item_url1" , set_value("ivd_item_url1", '') , 'class="form-control" placeholder="追加対象URLを入力してください。"')}
+          {if form_error("ivd_item_url1")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("ivd_item_url1")}</font></label>{/if}
+        </td>
+        <td colspan="3" class="col-md-1"></td>
+      </tr>
       {else}
         {form_hidden('ivd_item0' , "")}
         {form_hidden('ivd_qty0'  , "")}
         {form_hidden('ivd_price0', "")}
         {form_hidden('ivd_total0', 0)}
+        {form_hidden('ivd_item_url0' , "")}
         {form_hidden('ivd_item1' , "")}
         {form_hidden('ivd_qty1'  , "")}
         {form_hidden('ivd_price1', "")}
         {form_hidden('ivd_total1', 0)}
+        {form_hidden('ivd_item_url1' , "")}
       {/if}
 
       <tr>
@@ -169,7 +193,7 @@
   </table>
 
   <div class="form-group">
-    <label for="iv_remark" class="col-sm-2 control-label">請求書：備考<br>(max.5行)</label>
+    <label for="iv_remark" class="col-sm-2 control-label">請求書：備考<br>(max.4行)</label>
     <div class="col-md-8">
       <textarea class="form-control input-sm" id="iv_remark" name="iv_remark" placeholder="max.100文字">{$info.iv_remark}</textarea>
       {if form_error('iv_remark')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_remark')}</font></label>{/if}

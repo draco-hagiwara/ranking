@@ -49,9 +49,10 @@ class Project extends CI_Model
      * @param    int  : 課金方式（固定=0/成果=1/固+成=2）
      * @param    int  : クライアントSEQ（接続先テーブルを切替）
      * @param    char : 接続先DB
+     * @param    bool : 請求書発行有無のチェック
      * @return   bool
      */
-    public function get_pj_cm_seq($seq_no, $iv_type, $client_no, $db_name='default')
+    public function get_pj_cm_seq($seq_no, $iv_type, $client_no, $db_name='default', $invo_status = FALSE)
     {
 
     	$tb_name = 'tb_project_' . $client_no;
@@ -70,8 +71,16 @@ class Project extends CI_Model
     			  pj_cm_seq,
     			  pj_salesman
     			FROM ' . $tb_name
-    			. ' WHERE pj_cm_seq = ' . $seq_no . ' AND pj_accounting = ' . $iv_type . ' AND pj_invoice_status = 0  AND pj_status = 0 AND pj_delflg = 0'
-    			. ' ORDER BY pj_seq ASC';
+    	;
+
+    	if ($invo_status == FALSE)
+    	{
+    		$sql .= ' WHERE pj_cm_seq = ' . $seq_no . ' AND pj_accounting = ' . $iv_type . ' AND pj_invoice_status = 0  AND pj_status = 0 AND pj_delflg = 0'
+    				. ' ORDER BY pj_seq ASC';
+    	} else {
+    		$sql .= ' WHERE pj_cm_seq = ' . $seq_no . ' AND pj_accounting = ' . $iv_type . ' AND pj_status = 0 AND pj_delflg = 0'
+    				. ' ORDER BY pj_seq ASC';
+    	}
 
     	// 接続先DBを選択 ＆ クエリー実行
     	if ($db_name == 'default')

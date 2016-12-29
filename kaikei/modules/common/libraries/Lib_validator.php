@@ -4,7 +4,7 @@
  * 汎用バリデータ用クラス
  * 文字列・数字・文字数などのチェックを行う
  */
-class CommonValidator
+class Lib_validator
 {
 
     /**

@@ -131,18 +131,21 @@ class Batch extends MY_Controller
 
     		// トランザクション・START
     		$this->db->trans_strict(FALSE);                                         // StrictモードをOFF
-    		$this->db->trans_start();                                                  // trans_begin
+    		$this->db->trans_start();                                               // trans_begin
 
 			foreach($get_sales_data as $key => $value)
 			{
 
-				$set_sales['sa_sales_date']  = $value['iv_sales_date'];
+				// 売上月の指定：売上月度から指定月の売上に振り分ける
+				$set_sales['sa_sales_date']  = substr($value['iv_salse_yymm'], 0, 4) . '-' . substr($value['iv_salse_yymm'], 4, 2) . '-01';
+// 				$set_sales['sa_sales_date']  = $value['iv_sales_date'];
+
 				$set_sales['sa_cm_seq']      = $value['iv_cm_seq'];
 				$set_sales['sa_iv_seq']      = $value['iv_seq'];
 				$set_sales['sa_slip_no']     = $value['iv_slip_no'];
 				$set_sales['sa_tax']         = $value['iv_tax'];
 				$set_sales['sa_total']       = $value['iv_total'];
-				$set_sales['sa_company']     = $value['iv_company'];
+				$set_sales['sa_company']     = $value['iv_company_cm'];
 				$set_sales['sa_collect']     = $value['iv_collect'];
 				$set_sales['sa_salesman']    = $value['iv_salesman'];
 				$set_sales['sa_salesman_id'] = $value['iv_salesman_id'];

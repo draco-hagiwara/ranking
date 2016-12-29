@@ -23,7 +23,6 @@ class Top extends MY_Controller
 
             redirect('/login/');
         }
-
     }
 
     // ログイン 初期表示
@@ -31,8 +30,10 @@ class Top extends MY_Controller
     {
 
     	// セッションデータをクリア
-    	$this->load->model('comm_auth', 'comm_auth', TRUE);
-		$this->comm_auth->delete_session('client');
+    	$this->load->library('lib_auth');
+		$this->lib_auth->delete_session('client');
+//     	$this->load->model('comm_auth', 'comm_auth', TRUE);
+// 		$this->comm_auth->delete_session('client');
 
     	$this->_set_validation();
 

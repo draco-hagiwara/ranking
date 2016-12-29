@@ -14,21 +14,24 @@ class Pdf_create extends MY_Controller
     {
         parent::__construct();
 
-        if ($_SESSION['c_login'] == TRUE)
-        {
-            $this->smarty->assign('login_chk', TRUE);
-            $this->smarty->assign('mem_Type',  $_SESSION['c_memType']);
-            $this->smarty->assign('mem_Seq',   $_SESSION['c_memSeq']);
-            $this->smarty->assign('mem_Grp',   $_SESSION['c_memGrp']);
-            $this->smarty->assign('mem_Name',  $_SESSION['c_memName']);
-        } else {
-            $this->smarty->assign('login_chk', FALSE);
-            $this->smarty->assign('mem_Type',  "");
-            $this->smarty->assign('mem_Seq',   "");
-            $this->smarty->assign('mem_Grp',   "");
+        $this->load->library('lib_auth');
+        $this->lib_auth->check_session();
 
-            redirect('/login/');
-        }
+//         if ($_SESSION['c_login'] == TRUE)
+//         {
+//             $this->smarty->assign('login_chk', TRUE);
+//             $this->smarty->assign('mem_Type',  $_SESSION['c_memType']);
+//             $this->smarty->assign('mem_Seq',   $_SESSION['c_memSeq']);
+//             $this->smarty->assign('mem_Grp',   $_SESSION['c_memGrp']);
+//             $this->smarty->assign('mem_Name',  $_SESSION['c_memName']);
+//         } else {
+//             $this->smarty->assign('login_chk', FALSE);
+//             $this->smarty->assign('mem_Type',  "");
+//             $this->smarty->assign('mem_Seq',   "");
+//             $this->smarty->assign('mem_Grp',   "");
+
+//             redirect('/login/');
+//         }
 
     }
 
@@ -44,7 +47,7 @@ class Pdf_create extends MY_Controller
 
 	    	$this->load->model('Invoice',        'iv',  TRUE);
 	    	$this->load->model('Invoice_detail', 'ivd', TRUE);
-	    	$this->load->library('Commoninvoice');
+	    	$this->load->library('lib_invoice');
 	    	$this->config->load('config_comm');
 
 	    	// 請求書データの取得
@@ -82,8 +85,8 @@ class Pdf_create extends MY_Controller
 	    	$base_path = set_realpath($list_path);
 
 	    	// PDFライブラリ呼出
-	    	$this->load->library('pdf');
-	    	$this->pdf->pdf_one($get_iv_data[0], $get_ivd_data, $pdflist_path, $base_path);
+	    	$this->load->library('lib_pdf_invoice');
+	    	$this->lib_pdf_invoice->pdf_one($get_iv_data[0], $get_ivd_data, $pdflist_path, $base_path);
 
     	} else {
     		redirect('/invoicelist/');
@@ -107,7 +110,7 @@ class Pdf_create extends MY_Controller
 
 		    	$this->load->model('Invoice',        'iv',  TRUE);
 		    	$this->load->model('Invoice_detail', 'ivd', TRUE);
-		    	$this->load->library('Commoninvoice');
+		    	$this->load->library('lib_invoice');
 		    	$this->config->load('config_comm');
 
 		    	// 不要パラメータ削除
@@ -144,12 +147,6 @@ class Pdf_create extends MY_Controller
 			    		log_message('error', 'CLIENT::[Pdf_create -> pdf_one()]：請求書PDF 個別作成処理 トランザクションエラー');
 			    	}
 
-
-
-			    	log_message('error', "xxxxxxxxxxxxxxxxxxxxxxxxxxx");
-			    	log_message('error', count($get_ivd_data[$i]));
-
-
 					$i++;
 
 		    	}
@@ -167,8 +164,8 @@ class Pdf_create extends MY_Controller
 		    	$base_path = set_realpath($list_path);
 
 		    	// PDFライブラリ呼出
-		    	$this->load->library('pdf');
-	    		$this->pdf->pdf_batch($get_iv_data, $get_ivd_data, $pdflist_path, $base_path, $page_add = TRUE);
+		    	$this->load->library('lib_pdf_invoice');
+	    		$this->lib_pdf_invoice->pdf_batch($get_iv_data, $get_ivd_data, $pdflist_path, $base_path, $page_add = TRUE);
 
 	    	}
     	}
@@ -187,36 +184,75 @@ class Pdf_create extends MY_Controller
     	// 売上データ作成有無の判定
     	if ($get_iv_data['iv_status'] == 0)
     	{
-    		// 「未発行」→「発行済」
+    		// 「未発行」→「発行済」：売上日付 = 発行日
     		$date = new DateTime();
-    		$set_data_iv['iv_sales_date'] = $date->format('Y-m-d');								// 売上日
+    		$set_data_iv['iv_sales_date'] = $get_iv_data['iv_issue_date'];							// 売上日
+    		//$set_data_iv['iv_sales_date'] = $date->format('Y-m-d');								// 売上日
     	}
 
-    	$set_data_iv['iv_status']     = 1;														// ステータス：「発行済」
+    	$set_data_iv['iv_status']     = 1;															// ステータス：「発行済」
 
-    	$set_data_iv['iv_seq_suffix'] = $get_iv_data['iv_seq_suffix'] + 1;						// 履歴カウント
-    	$set_data_iv['iv_reissue']    = $get_iv_data['iv_reissue'] + 1;							// 発行カウント
+    	$set_data_iv['iv_seq_suffix'] = $get_iv_data['iv_seq_suffix'] + 1;							// 履歴カウント
+    	$set_data_iv['iv_reissue']    = $get_iv_data['iv_reissue'] + 1;								// 発行カウント
 
-    	// 請求書発行番号
-    	$_issue_num['issue_num']      = $this->config->item('INVOICE_ISSUE_NUM');				// 接頭語
-    	$_issue_num['client_no']      = $_SESSION['c_memGrp'];									// クライアントNO
-    	$_issue_num['customer_no']    = $set_data_iv['iv_cm_seq'];								// 顧客NO
-    	$_issue_num['issue_class']    = $get_iv_data['iv_method'];                        		// 一括発行=1,個別発行=2
-    	if ($get_iv_data['iv_accounting'] == 0)
+    	// 請求書発行番号 :: 【LA101-KT-BX001-1611】
+    	$_issue_num['issue_num']      = $this->config->item('INVOICE_ISSUE_NUM');       			// 接頭語:L
+    	$_issue_num['issue_code']     = $this->lib_invoice->issue_code($set_data_iv['iv_cm_seq']);	// 会社名かな⇒記号
+    	$_issue_num['issue_client']   = $_SESSION['c_memGrp'];                          			// クライアントNO
+    	$_issue_num['issue_customer'] = $set_data_iv['iv_cm_seq'];                       			// 顧客NO
+    	$_issue_num['issue_kind']     = "KT";                       								// KT(SEO固定)、SK（SEO成功）、KK(広告)、SS(制作)、AF(アフィリエイト）、OT(その他)
+    	if ($get_iv_data['iv_method'] == "B")														// 一括発行=B,個別発行=C
     	{
-    		$_issue_num['issue_accounting'] = 'A';												// 「通常（固定or成果）:A」/「前受取:B」/「赤伝票:C」
-    	} elseif ($get_iv_data['iv_accounting'] == 1) {
-    		$_issue_num['issue_accounting'] = 'B';
-    	} elseif ($get_iv_data['iv_accounting'] == 2) {
-    		$_issue_num['issue_accounting'] = 'C';
+    		$_issue_num['issue_class']    = "B";
     	} else {
-    		$_issue_num['issue_accounting'] = 'x';
+    		$_issue_num['issue_class']    = "C";
     	}
-    	$_issue_num['issue_suffix']   = $set_data_iv['iv_seq_suffix'];							// 枝番
-    	$_issue_num['issue_yymm']     = $get_iv_data['iv_issue_yymm'];							// 発行年月
-    	$_issue_num['issue_re']       = $set_data_iv['iv_reissue'];								// 再発行
+    	if ($get_iv_data['iv_accounting'] == 0)														// X=通常(固定、成果)/Y=前受が含む場合/Z=赤伝用請求書（マイナス）
+    	{
+    		$_issue_num['issue_accounting'] = 'X';
+    		$_tmp_accounting = 0;
+    	} elseif ($get_iv_data['iv_accounting'] == 1) {
+    		$_issue_num['issue_accounting'] = 'X';
+    		$_tmp_accounting = 1;
+    	} elseif ($get_iv_data['iv_accounting'] == 2) {
+    		$_issue_num['issue_accounting'] = 'X';
+    		$_tmp_accounting = 2;
+    	} elseif ($get_iv_data['iv_accounting'] == 7) {
+    		$_issue_num['issue_accounting'] = 'H';
+    		$_tmp_accounting = 7;
+    	} elseif ($get_iv_data['iv_accounting'] == 8) {
+    		$_issue_num['issue_accounting'] = 'Y';
+    		$_tmp_accounting = 8;
+    	} elseif ($get_iv_data['iv_accounting'] == 9) {
+    		$_issue_num['issue_accounting'] = 'Z';
+    		$_tmp_accounting = 9;
+    	} else {
+    		$_issue_num['issue_accounting'] = 'EE';
+    		$_tmp_accounting = 99;
+    	}
+    	$_issue_num['issue_suffix']   = $set_data_iv['iv_seq_suffix'];                              // 枝番
+    	$_issue_num['issue_yymm']     = $get_iv_data['iv_issue_yymm'];                   			// 発行年月
+    	$_issue_num['issue_re']       = $set_data_iv['iv_reissue'];                  				// 再発行
+//     	// 請求書発行番号
+//     	$_issue_num['issue_num']      = $this->config->item('INVOICE_ISSUE_NUM');				// 接頭語
+//     	$_issue_num['client_no']      = $_SESSION['c_memGrp'];									// クライアントNO
+//     	$_issue_num['customer_no']    = $set_data_iv['iv_cm_seq'];								// 顧客NO
+//     	$_issue_num['issue_class']    = $get_iv_data['iv_method'];                        		// 一括発行=1,個別発行=2
+//     	if ($get_iv_data['iv_accounting'] == 0)
+//     	{
+//     		$_issue_num['issue_accounting'] = 'A';												// 「通常（固定or成果）:A」/「前受取:B」/「赤伝票:C」
+//     	} elseif ($get_iv_data['iv_accounting'] == 1) {
+//     		$_issue_num['issue_accounting'] = 'B';
+//     	} elseif ($get_iv_data['iv_accounting'] == 2) {
+//     		$_issue_num['issue_accounting'] = 'C';
+//     	} else {
+//     		$_issue_num['issue_accounting'] = 'x';
+//     	}
+//     	$_issue_num['issue_suffix']   = $set_data_iv['iv_seq_suffix'];							// 枝番
+//     	$_issue_num['issue_yymm']     = $get_iv_data['iv_issue_yymm'];							// 発行年月
+//     	$_issue_num['issue_re']       = $set_data_iv['iv_reissue'];								// 再発行
 
-    	$set_data_iv['iv_slip_no']    = $this->commoninvoice->issue_num($_issue_num);
+    	$set_data_iv['iv_slip_no']    = $this->lib_invoice->issue_num($_issue_num);
 
     	// 不要パラメータ削除
     	unset($set_data_iv["iv_create_date"]) ;

@@ -34,14 +34,14 @@
         </td>
       </tr>
       <tr>
-        <td class="col-md-1">売上日<font color=red> *</font></td>
+        <td class="col-md-1">売上月<font color=red> *</font></td>
         <td class="col-md-2 input-group-sm">
-          {form_input('sa_sales_date01' , set_value('sa_sales_date01', {$seach_sa_sales_date01}) , 'class="form-control"')}
+          {form_input('sa_sales_date01' , set_value('sa_sales_date01', {$seach_sa_sales_date01}) , 'class="form-control" placeholder="yyyy-mm"')}
           {if form_error('sa_sales_date01')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('sa_sales_date01')}</font></label>{/if}
         </td>
         <td class="col-md-1 text-center">　～　</td>
         <td class="col-md-2 input-group-sm">
-          {form_input('sa_sales_date02' , set_value('sa_sales_date02', {$seach_sa_sales_date02}) , 'class="form-control"')}
+          {form_input('sa_sales_date02' , set_value('sa_sales_date02', {$seach_sa_sales_date02}) , 'class="form-control" placeholder="yyyy-mm"')}
           {if form_error('sa_sales_date02')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('sa_sales_date02')}</font></label>{/if}
         </td>
         <td class="col-md-1">回収サイト</td>
@@ -79,11 +79,11 @@
 </ul>
 
 
-  {if $seach_displine==0}
+  {if $seach_displine==0}{* 会社別表示 *}
   <table class="table table-striped table-hover">
     <thead>
       <tr>
-        <th>売 上 日</th>
+        <th>売 上 月</th>
         <th>会 社 名</th>
         <th>請求書NO</th>
         <th>売上金額</th>
@@ -95,7 +95,7 @@
       <tbody>
         <tr>
           <td>
-            {$sa.sa_sales_date}
+            {$sa.sa_sales_date|date_format:"%Y-%m"}
           </td>
           <td>
             {$sa.sa_company}
@@ -117,11 +117,11 @@
 
   </table>
 
-  {elseif $seach_displine==1}
+  {elseif $seach_displine==1}{* 金額集計（売上月毎） *}
   <table class="table table-striped table-hover">
     <thead>
       <tr>
-        <th>売 上 日</th>
+        <th>売 上 月</th>
         <th>売上金額</th>
       </tr>
     </thead>
@@ -130,7 +130,7 @@
       <tbody>
         <tr>
           <td>
-            {$sa.sa_sales_date}
+            {$sa.sa_sales_date|date_format:"%Y-%m"}
           </td>
           <td>
             {$sa.sum_total|number_format} 円

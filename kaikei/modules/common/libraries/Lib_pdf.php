@@ -7,7 +7,7 @@ require_once(APPPATH . '../../vendor/setasign/fpdi/fpdi.php');
 /**
  * TCPDF - CodeIgniter Integration
  */
-class Pdf extends TCPDF {
+class Lib_pdf extends TCPDF {
 
     /**
      * Initialize
@@ -90,14 +90,14 @@ class Pdf extends TCPDF {
 		$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 
 		$pdf->SetFont($font1, '', 9);
-		$pdf->Text(155, 10, "伝票No:" . $iv_data['iv_slip_no']);
+		$pdf->Text(145, 10, "伝票No:" . $iv_data['iv_slip_no']);
 
 		$format = 'Y-m-d';
 		$date = DateTime::createFromFormat($format, $iv_data["iv_issue_date"]);
-		$pdf->Text(155, 15, "発行日:" . $date->format('Y年m月d日'));
+		$pdf->Text(163, 15, "発行日:" . $date->format('Y年m月d日'));
 
 		$pdf->Text(25, 10, "〒" . $iv_data["iv_zip01"] . '-' . $iv_data["iv_zip02"]);
-		$pdf->Text(25, 15, $iv_data["iv_pref"] . $iv_data["iv_addr01"] . $iv_data["iv_addr02"] . $iv_data["iv_buil"]);
+		$pdf->Text(25, 15, $iv_data["iv_pref"] . $iv_data["iv_addr01"] . $iv_data["iv_addr02"] . " " . $iv_data["iv_buil"]);
 		if ($iv_data["iv_person01"] == "")
 		{
 			$pdf->Text(25, 20, $iv_data["iv_company"] . " 御中");
@@ -160,7 +160,8 @@ class Pdf extends TCPDF {
 		// 明細
 		if ($iv_data["iv_accounting"] == 0)
 		{
-			$pdf->Cell($w1, $h2, 'SEO月額報酬 明細（' . $iv_data["iv_issue_yymm"] . '月度）', "LR", 0);
+			$_issue_yymm = str_split($iv_data["iv_issue_yymm"], 4);
+			$pdf->Cell($w1, $h2, 'SEO月額報酬 明細（' . $_issue_yymm[0] . '年' . $_issue_yymm[1] . '月度）', "LR", 0);
 			$pdf->Cell($w2, $h2, '', "LR", 0, "C");
 			$pdf->Cell($w3, $h2, '', "LR", 0, "R");
 			$pdf->Cell($w4, $h2, '', "LR", 1, "R");
@@ -185,9 +186,16 @@ class Pdf extends TCPDF {
 				$pdf->Cell($w1, $h3, '　対象キーワード：「' . $_key_word . '」', "LR", 0);
 			}
 
-			$pdf->Cell($w2, $h3, number_format($val["ivd_qty"]), "LR", 0, "C");
-			$pdf->Cell($w3, $h3, number_format($val["ivd_price"]), "LR", 0, "R");
-			$pdf->Cell($w4, $h3, number_format($val["ivd_total"]), "LR", 1, "R");
+			if ($val["ivd_total"] != 0)
+			{
+				$pdf->Cell($w2, $h3, number_format($val["ivd_qty"]), "LR", 0, "C");
+				$pdf->Cell($w3, $h3, number_format($val["ivd_price"]), "LR", 0, "R");
+				$pdf->Cell($w4, $h3, number_format($val["ivd_total"]), "LR", 1, "R");
+			} else {
+				$pdf->Cell($w2, $h3, "", "LR", 0, "C");
+				$pdf->Cell($w3, $h3, "", "LR", 0, "R");
+				$pdf->Cell($w4, $h3, "", "LR", 1, "R");
+			}
 		}
 
 		// 明細：最後の空白行
@@ -246,8 +254,10 @@ class Pdf extends TCPDF {
 
 		$w1 = $y+4;
 		$w2 = $y+10;
-		$w3 = $y+5;
-		$h1 = 18.0;
+		$w3 = $y+4;
+// 		$w3 = $y+5;
+		$h1 = 16.0;
+// 		$h1 = 18.0;
 
 		$pdf->SetFont($font1, '', 9);
 		$pdf->SetFillColor(211, 211, 211);
@@ -258,6 +268,8 @@ class Pdf extends TCPDF {
 		$date = DateTime::createFromFormat($format, $iv_data["iv_pay_date"]);
 		$pdf->Rect(40.0, $w1, 50.0, $h1, 'D');
 		$pdf->Text(50.0, $w2, $date->format('Y年m月d日'));
+
+		$pdf->SetFont($font1, '', 8);
 
 		$pdf->Rect(90.0, $w1, 30.0, $h1, 'DF');
 		$pdf->Text(92.0, $w2, "お振込先");
@@ -336,14 +348,14 @@ class Pdf extends TCPDF {
 				$pdf->AddPage();                                                        // 空のページを追加
 
 				$pdf->SetFont($font1, '', 9);
-				$pdf->Text(155, 10, "伝票No:" . $val['iv_slip_no']);
+				$pdf->Text(145, 10, "伝票No:" . $val['iv_slip_no']);
 
 				$format = 'Y-m-d';
 				$date = DateTime::createFromFormat($format, $val["iv_issue_date"]);
-				$pdf->Text(155, 15, "発行日:" . $date->format('Y年m月d日'));
+				$pdf->Text(163, 15, "発行日:" . $date->format('Y年m月d日'));
 
 				$pdf->Text(25, 10, "〒" . $val["iv_zip01"] . '-' . $val["iv_zip02"]);
-				$pdf->Text(25, 15, $val["iv_pref"] . $val["iv_addr01"] . $val["iv_addr02"] . $val["iv_buil"]);
+				$pdf->Text(25, 15, $val["iv_pref"] . $val["iv_addr01"] . $val["iv_addr02"] . " " . $val["iv_buil"]);
 				if ($val["iv_person01"] == "")
 				{
 					$pdf->Text(25, 20, $val["iv_company"] . " 御中");
@@ -406,7 +418,8 @@ class Pdf extends TCPDF {
 				// 明細
 				if ($val["iv_accounting"] == 0)
 				{
-					$pdf->Cell($w1, $h2, 'SEO月額報酬 明細（' . $val["iv_issue_yymm"] . '月度）', "LR", 0);
+					$_issue_yymm = str_split($val["iv_issue_yymm"], 4);
+					$pdf->Cell($w1, $h2, 'SEO月額報酬 明細（' . $_issue_yymm[0] . '年' . $_issue_yymm[1] . '月度）', "LR", 0);
 					$pdf->Cell($w2, $h2, '', "LR", 0, "C");
 					$pdf->Cell($w3, $h2, '', "LR", 0, "R");
 					$pdf->Cell($w4, $h2, '', "LR", 1, "R");
@@ -430,9 +443,21 @@ class Pdf extends TCPDF {
 					} else {
 						$pdf->Cell($w1, $h3, '　対象キーワード：「' . $_key_word . '」', "LR", 0);
 					}
-					$pdf->Cell($w2, $h3, number_format($val_ivd["ivd_qty"]), "LR", 0, "C");
-					$pdf->Cell($w3, $h3, number_format($val_ivd["ivd_price"]), "LR", 0, "R");
-					$pdf->Cell($w4, $h3, number_format($val_ivd["ivd_total"]), "LR", 1, "R");
+
+					if ($val_ivd["ivd_total"] != 0)
+					{
+						$pdf->Cell($w2, $h3, number_format($val_ivd["ivd_qty"]), "LR", 0, "C");
+						$pdf->Cell($w3, $h3, number_format($val_ivd["ivd_price"]), "LR", 0, "R");
+						$pdf->Cell($w4, $h3, number_format($val_ivd["ivd_total"]), "LR", 1, "R");
+					} else {
+						$pdf->Cell($w2, $h3, "", "LR", 0, "C");
+						$pdf->Cell($w3, $h3, "", "LR", 0, "R");
+						$pdf->Cell($w4, $h3, "", "LR", 1, "R");
+					}
+
+// 					$pdf->Cell($w2, $h3, number_format($val_ivd["ivd_qty"]), "LR", 0, "C");
+// 					$pdf->Cell($w3, $h3, number_format($val_ivd["ivd_price"]), "LR", 0, "R");
+// 					$pdf->Cell($w4, $h3, number_format($val_ivd["ivd_total"]), "LR", 1, "R");
 
 				}
 
@@ -465,21 +490,24 @@ class Pdf extends TCPDF {
 
 				// 複数ページ処理 : 明細20行位がmax？
 				/*
-				 * 一括作成でその中に１ページでも改ページ処理がはいると全てのページに反映されてしまう。
+				 * 一括作成でその中に１ページでも改ページ処理がはいると全てのページに反映されてしまうか、改ページが効かない。
 				 * 自動改ページ指定にすると「振込指定」欄が崩れる。
 				 * 現状、この場合該当ページのみ個別でPDF作成を行ってもらう？
 				 * 「備考」欄はmax５行まで考慮。
 				 */
 				if ($val["iv_remark"] != '')
 				{
-					if (count($ivd_data) >= 10 && count($ivd_data) <= 20)
+					$_line_cnt = count($ivd_data[$key]);
+					if (($_line_cnt >= 15) && ($_line_cnt <= 19))
 					{
 						$pdf->AddPage();                                                        // 空のページを追加
 					}
 
 					$pdf->MultiCell(185, 10, "【備　考　】\n" . $val["iv_remark"], 1, 'L', 0);
 				} else {
-					if (count($ivd_data) >= 15 && count($ivd_data) <= 20)
+
+					$_line_cnt = count($ivd_data[$key]);
+					if (($_line_cnt >= 15) && ($_line_cnt <= 19))
 					{
 						$pdf->AddPage();                                                        // 空のページを追加
 					}
@@ -492,8 +520,10 @@ class Pdf extends TCPDF {
 
 				$w1 = $y+4;
 				$w2 = $y+10;
-				$w3 = $y+5;
-				$h1 = 18.0;
+				$w3 = $y+4;
+// 				$w3 = $y+5;
+				$h1 = 16.0;
+// 				$h1 = 18.0;
 
 				$pdf->SetFont($font1, '', 9);
 				$pdf->SetFillColor(211, 211, 211);
@@ -504,6 +534,8 @@ class Pdf extends TCPDF {
 				$date = DateTime::createFromFormat($format, $val["iv_pay_date"]);
 				$pdf->Rect(40.0, $w1, 50.0, $h1, 'D');
 				$pdf->Text(50.0, $w2, $date->format('Y年m月d日'));
+
+				$pdf->SetFont($font1, '', 8);
 
 				$pdf->Rect(90.0, $w1, 30.0, $h1, 'DF');
 				$pdf->Text(92.0, $w2, "お振込先");

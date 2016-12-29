@@ -64,7 +64,7 @@
   <table class="table table-hover table-bordered">
     <tbody>
       <tr class="active">
-        <td class="col-md-7 text-center">請　求　項　目</td>
+        <td class="col-md-7 text-center">請　求　項　目　（下段：対象URL）</td>
         <td class="col-md-1 text-center">数 量</td>
         <td class="col-md-1 text-center">単 価（円）</td>
         <td class="col-md-1 text-center">金 額（円）</td>
@@ -84,6 +84,11 @@
         <td class="col-md-1 input-group-sm text-right">
           {$ivd.ivd_total|number_format}
         </td>
+      <tr>
+        <td class="col-md-7 input-group-sm">
+          {$ivd.ivd_item_url}
+        </td>
+        <td colspan="3" class="col-md-1"></td>
       </tr>
       {/foreach}
 

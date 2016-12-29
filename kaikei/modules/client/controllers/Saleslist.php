@@ -11,21 +11,24 @@ class Saleslist extends MY_Controller
     {
         parent::__construct();
 
-        if ($_SESSION['c_login'] == TRUE)
-        {
-            $this->smarty->assign('login_chk', TRUE);
-            $this->smarty->assign('mem_Type',  $_SESSION['c_memType']);
-            $this->smarty->assign('mem_Seq',   $_SESSION['c_memSeq']);
-            $this->smarty->assign('mem_Grp',   $_SESSION['c_memGrp']);
-            $this->smarty->assign('mem_Name',  $_SESSION['c_memName']);
-        } else {
-            $this->smarty->assign('login_chk', FALSE);
-            $this->smarty->assign('mem_Type',  "");
-            $this->smarty->assign('mem_Seq',   "");
-            $this->smarty->assign('mem_Grp',   "");
+        $this->load->library('lib_auth');
+        $this->lib_auth->check_session();
 
-            redirect('/login/');
-        }
+//         if ($_SESSION['c_login'] == TRUE)
+//         {
+//             $this->smarty->assign('login_chk', TRUE);
+//             $this->smarty->assign('mem_Type',  $_SESSION['c_memType']);
+//             $this->smarty->assign('mem_Seq',   $_SESSION['c_memSeq']);
+//             $this->smarty->assign('mem_Grp',   $_SESSION['c_memGrp']);
+//             $this->smarty->assign('mem_Name',  $_SESSION['c_memName']);
+//         } else {
+//             $this->smarty->assign('login_chk', FALSE);
+//             $this->smarty->assign('mem_Type',  "");
+//             $this->smarty->assign('mem_Seq',   "");
+//             $this->smarty->assign('mem_Grp',   "");
+
+//             redirect('/login/');
+//         }
 
         $this->smarty->assign('mess', FALSE);
 
@@ -36,8 +39,8 @@ class Saleslist extends MY_Controller
     {
 
     	// セッションデータをクリア
-    	$this->load->model('comm_auth', 'comm_auth', TRUE);
-    	$this->comm_auth->delete_session('client');
+    	$this->load->library('lib_auth');
+    	$this->lib_auth->delete_session('client');
 
         // バリデーション・チェック
         $this->_set_validation();												// バリデーション設定
@@ -58,7 +61,8 @@ class Saleslist extends MY_Controller
 
             // 発行年月 <- 初期値(当月1日を設定)
             $date = new DateTime();
-            $_date_ymd = $date->modify('first day of this months')->format('Y-m-d');
+            $_date_ymd = $date->modify('first day of this months')->format('Y-m');
+//             $_date_ymd = $date->modify('first day of this months')->format('Y-m-d');
 
 			$tmp_inputpost = array(
 								'sa_slip_no'      => '',
@@ -173,7 +177,7 @@ class Saleslist extends MY_Controller
 	            	$tmp_inputpost['sa_sales_date02'] = $date->format('Y-m-d 23:59:59');
 	            } else {
 	            	$date = new DateTime($tmp_inputpost['sa_sales_date02']);
-	            	$tmp_inputpost['sa_sales_date02'] = $date->format('Y-m-d 23:59:59');
+	            	$tmp_inputpost['sa_sales_date02'] = $date->modify('last day of this months')->format('Y-m-d 23:59:59');
 	            }
         	}
 
@@ -207,7 +211,7 @@ class Saleslist extends MY_Controller
             	$tmp_inputpost['sa_sales_date02'] = $date->format('Y-m-d 23:59:59');
             } else {
             	$date = new DateTime($tmp_inputpost['sa_sales_date02']);
-            	$tmp_inputpost['sa_sales_date02'] = $date->format('Y-m-d 23:59:59');
+            	$tmp_inputpost['sa_sales_date02'] = $date->modify('last day of this months')->format('Y-m-d 23:59:59');
             }
 
         }
@@ -415,13 +419,13 @@ class Saleslist extends MY_Controller
     			),
     			array(
     					'field'   => 'sa_sales_date01',
-    					'label'   => ' ',
-    					'rules'   => 'trim|regex_match[/^\d{4}\-|\/\d{1,2}\-|\/\d{1,2}+$/]|max_length[10]'
+    					'label'   => '開始月',
+    					'rules'   => 'trim|regex_match[/^\d{4}\-|\/\d{1,2}+$/]|max_length[7]'
     			),
     			array(
     					'field'   => 'sa_sales_date02',
-    					'label'   => ' ',
-    					'rules'   => 'trim|regex_match[/^\d{4}\-|\/\d{1,2}\-|\/\d{1,2}+$/]|max_length[10]'
+    					'label'   => '終了月',
+    					'rules'   => 'trim|regex_match[/^\d{4}\-|\/\d{1,2}+$/]|max_length[7]'
     			),
     			array(
     					'field'   => 'sa_collect',

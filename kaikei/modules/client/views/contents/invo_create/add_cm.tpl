@@ -35,7 +35,7 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="iv_issue_date" class="col-xs-3 col-md-3 control-label">発効日指定<font color=red> *</font></label>
+    <label for="iv_issue_date" class="col-xs-3 col-md-3 control-label">発行日指定<font color=red> *</font></label>
     <div class="col-xs-4 col-md-2">
       {form_input('iv_issue_date' , set_value('iv_issue_date', '') , 'id="mydate1" class="form-control"')}
       {if form_error('iv_issue_date')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_issue_date')}</font></label>{/if}
@@ -60,8 +60,15 @@
   </div>
 
   <div class="form-group">
-    <label for="iv_company" class="col-md-3 control-label">会社名<font color=red> *</font></label>
-    <div class="col-md-8">{$info.cm_company}</div>
+    <label for="iv_company_cm" class="col-md-3 control-label">会社名<font color=red> *</font></label>
+    <div class="col-md-8">{$info.cm_company_cm}</div>
+  </div>
+  <div class="form-group">
+    <label for="iv_company" class="col-xs-3 col-md-3 control-label">請求書住所：会社名<font color=red> *</font></label>
+    <div class="col-md-8">
+      {form_input('iv_company' , set_value('iv_company', {$info.cm_company}) , 'class="form-control p-locality" placeholder="請求書住所：会社名を入力してください。 max.50文字"')}
+      {if form_error('iv_company')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_company')}</font></label>{/if}
+    </div>
   </div>
   <div class="form-group">
     <label for="iv_zip" class="col-xs-3 col-md-3 control-label">郵便番号<font color=red> *</font></label>
@@ -171,7 +178,7 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="iv_memo_iv" class="col-sm-3 control-label">備　考　欄<br>(max.5行)</label>
+    <label for="iv_memo_iv" class="col-sm-3 control-label">備　考　欄<br>(max.4行)</label>
     <div class="col-md-8">
       <textarea class="form-control input-sm" id="iv_remark" name="iv_remark" placeholder="max.100文字">{$tmp_remark}</textarea>
       {if form_error('iv_remark')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_remark')}</font></label>{/if}
@@ -241,7 +248,7 @@
   <table class="table table-hover table-bordered">
     <tbody>
       <tr class="active">
-        <td class="col-md-7 text-center">請　求　項　目</td>
+        <td class="col-md-7 text-center">請　求　項　目　（下段：対象URL）</td>
         <td class="col-md-1 text-center">数 量</td>
         <td class="col-md-1 text-center">単 価（円）</td>
         <td class="col-md-1 text-center">金 額（円）</td>
@@ -250,7 +257,7 @@
       {foreach from=$info_ivd item=ivd name="id"}
       <tr>
         <td class="col-md-7 input-group-sm">
-          {form_input("ivd_item{$smarty.foreach.id.index}" , set_value("ivd_item{$smarty.foreach.id.index}", $ivd.pj_keyword) , 'class="form-control" placeholder="キーワード文字のみ入力してください。"')}
+          {form_input("ivd_item{$smarty.foreach.id.index}" , set_value("ivd_item{$smarty.foreach.id.index}", $ivd.pj_keyword) , 'class="form-control" placeholder="追加キーワード文字を入力してください。"')}
           {if form_error("ivd_item{$smarty.foreach.id.index}")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("ivd_item{$smarty.foreach.id.index}")}</font></label>{/if}
         </td>
         <td class="col-md-1 input-group-sm">
@@ -266,6 +273,13 @@
           {if form_error("ivd_total{$smarty.foreach.id.index}")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("ivd_total{$smarty.foreach.id.index}")}</font></label>{/if}
         </td>
       </tr>
+      <tr>
+        <td class="col-md-7 input-group-sm">
+          {form_input("ivd_item_url{$smarty.foreach.id.index}" , set_value("ivd_item_url{$smarty.foreach.id.index}", $ivd.pj_url) , 'class="form-control" placeholder="追加対象URLを入力してください。"')}
+          {if form_error("ivd_item_url{$smarty.foreach.id.index}")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("ivd_item_url{$smarty.foreach.id.index}")}</font></label>{/if}
+        </td>
+        <td colspan="3" class="col-md-1"></td>
+      </tr>
       {/foreach}
     </tbody>
   </table>
@@ -276,9 +290,10 @@
     </div>
   </div>
 
-  {form_hidden('iv_seq',      $info.cm_seq)}
-  {form_hidden('iv_company',  $info.cm_company)}
-  {form_hidden('iv_salesman', $info.cm_salesman)}
+  {form_hidden('iv_seq',        $info.cm_seq)}
+  {form_hidden('iv_company_cm', $info.cm_company_cm)}
+  {*form_hidden('iv_company',    $info.cm_company)*}
+  {form_hidden('iv_salesman',   $info.cm_salesman)}
 
   <br>
   <!-- Button trigger modal -->

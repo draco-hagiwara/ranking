@@ -60,8 +60,15 @@
   </div>
 
   <div class="form-group">
-    <label for="iv_company" class="col-md-3 control-label">会社名<font color=red> *</font></label>
-    <div class="col-md-8">{$iv_company}</div>
+    <label for="iv_company_cm" class="col-md-3 control-label">会社名<font color=red> *</font></label>
+    <div class="col-md-8">{$info.iv_company_cm}</div>
+  </div>
+  <div class="form-group">
+    <label for="iv_company" class="col-xs-3 col-md-3 control-label">請求書住所：会社名<font color=red> *</font></label>
+    <div class="col-md-8">
+      {form_input('iv_company' , set_value('iv_company', {$info.iv_company}) , 'class="form-control p-locality" placeholder="請求書住所：会社名を入力してください。 max.50文字"')}
+      {if form_error('iv_company')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_company')}</font></label>{/if}
+    </div>
   </div>
   <div class="form-group">
     <label for="iv_zip" class="col-xs-3 col-md-3 control-label">郵便番号<font color=red> *</font></label>
@@ -171,7 +178,7 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="iv_memo_iv" class="col-sm-3 control-label">備　考　欄<br>(max.5行)</label>
+    <label for="iv_memo_iv" class="col-sm-3 control-label">備　考　欄<br>(max.4行)</label>
     <div class="col-md-8">
       <textarea class="form-control input-sm" id="iv_remark" name="iv_remark" placeholder="max.100文字">{$tmp_remark}</textarea>
       {if form_error('iv_remark')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_remark')}</font></label>{/if}
@@ -241,7 +248,7 @@
   <table class="table table-hover table-bordered">
     <tbody>
       <tr class="active">
-        <td class="col-md-7 text-center">請　求　項　目</td>
+        <td class="col-md-7 text-center">請　求　項　目　（下段：対象URL）</td>
         <td class="col-md-1 text-center">数 量</td>
         <td class="col-md-1 text-center">単 価（円）</td>
         <td class="col-md-1 text-center">金 額（円）</td>
@@ -249,7 +256,7 @@
 
       <tr>
         <td class="col-md-7 input-group-sm">
-          {form_input('ivd_item0' , set_value('ivd_item0','') , 'class="form-control" placeholder="キーワード文字のみ入力してください。"')}
+          {form_input('ivd_item0' , set_value('ivd_item0','') , 'class="form-control" placeholder="キーワード文字を入力してください。"')}
           {if form_error('ivd_item0')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_item0')}</font></label>{/if}
         </td>
         <td class="col-md-1 input-group-sm">
@@ -267,7 +274,14 @@
       </tr>
       <tr>
         <td class="col-md-7 input-group-sm">
-          {form_input('ivd_item1' , set_value('ivd_item1','') , 'class="form-control" placeholder="キーワード文字のみ入力してください。"')}
+          {form_input("ivd_item_url0" , set_value("ivd_item_url0", '') , 'class="form-control" placeholder="対象URLを入力してください。"')}
+          {if form_error("ivd_item_url0")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("ivd_item_url0")}</font></label>{/if}
+        </td>
+        <td colspan="3" class="col-md-1"></td>
+      </tr>
+      <tr>
+        <td class="col-md-7 input-group-sm">
+          {form_input('ivd_item1' , set_value('ivd_item1','') , 'class="form-control" placeholder="キーワード文字を入力してください。"')}
           {if form_error('ivd_item1')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_item1')}</font></label>{/if}
         </td>
         <td class="col-md-1 input-group-sm">
@@ -283,11 +297,19 @@
           {if form_error('ivd_total1')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_total1')}</font></label>{/if}
         </td>
       </tr>
+      <tr>
+        <td class="col-md-7 input-group-sm">
+          {form_input("ivd_item_url1" , set_value("ivd_item_url1", '') , 'class="form-control" placeholder="対象URLを入力してください。"')}
+          {if form_error("ivd_item_url1")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("ivd_item_url1")}</font></label>{/if}
+        </td>
+        <td colspan="3" class="col-md-1"></td>
+      </tr>
+
     </tbody>
   </table>
 
   {form_hidden('iv_cm_seq',  $info.iv_cm_seq)}
-  {form_hidden('iv_company', $iv_company)}
+  {form_hidden('iv_company_cm', $info.iv_company_cm)}
   {form_hidden('iv_salesman', $info.iv_salesman)}
 
 

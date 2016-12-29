@@ -118,7 +118,7 @@ function fmSubmit(formName, url, method, num) {
             {$iv.iv_slip_no}
           </td>
           <td>
-            {$iv.iv_company}
+            {$iv.iv_company_cm}
           </td>
           <td>
             {$iv.iv_total|number_format} 円

@@ -1,6 +1,6 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class CsvParser
+class Lib_csvparser
 {
     private $handle;
     private $file;
