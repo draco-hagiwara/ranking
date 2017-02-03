@@ -14,25 +14,6 @@ class Login extends MY_Controller
         $this->load->library('lib_auth');
         $this->lib_auth->check_session();
 
-//         if (isset($_SESSION['c_login']) && $_SESSION['c_login'] == TRUE)
-//         {
-//         	$this->smarty->assign('login_chk', TRUE);
-//             $this->smarty->assign('mem_Seq',   $_SESSION['c_memSeq']);
-//             $this->smarty->assign('mem_Type',  $_SESSION['c_memType']);
-//             $this->smarty->assign('mem_Grp',   $_SESSION['c_memGrp']);
-//             $this->smarty->assign('mem_Name',  $_SESSION['c_memName']);
-//         	$this->view('top/index.tpl');
-//         } else {
-
-//         	$this->smarty->assign('login_chk', FALSE);
-//         	$this->smarty->assign('mem_Seq',   "");
-//         	$this->smarty->assign('mem_Type',  "");
-//         	$this->smarty->assign('mem_Grp',   "");
-//         	$this->smarty->assign('mem_Name',  "");
-//         	$this->smarty->assign('err_mess',  '');
-//         	$this->view('login/index.tpl');
-//         }
-
     }
 
     // ログイン 初期表示
@@ -40,6 +21,9 @@ class Login extends MY_Controller
     {
 
     	$this->_set_validation();												// バリデーション設定
+
+    	$this->smarty->assign('err_mess', '');
+    	$this->view('login/index.tpl');
 
     }
 
@@ -88,10 +72,8 @@ class Login extends MY_Controller
         // SESSION クリア
         $this->load->library('lib_auth');
         $this->lib_auth->logout('client');
-//     	$this->load->model('comm_auth', 'auth', TRUE);
-//         $this->auth->logout('client');
 
-        // TOPへリダイレクト
+        // ログイン画面へリダイレクト
         redirect(base_url());
     }
 

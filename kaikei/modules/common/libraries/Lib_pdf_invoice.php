@@ -16,11 +16,11 @@ class Lib_pdf_invoice extends TCPDF {
     function __construct($params = array())
     {
 		$orientation = 'P';                                                     // 用紙の向き[P=縦方向、L=横方向]
-		$unit = 'mm';                                                           // 処理単位[mm=ミリメートル]
-		$format = 'A4';                                                         // ページフォーマット[A4]
-    	$unicode = true;
-        $encoding = 'UTF-8';
-        $diskcache = false;
+		$unit        = 'mm';                                                    // 処理単位[mm=ミリメートル]
+		$format      = 'A4';                                                    // ページフォーマット[A4]
+    	$unicode     = true;
+        $encoding    = 'UTF-8';
+        $diskcache   = false;
 
         if (isset($params['orientation'])) {
             $orientation = $params['orientation'];
@@ -43,506 +43,10 @@ class Lib_pdf_invoice extends TCPDF {
     }
 
 	/**
-	 * 請求書PDF：個別作成
+	 * 請求書PDF：１枚＆複数枚（明細別） 作成
 	 *
 	 */
-	public function pdf_one($iv_data, $ivd_data, $pdflist_path, $base_path)
-	{
-
- 		$pdf = new FPDI();                                                      // 組み込んだらFPDIを呼び出す
-		$pdf->SetMargins(0, 0, 0);                                              // PDFの余白(上左右)を設定
-		$pdf->SetCellPadding(0);                                                // セルパディングの設定
-		$pdf->SetAutoPageBreak(false);                                          // 自動改ページを無効(writeHTMLcellはこれを無効にしても自動改行される)
-		$pdf->setPrintHeader(false);                                            // ページヘッダを無効
-		$pdf->setPrintFooter(false);                                            // ページフッタを無効
-		$pdf->AddPage();                                                        // 空のページを追加
-		$pdf->SetAutoPageBreak(true);
-
-		// ノーマルフォントとボールドフォントを追加
-		$font_path1 = $base_path . 'vendor/tecnickcom/tcpdf/fonts/migmix-2p-regular.ttf';
-		$font_path2 = $base_path . 'vendor/tecnickcom/tcpdf/fonts/migmix-2p-bold.ttf';
-		$font = new TCPDF_FONTS();
-		$font1 = $font->addTTFfont($font_path1, '', '', 32);
-		$font2 = $font->addTTFfont($font_path2, '', '', 32);
-
-		// PDFテンプレートの読み込み
-// 		$pdf->setSourceFile($pdflist_path);
-// 		$page = $pdf->importPage(1);                                            // PDFテンプレートの指定ページを使用する
-// 		$pdf->useTemplate($page);
-
-		$pdf->setCellHeightRatio(1.2);                                          // セルの行間を設定
-
-		// PDFドキュメントプロパティ設定
-		$pdf->SetCreator(PDF_CREATOR);
-		$pdf->SetAuthor('Themis Inc.');
-		$pdf->SetTitle('invoice');
-		$pdf->SetSubject('invoice');
-
-		// set default monospaced font
-		$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-
-		// set margins
-		$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-
-		// set auto page breaks
-		$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-
-		$pdf->SetFont($font1, '', 9);
-
-		$_slip_cnt = strlen($iv_data['iv_slip_no']);
-		$_space_wd = "";
-		for ($i=$_slip_cnt; $i<=22; $i++)
-		{
-			$_space_wd .= " ";
-		}
-		$pdf->Text(145, 10, $_space_wd . "伝票No:" . $iv_data['iv_slip_no']);
-
-		$format = 'Y-m-d';
-		$date = DateTime::createFromFormat($format, $iv_data["iv_issue_date"]);
-		$pdf->Text(163, 15, "発行日:" . $date->format('Y年m月d日'));
-
-		$pdf->Text(25, 10, "〒" . $iv_data["iv_zip01"] . '-' . $iv_data["iv_zip02"]);
-		$pdf->Text(25, 15, $iv_data["iv_pref"] . $iv_data["iv_addr01"] . $iv_data["iv_addr02"] . " " . $iv_data["iv_buil"]);
-		if ($iv_data["iv_person01"] == "")
-		{
-			$pdf->Text(25, 20, $iv_data["iv_company"] . " 御中");
-		} else {
-			$pdf->Text(25, 20, $iv_data["iv_company"]);
-			$pdf->Text(25, 25, $iv_data["iv_department"]);
-			$pdf->Text(25, 30, $iv_data["iv_person01"] . ' ' . $iv_data["iv_person02"] . ' 様');
-		}
-
-		$pdf->line(10, 40, 200, 40);
-
-		$pdf->SetFont($font1, 'B', 16);
-		$pdf->Text(10, 52, "御　請　求　書");
-
-		$pdf->SetFont($font1, 'BU', 12);
-		$pdf->Text(15, 70, $iv_data["iv_company_cm"] . '　御中');
-
-		$pdf->SetFont($font1, '', 9);
-		$pdf->Text(149, 75, "株式会社ラベンダーマーケティング");
-		$pdf->SetFont($font1, '', 8);
-		$pdf->Text(161, 80, "〒150-0043");
-		$pdf->Text(161, 84, "東京都渋谷区道玄坂 1-19-12");
-		$pdf->Text(175, 88, "道玄坂今井ビル 4F");
-		$pdf->Text(173, 92, "tel. 03-3464-6115");
-
-		$pdf->Rect(165.0, 96.0, 17.0, 18.0, 'D');
-		$pdf->Rect(182.0, 96.0, 17.0, 18.0, 'D');
-
-		$pdf->SetFont($font1, '', 9);
-		$pdf->Text(15, 100, "下記の通りご請求いたします。");
-
-		$pdf->SetFont($font1, '', 12);
-		$pdf->SetFillColor(211, 211, 211);
-		$pdf->Rect(15.0, 105.0, 50.0, 9.0, 'DF');
-		$pdf->Text(20, 107, "ご請求金額（税込み）");
-		$pdf->Rect(65.0, 105.0, 50.0, 9.0, 'D');
-		$pdf->Text(83, 107, number_format($iv_data["iv_total"]) . " 円");
-
-		$pdf->Ln();
-		$pdf->Ln();
-
-		$pdf->SetFont($font1, '', 8);
-		$pdf->SetDrawColor(0, 0, 255);
-
-		$w1 = 130;
-		$w2 = 10;
-		$w3 = 20;
-		$w4 = 25;
-		$h1 = 10;
-		$h2 = 5;
-		$h3 = 3;
-
-		// 表タイトル
-		$pdf->Cell($w1, $h2, '請　求　項　目', 1, 0, "C", 1);
-		$pdf->Cell($w2, $h2, '数量', 1, 0, "C", 1);
-		$pdf->Cell($w3, $h2, '単　価', 1, 0, "C", 1);
-		$pdf->Cell($w4, $h2, '金　額', 1, 1, "C", 1);
-
-		$pdf->SetFont($font1, '', 7);
-
-		// 明細
-		if ($iv_data["iv_accounting"] == 0)
-		{
-			$_salse_yymm = str_split($iv_data["iv_salse_yymm"], 4);
-			$pdf->Cell($w1, $h2, ' SEO月額固定報酬 明細（' . $_salse_yymm[0] . '年' . $_salse_yymm[1] . '月度）', "LR", 0);
-
-			$pdf->Cell($w2, $h2, '', "LR", 0, "C");
-			$pdf->Cell($w3, $h2, '', "LR", 0, "R");
-			$pdf->Cell($w4, $h2, '', "LR", 1, "R");
-		} elseif ($iv_data["iv_accounting"] == 1) {
-			$_salse_yymm = str_split($iv_data["iv_salse_yymm"], 4);
-			$pdf->Cell($w1, $h2, ' 月額固定報酬 明細（' . $_salse_yymm[0] . '年' . $_salse_yymm[1] . '月度）', "LR", 0);
-
-			$pdf->Cell($w2, $h2, '', "LR", 0, "C");
-			$pdf->Cell($w3, $h2, '', "LR", 0, "R");
-			$pdf->Cell($w4, $h2, '', "LR", 1, "R");
-		} elseif ($iv_data["iv_accounting"] == 7) {
-			$_salse_yymm = str_split($iv_data["iv_salse_yymm"], 4);
-			$pdf->Cell($w1, $h2, ' 月額保守費用 明細（' . $_salse_yymm[0] . '年' . $_salse_yymm[1] . '月度）', "LR", 0);
-
-			$pdf->Cell($w2, $h2, '', "LR", 0, "C");
-			$pdf->Cell($w3, $h2, '', "LR", 0, "R");
-			$pdf->Cell($w4, $h2, '', "LR", 1, "R");
-		} else {
-			$pdf->Cell($w1, $h3, ' ', "LR", 0);
-			$pdf->Cell($w2, $h3, ' ', "LR", 0);
-			$pdf->Cell($w3, $h3, ' ', "LR", 0);
-			$pdf->Cell($w4, $h3, ' ', "LR", 1);
-		}
-
-
-
-
-// 		print_r($ivd_data);
-// 		print("<br><br>");
-// 		print(count($ivd_data));
-// 		print("<br><br>");
-// 		exit;
-
-
-
-
-		if (count($ivd_data) <= 17)
-		{
-
-
-			$_line_cnt = 0;
-			foreach ($ivd_data as $key => $val_ivd)
-			{
-
-				// キーワード：文字数チェック
-				$_key_word = $val_ivd["ivd_item"];
-				// 					$_key_word = mb_convert_kana($val_ivd["ivd_item"], 'ASKV', "UTF-8");
-				$_word_cnt = mb_strlen($_key_word);
-				$_wordurl_cnt = strlen($val_ivd["ivd_item_url"]);
-
-				// キーワードURL：文字数チェック
-				$_word_cnt_max = 90;
-				$_wordurl_cnt_max = 60;
-				$_total_cnt_max = 150;
-
-				if ($_word_cnt_max <= $_word_cnt)
-				{
-					$_key_word = mb_substr($_key_word, 0, 90) . " ...";
-					$_url_word = substr($val_ivd["ivd_item_url"], 0, 30) . " ...";
-
-				} elseif ($_wordurl_cnt_max <= $_wordurl_cnt) {
-
-					$_amari_cnt = $_total_cnt_max - $_word_cnt;
-
-					$_url_word = substr($val_ivd["ivd_item_url"], 0, $_amari_cnt/3) . " ...";
-
-				} else {
-					$_url_word = $val_ivd["ivd_item_url"];
-				}
-
-				// キーワード行明細の書き込み
-				if (($val_ivd["ivd_iv_accounting"] == 9) || ($val_ivd["ivd_iv_accounting"] == 8))
-				{
-					$pdf->Cell($w1, $h3, '　' . $_key_word, "LR", 0);
-				} elseif ($val_ivd["ivd_iv_accounting"] == 1) {
-					$pdf->Cell($w1, $h3, '　' . $_key_word, "LR", 0);
-				} elseif ($val_ivd["ivd_iv_accounting"] == 7) {
-					$pdf->Cell($w1, $h3, '　対象URL：' . $_url_word, "LR", 0);
-				} else {
-					$pdf->Cell($w1, $h3, '　対象KW：' . $_key_word . '：' . $_url_word, "LR", 0);
-				}
-
-				if ($val_ivd["ivd_total"] != 0)
-				{
-					$pdf->Cell($w2, $h3, number_format($val_ivd["ivd_qty"]), "LR", 0, "C");
-					$pdf->Cell($w3, $h3, number_format($val_ivd["ivd_price"]), "LR", 0, "R");
-					$pdf->Cell($w4, $h3, number_format($val_ivd["ivd_total"]), "LR", 1, "R");
-				} else {
-					$pdf->Cell($w2, $h3, "", "LR", 0, "C");
-					$pdf->Cell($w3, $h3, "", "LR", 0, "R");
-					$pdf->Cell($w4, $h3, "", "LR", 1, "R");
-				}
-
-				$pdf->Cell($w1, $h3, ' ', "LR", 0);
-				$pdf->Cell($w2, $h3, ' ', "LR", 0);
-				$pdf->Cell($w3, $h3, ' ', "LR", 0);
-				$pdf->Cell($w4, $h3, ' ', "LR", 1);
-
-				$_line_cnt++;
-
-			}
-
-			if ($_line_cnt <= 14)
-			{
-				for ($_cnt=$_line_cnt; $_cnt<=12; $_cnt++)
-				{
-					// 明細：空白行で埋める
-					$pdf->Cell($w1, $h3, ' ', "LR", 0);
-					$pdf->Cell($w2, $h3, ' ', "LR", 0);
-					$pdf->Cell($w3, $h3, ' ', "LR", 0);
-					$pdf->Cell($w4, $h3, ' ', "LR", 1);
-
-					$pdf->Cell($w1, $h3, ' ', "LR", 0);
-					$pdf->Cell($w2, $h3, ' ', "LR", 0);
-					$pdf->Cell($w3, $h3, ' ', "LR", 0);
-					$pdf->Cell($w4, $h3, ' ', "LR", 1);
-				}
-			}
-
-
-
-		} else {
-
-
-
-
-
-			/*
-			 * 2016-12-28
-			 *
-			 * 【今回限定処理（個別出力のみで対応）】
-			 *
-			 *   請求書を全て1枚の中に収めるため、共通なURLをまとめてKW+URLを明細に記載。
-			 *   改ページが発生する場合「備考」欄をカット。
-			 *
-			 *   将来的には明細を別紙に分けるか？
-			 *   成功報酬でレポートが添付されるので請求書は金額のみとするか？
-			 *
-			 *   要検討！
-			 *
-			 */
-			$_tmp_url  = "";
-			$_line_cnt = 0;
-			$_url_word_flg = FALSE;
-			foreach ($ivd_data as $key => $val)
-			{
-
-				// キーワード：文字数チェック
-				$_key_word = $val["ivd_item"];
-	// 			$_key_word = mb_convert_kana($val["ivd_item"], 'ASKV', "UTF-8");
-
-				$_word_cnt = mb_strlen($_key_word);
-				$_wordurl_cnt = strlen($val["ivd_item_url"]);
-
-				// キーワードURL：文字数チェック
-				$_word_cnt_max = 90;
-				$_wordurl_cnt_max = 60;
-				$_total_cnt_max = 150;
-
-				if ($_word_cnt_max <= $_word_cnt)
-				{
-					$_key_word = mb_substr($_key_word, 0, 90) . " ...";
-					$_url_word = substr($val["ivd_item_url"], 0, 30) . " ...";
-
-				} elseif ($_wordurl_cnt_max <= $_wordurl_cnt) {
-
-					$_amari_cnt = $_total_cnt_max - $_word_cnt;
-					$_url_word = substr($val["ivd_item_url"], 0, $_amari_cnt/3) . " ...";
-
-				} else {
-					$_url_word = $val["ivd_item_url"];
-				}
-
-
-				// キーワード行明細の書き込み : URLが変わったところで明細に記載
-				if ($_url_word_flg == FALSE)
-				{
-					$_tmp_url = $_url_word;
-				}
-				if ($_tmp_url != $_url_word)
-				{
-
-					if ($val["ivd_iv_accounting"] == 9)
-					{
-						$pdf->Cell($w1, $h3, '　' . $_tmp_key_word, "LR", 0);
-					} else {
-						$pdf->Cell($w1, $h3, '　対象KW：' . $_tmp_key_word . '：' . $_tmp_url, "LR", 0);
-					}
-
-					if ($_tmp_total != 0)
-					{
-						$pdf->Cell($w2, $h3, number_format($_tmp_qty),   "LR", 0, "C");
-						$pdf->Cell($w3, $h3, number_format($_tmp_price), "LR", 0, "R");
-						$pdf->Cell($w4, $h3, number_format($_tmp_total), "LR", 1, "R");
-					} else {
-						$pdf->Cell($w2, $h3, "", "LR", 0, "C");
-						$pdf->Cell($w3, $h3, "", "LR", 0, "R");
-						$pdf->Cell($w4, $h3, "", "LR", 1, "R");
-					}
-
-					$pdf->Cell($w1, $h3, ' ', "LR", 0);
-					$pdf->Cell($w2, $h3, ' ', "LR", 0);
-					$pdf->Cell($w3, $h3, ' ', "LR", 0);
-					$pdf->Cell($w4, $h3, ' ', "LR", 1);
-
-					$_tmp_key_word = '[' . $_key_word . '] ';
-					$_tmp_total    = $val["ivd_total"];
-
-					$_line_cnt++;
-
-				} else {
-
-					if ($val["ivd_total"] != 0)
-					{
-						$_tmp_qty   = $val["ivd_qty"];
-						$_tmp_price = $val["ivd_price"];
-						$_tmp_total = $val["ivd_total"];
-					}
-
-					$_tmp_key_word .= '[' . $_key_word . '] ';
-					$_url_word_flg  = TRUE;
-				}
-				$_tmp_url = $_url_word;
-			}
-
-
-			if ($_line_cnt <= 16)
-			{
-
-				// 最終明細を記載
-				if ($val["ivd_iv_accounting"] == 9)
-				{
-					$pdf->Cell($w1, $h3, '　' . $_tmp_key_word, "LR", 0);
-				} else {
-					$pdf->Cell($w1, $h3, '　対象KW：' . $_tmp_key_word . '：' . $_tmp_url, "LR", 0);
-				}
-
-				if ($_tmp_total != 0)
-				{
-					$pdf->Cell($w2, $h3, number_format($_tmp_qty),   "LR", 0, "C");
-					$pdf->Cell($w3, $h3, number_format($_tmp_price), "LR", 0, "R");
-					$pdf->Cell($w4, $h3, number_format($_tmp_total), "LR", 1, "R");
-				} else {
-					$pdf->Cell($w2, $h3, "", "LR", 0, "C");
-					$pdf->Cell($w3, $h3, "", "LR", 0, "R");
-					$pdf->Cell($w4, $h3, "", "LR", 1, "R");
-				}
-
-				$pdf->Cell($w1, $h3, ' ', "LR", 0);
-				$pdf->Cell($w2, $h3, ' ', "LR", 0);
-				$pdf->Cell($w3, $h3, ' ', "LR", 0);
-				$pdf->Cell($w4, $h3, ' ', "LR", 1);
-
-				for ($_cnt=$_line_cnt; $_cnt<=11; $_cnt++)
-				{
-					// 明細：空白行で埋める
-					$pdf->Cell($w1, $h3, ' ', "LR", 0);
-					$pdf->Cell($w2, $h3, ' ', "LR", 0);
-					$pdf->Cell($w3, $h3, ' ', "LR", 0);
-					$pdf->Cell($w4, $h3, ' ', "LR", 1);
-
-					$pdf->Cell($w1, $h3, ' ', "LR", 0);
-					$pdf->Cell($w2, $h3, ' ', "LR", 0);
-					$pdf->Cell($w3, $h3, ' ', "LR", 0);
-					$pdf->Cell($w4, $h3, ' ', "LR", 1);
-				}
-			}
-		}
-
-
-
-
-
-
-
-
-
-		// 明細：最後の空白行
-		$pdf->Cell($w1, $h3, ' ', "LRB", 0);
-		$pdf->Cell($w2, $h3, ' ', "LRB", 0);
-		$pdf->Cell($w3, $h3, ' ', "LRB", 0);
-		$pdf->Cell($w4, $h3, ' ', "LRB", 1);
-
-		$pdf->SetFont($font1, '', 8);
-
-		// 合計欄
-		$pdf->Cell($w1, $h2, ' ', "", 0);
-		$pdf->Cell($w2, $h2, ' ', "", 0);
-		$pdf->Cell($w3, $h2, '小　　計', "", 0, "C");
-		$pdf->Cell($w4, $h2, number_format($iv_data["iv_subtotal"]), 1, 1, "R");
-		$pdf->Cell($w1, $h2, ' ', "", 0);
-		$pdf->Cell($w2, $h2, ' ', "", 0);
-		$pdf->Cell($w3, $h2, '消費税等', "", 0, "C");
-		$pdf->Cell($w4, $h2, number_format($iv_data["iv_tax"]), 1, 1, "R");
-		$pdf->Cell($w1, $h2, ' ', "", 0);
-		$pdf->Cell($w2, $h2, ' ', "", 0);
-		$pdf->Cell($w3, $h2, '合　　計', "", 0, "C");
-		$pdf->Cell($w4, $h2, number_format($iv_data["iv_total"]), 1, 1, "R");
-
-		// 空のページを追加
-// 		if (($_line_cnt >= 13) && ($_line_cnt <= 20))
-// 		{
-// 			$pdf->AddPage();
-// 		}
-
-// 		$pdf->Ln();
-
-		$pdf->SetFont($font1, '', 8);
-		$pdf->SetDrawColor(0, 0, 0);
-
-
-		// 改ページ発生時は備考欄を削除：一時的処置
-		if (($_line_cnt <= 13))
-		{
-			$pdf->Ln();
-
-			// 「備考」欄はmax4行まで考慮。
-			$pdf->MultiCell(185, 20, "【備　考　】\n" . $iv_data["iv_remark"], 1, 'L', 0);
-		}
-
-
-		$x = $pdf->GetX();
-		$y = $pdf->GetY() + 5;
-		$pdf->Text(15, $y, "※支払期日までに下記口座までお振込みくださいますようお願いいたします。尚、振込手数料は貴社にてご負担願います。");
-
-		$w1 = $y+4;
-		$w2 = $y+8;
-		$w3 = $y+4;
-		$h1 = 13.0;
-
-		$pdf->SetFont($font1, '', 8);
-		$pdf->SetFillColor(211, 211, 211);
-		$pdf->Rect(15.0, $w1, 30.0, $h1, 'DF');
-		$pdf->Text(17.0, $w2, "お振込期日");
-
-		$pdf->SetFont($font1, '', 9);
-		$format = 'Y-m-d';
-		$date = DateTime::createFromFormat($format, $iv_data["iv_pay_date"]);
-		$pdf->Rect(45.0, $w1, 50.0, $h1, 'D');
-		$pdf->Text(55.0, $w2, $date->format('Y年m月d日'));
-
-		$pdf->SetFont($font1, '', 8);
-
-		$pdf->Rect(95.0, $w1, 30.0, $h1, 'DF');
-		$pdf->Text(97.0, $w2, "お振込先");
-		$pdf->Rect(125.0, $w1, 75.0, $h1, 'D');
-		$pdf->Text(127, $w3,    "銀 行 名 ：　三井住友銀行（0009）");
-		$pdf->Text(127, $w3+3,  "支 店 名 ：　渋谷駅前支店（234）");
-		$pdf->Text(127, $w3+6,  "口座番号：　4792809（普通口座）");
-		$pdf->Text(127, $w3+9, "口座名義：　株式会社ラベンダーマーケティング");
-
-		// ---------------------------------------------------------
-
-		//Close and output PDF document
-		$pdf->Close();
-		ob_end_clean();
-
-		$pdf->Output($iv_data['iv_slip_no'] . '.pdf', 'D');
-// 		$pdf->Output('example_20161121.pdf', 'D');
-// 		$pdf->Output($iv_data['iv_slip_no'] . '.pdf', 'I');
-
-		//============================================================+
-		// END OF FILE
-		//============================================================+
-
-	}
-
-	/**
-	 * 請求書PDF：一括作成
-	 *
-	 */
-	public function pdf_batch($iv_data, $ivd_data, $pdflist_path, $base_path, $page_add = FALSE)
+	public function create_pdf($iv_data, $ivd_data, $pdflist_path, $base_path)
 	{
 
 		$pdf = new FPDI();                                                      // 組み込んだらFPDIを呼び出す
@@ -561,9 +65,9 @@ class Lib_pdf_invoice extends TCPDF {
 		$font2 = $font->addTTFfont($font_path2, '', '', 32);
 
 		// PDFテンプレートの読み込み
-		// 		$pdf->setSourceFile($pdflist_path);
-		// 		$page = $pdf->importPage(1);                                            // PDFテンプレートの指定ページを使用する
-		// 		$pdf->useTemplate($page);
+		//$pdf->setSourceFile($pdflist_path);
+		//$page = $pdf->importPage(1);                                          // PDFテンプレートの指定ページを使用する
+		//$pdf->useTemplate($page);
 
 		$pdf->setCellHeightRatio(1.2);                                          // セルの行間を設定
 
@@ -584,261 +88,625 @@ class Lib_pdf_invoice extends TCPDF {
 		// set auto page breaks
 		$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 
+		// 【１枚請求書の作成】
 		foreach ($iv_data as $key => $value) {
 			foreach ($value as $key_iv => $val) {
 
-				$pdf->AddPage();                                                        // 空のページを追加
+				// 各明細行データを先に分析＆データ化する
+				$CI =& get_instance();
+				$CI->load->library('lib_pdf_invoice');
+				list($get_iv, $get_ivd, $line_cnt) = $CI->lib_pdf_invoice->create_detail_lines($val, $ivd_data[$key]);
 
-				$pdf->SetFont($font1, '', 9);
-
-				$_slip_cnt = strlen($val['iv_slip_no']);
-				$_space_wd = "";
-				for ($i=$_slip_cnt; $i<=22; $i++)
-				{
-					$_space_wd .= " ";
-				}
-				$pdf->Text(145, 10, $_space_wd . "伝票No:" . $val['iv_slip_no']);
-
-				$format = 'Y-m-d';
-				$date = DateTime::createFromFormat($format, $val["iv_issue_date"]);
-				$pdf->Text(163, 15, "発行日:" . $date->format('Y年m月d日'));
-
-				$pdf->Text(25, 10, "〒" . $val["iv_zip01"] . '-' . $val["iv_zip02"]);
-				$pdf->Text(25, 15, $val["iv_pref"] . $val["iv_addr01"] . $val["iv_addr02"] . " " . $val["iv_buil"]);
-				if ($val["iv_person01"] == "")
-				{
-					$pdf->Text(25, 20, $val["iv_company"] . " 御中");
-				} else {
-					$pdf->Text(25, 20, $val["iv_company"]);
-					$pdf->Text(25, 25, $val["iv_department"]);
-					$pdf->Text(25, 30, $val["iv_person01"] . ' ' . $val["iv_person02"] . ' 様');
-				}
-
-				$pdf->line(10, 40, 200, 40);
-
-				$pdf->SetFont($font1, 'B', 16);
-				$pdf->Text(10, 52, "御　請　求　書");
-
-				$pdf->SetFont($font1, 'BU', 12);
-				$pdf->Text(15, 70, $val["iv_company_cm"] . '　御中');
-// 				$pdf->Text(15, 73, $val["iv_company"] . '　御中');
-
-
-
-				$pdf->SetFont($font1, '', 9);
-				$pdf->Text(149, 75, "株式会社ラベンダーマーケティング");
-				$pdf->SetFont($font1, '', 8);
-				$pdf->Text(161, 80, "〒150-0043");
-				$pdf->Text(161, 84, "東京都渋谷区道玄坂 1-19-12");
-				$pdf->Text(175, 88, "道玄坂今井ビル 4F");
-				$pdf->Text(173, 92, "tel. 03-3464-6115");
-
-				$pdf->Rect(165.0, 96.0, 17.0, 18.0, 'D');
-				$pdf->Rect(182.0, 96.0, 17.0, 18.0, 'D');
-
-				$pdf->SetFont($font1, '', 9);
-				$pdf->Text(15, 100, "下記の通りご請求いたします。");
-
-				$pdf->SetFont($font1, '', 12);
-				$pdf->SetFillColor(211, 211, 211);
-				$pdf->Rect(15.0, 105.0, 50.0, 9.0, 'DF');
-				$pdf->Text(20, 107, "ご請求金額（税込み）");
-				$pdf->Rect(65.0, 105.0, 50.0, 9.0, 'D');
-				$pdf->Text(83, 107, number_format($val["iv_total"]) . " 円");
-
-				$pdf->Ln();
-				$pdf->Ln();
-
-				$pdf->SetFont($font1, '', 8);
-				$pdf->SetDrawColor(0, 0, 255);
-
-				$w1 = 130;
-				$w2 = 10;
-				$w3 = 20;
-				$w4 = 25;
-				$h1 = 10;
-				$h2 = 5;
-				$h3 = 3;
-
-				// 表タイトル
-				$pdf->Cell($w1, $h2, '請　求　項　目', 1, 0, "C", 1);
-				$pdf->Cell($w2, $h2, '数量', 1, 0, "C", 1);
-				$pdf->Cell($w3, $h2, '単　価', 1, 0, "C", 1);
-				$pdf->Cell($w4, $h2, '金　額', 1, 1, "C", 1);
-
-// 				$pdf->SetFont($font1, '', 8);
-				$pdf->SetFont($font1, '', 7);
-
-				// 明細
-				if ($val["iv_accounting"] == 0)
-				{
-					$_salse_yymm = str_split($val["iv_salse_yymm"], 4);
-					$pdf->Cell($w1, $h2, ' SEO月額固定報酬 明細（' . $_salse_yymm[0] . '年' . $_salse_yymm[1] . '月度）', "LR", 0);
-
-					$pdf->Cell($w2, $h2, '', "LR", 0, "C");
-					$pdf->Cell($w3, $h2, '', "LR", 0, "R");
-					$pdf->Cell($w4, $h2, '', "LR", 1, "R");
-				} elseif ($val["iv_accounting"] == 1) {
-					$_salse_yymm = str_split($val["iv_salse_yymm"], 4);
-					$pdf->Cell($w1, $h2, ' 月額固定報酬 明細（' . $_salse_yymm[0] . '年' . $_salse_yymm[1] . '月度）', "LR", 0);
-
-					$pdf->Cell($w2, $h2, '', "LR", 0, "C");
-					$pdf->Cell($w3, $h2, '', "LR", 0, "R");
-					$pdf->Cell($w4, $h2, '', "LR", 1, "R");
-				} else {
-					$pdf->Cell($w1, $h3, ' ', "LR", 0);
-					$pdf->Cell($w2, $h3, ' ', "LR", 0);
-					$pdf->Cell($w3, $h3, ' ', "LR", 0);
-					$pdf->Cell($w4, $h3, ' ', "LR", 1);
-				}
-
-				$_line_cnt = 0;
-				foreach ($ivd_data[$key] as $key_ivd => $val_ivd)
+				// 明細がこれ以上の場合、別明細用のフォーマットで作成
+				if ($line_cnt <= 24)
 				{
 
-					// キーワード：文字数チェック
-					$_key_word = $val_ivd["ivd_item"];
-// 					$_key_word = mb_convert_kana($val_ivd["ivd_item"], 'ASKV', "UTF-8");
-					$_word_cnt = mb_strlen($_key_word);
-					$_wordurl_cnt = strlen($val_ivd["ivd_item_url"]);
+					// ここからPDF作成
+					$pdf->AddPage();                                                        // 空のページを追加
 
-					// キーワードURL：文字数チェック
-					$_word_cnt_max = 90;
-					$_wordurl_cnt_max = 60;
-					$_total_cnt_max = 150;
+					$pdf->SetFont($font1, '', 9);
 
-					if ($_word_cnt_max <= $_word_cnt)
+					$_slip_cnt = strlen($val['iv_slip_no']);
+					$_space_wd = "";
+					for ($i=$_slip_cnt; $i<=22; $i++)
 					{
-						$_key_word = mb_substr($_key_word, 0, 90) . " ...";
-						$_url_word = substr($val_ivd["ivd_item_url"], 0, 30) . " ...";
+						$_space_wd .= " ";
+					}
+					$pdf->Text(146, 6, $_space_wd . "伝票No:" . $val['iv_slip_no']);
 
-					} elseif ($_wordurl_cnt_max <= $_wordurl_cnt) {
+					$format = 'Y-m-d';
+					$date = DateTime::createFromFormat($format, $val["iv_issue_date"]);
+					$pdf->Text(163, 11, "発行日:" . $date->format('Y年m月d日'));
 
-						$_amari_cnt = $_total_cnt_max - $_word_cnt;
-
-						$_url_word = substr($val_ivd["ivd_item_url"], 0, $_amari_cnt/3) . " ...";
-
+					$pdf->Text(25, 6, "〒" . $val["iv_zip01"] . '-' . $val["iv_zip02"]);
+					$pdf->Text(25, 10, $val["iv_pref"] . $val["iv_addr01"] . $val["iv_addr02"]);
+					$pdf->Text(25, 14, "　　　　　　" . $val["iv_buil"]);
+					if ($val["iv_person01"] == "")
+					{
+						$pdf->SetFont($font1, '', 10);
+						$pdf->Text(25, 20, $val["iv_company"] . " 御中");
 					} else {
-						$_url_word = $val_ivd["ivd_item_url"];
+						$pdf->SetFont($font1, '', 10);
+						$pdf->Text(25, 20, $val["iv_company"]);
+						$pdf->SetFont($font1, '', 9);
+						$pdf->Text(25, 26, $val["iv_department"]);
+						$pdf->SetFont($font1, '', 10);
+						$pdf->Text(25, 29, $val["iv_person01"] . ' ' . $val["iv_person02"] . ' 様');
+					}
+// 					$pdf->Text(25, 15, $val["iv_pref"] . $val["iv_addr01"] . $val["iv_addr02"] . " " . $val["iv_buil"]);
+// 					if ($val["iv_person01"] == "")
+// 					{
+// 						$pdf->Text(25, 20, $val["iv_company"] . " 御中");
+// 					} else {
+// 						$pdf->Text(25, 20, $val["iv_company"]);
+// 						$pdf->Text(25, 25, $val["iv_department"]);
+// 						$pdf->Text(25, 30, $val["iv_person01"] . ' ' . $val["iv_person02"] . ' 様');
+// 					}
+
+					$pdf->line(10, 40, 200, 40);
+
+					$pdf->SetFont($font1, 'B', 16);
+					$pdf->Text(10, 52, "御　請　求　書");
+
+					$pdf->SetFont($font1, 'BU', 12);
+					$pdf->Text(15, 70, $val["iv_company_cm"] . '　御中');
+					//$pdf->Text(15, 73, $val["iv_company"] . '　御中');
+
+					$pdf->SetFont($font1, '', 9);
+					$pdf->Text(148, 75, "株式会社ラベンダーマーケティング");
+					$pdf->SetFont($font1, '', 8);
+					$pdf->Text(161, 80, "〒150-0043");
+					$pdf->Text(161, 84, "東京都渋谷区道玄坂 1-19-12");
+					$pdf->Text(175, 88, "道玄坂今井ビル 4F");
+					$pdf->Text(173, 92, "tel. 03-3464-6115");
+
+					$pdf->Rect(165.0, 96.0, 17.0, 18.0, 'D');
+					$pdf->Rect(182.0, 96.0, 17.0, 18.0, 'D');
+
+					$pdf->SetFont($font1, '', 9);
+					$pdf->Text(15, 100, "下記の通りご請求いたします。");
+
+					$pdf->SetFont($font1, '', 12);
+					$pdf->SetFillColor(211, 211, 211);
+					$pdf->Rect(15.0, 105.0, 50.0, 9.0, 'DF');
+					$pdf->Text(20, 107, "ご請求金額（税込み）");
+					$pdf->Rect(65.0, 105.0, 50.0, 9.0, 'D');
+					$pdf->Text(83, 107, number_format($val["iv_total"]) . " 円");
+
+					$pdf->Ln();
+					$pdf->Ln();
+
+					$pdf->SetFont($font1, '', 8);
+					$pdf->SetDrawColor(0, 0, 255);
+
+					$w1 = 130;
+					$w2 = 10;
+					$w3 = 20;
+					$w4 = 25;
+					$h1 = 10;
+					$h2 = 5;
+					$h3 = 3;
+
+					// 表タイトル
+					$pdf->Cell($w1, $h2, '請　求　項　目', 1, 0, "C", 1);
+					$pdf->Cell($w2, $h2, '数量', 1, 0, "C", 1);
+					$pdf->Cell($w3, $h2, '単　価', 1, 0, "C", 1);
+					$pdf->Cell($w4, $h2, '金　額', 1, 1, "C", 1);
+
+					$pdf->SetFont($font1, '', 7);
+
+					// 明細 Ⅰ
+					foreach ($get_ivd as $key00 => $val00) {
+						foreach ($val00 as $key01 => $val01) {
+							foreach ($val01 as $key02 => $val02) {
+
+								if ((isset($val02[9])) && ($val02[9] = "LF"))
+								{
+									$pdf->Cell($w1, $h3, ' ', "LR", 0);
+									$pdf->Cell($w2, $h3, ' ', "LR", 0);
+									$pdf->Cell($w3, $h3, ' ', "LR", 0);
+									$pdf->Cell($w4, $h3, ' ', "LR", 1);
+								}
+
+								$pdf->Cell($w1, $h3, $val02[0], "LR", 0);
+
+								if (isset($val02[3]) && ($val02[3] != 0))
+								{
+									$pdf->Cell($w2, $h3, $val02[1], "LR", 0, "C");
+									$pdf->Cell($w3, $h3, number_format($val02[2]), "LR", 0, "R");
+									$pdf->Cell($w4, $h3, number_format($val02[3]), "LR", 1, "R");
+								} else {
+									/*
+									 * 単価が“0円でなく”、かつ金額が“0円”の成功報酬は数量＆単価＆金額を表示！
+									 */
+									if (isset($val02[3]) && ($val02[3] == 0) && ($val02[2] != 0))
+									{
+										$pdf->Cell($w2, $h3, $val02[1], "LR", 0, "C");
+										$pdf->Cell($w3, $h3, number_format($val02[2]), "LR", 0, "R");
+										$pdf->Cell($w4, $h3, number_format($val02[3]), "LR", 1, "R");
+									} else {
+										$pdf->Cell($w2, $h3, "", "LR", 0, "C");
+										$pdf->Cell($w3, $h3, "", "LR", 0, "R");
+										$pdf->Cell($w4, $h3, "", "LR", 1, "R");
+									}
+// 									$pdf->Cell($w2, $h3, "", "LR", 0, "C");
+// 									$pdf->Cell($w3, $h3, "", "LR", 0, "R");
+// 									$pdf->Cell($w4, $h3, "", "LR", 1, "R");
+								}
+							}
+						}
+
+						$pdf->Cell($w1, $h3, ' ', "LR", 0);
+						$pdf->Cell($w2, $h3, ' ', "LR", 0);
+						$pdf->Cell($w3, $h3, ' ', "LR", 0);
+						$pdf->Cell($w4, $h3, ' ', "LR", 1);
 					}
 
-					// キーワード行明細の書き込み
-					if ($val_ivd["ivd_iv_accounting"] == 9)
-					{
-						$pdf->Cell($w1, $h3, '　' . $_key_word, "LR", 0);
-					} else {
-						$pdf->Cell($w1, $h3, '　対象キーワード：「' . $_key_word . '」：' . $_url_word, "LR", 0);
-					}
-
-					if ($val_ivd["ivd_total"] != 0)
-					{
-						$pdf->Cell($w2, $h3, number_format($val_ivd["ivd_qty"]), "LR", 0, "C");
-						$pdf->Cell($w3, $h3, number_format($val_ivd["ivd_price"]), "LR", 0, "R");
-						$pdf->Cell($w4, $h3, number_format($val_ivd["ivd_total"]), "LR", 1, "R");
-					} else {
-						$pdf->Cell($w2, $h3, "", "LR", 0, "C");
-						$pdf->Cell($w3, $h3, "", "LR", 0, "R");
-						$pdf->Cell($w4, $h3, "", "LR", 1, "R");
-					}
-
-					$pdf->Cell($w1, $h3, ' ', "LR", 0);
-					$pdf->Cell($w2, $h3, ' ', "LR", 0);
-					$pdf->Cell($w3, $h3, ' ', "LR", 0);
-					$pdf->Cell($w4, $h3, ' ', "LR", 1);
-
-					$_line_cnt++;
-
-				}
-
-				if ($_line_cnt <= 14)
-				{
-					for ($_cnt=$_line_cnt; $_cnt<=12; $_cnt++)
+					for ($i=$line_cnt; $i<=24; $i++)
 					{
 						// 明細：空白行で埋める
 						$pdf->Cell($w1, $h3, ' ', "LR", 0);
 						$pdf->Cell($w2, $h3, ' ', "LR", 0);
 						$pdf->Cell($w3, $h3, ' ', "LR", 0);
 						$pdf->Cell($w4, $h3, ' ', "LR", 1);
+					}
+
+					// 明細：最後の空白行
+					$pdf->Cell($w1, $h3, ' ', "LRB", 0);
+					$pdf->Cell($w2, $h3, ' ', "LRB", 0);
+					$pdf->Cell($w3, $h3, ' ', "LRB", 0);
+					$pdf->Cell($w4, $h3, ' ', "LRB", 1);
+
+					$pdf->SetFont($font1, '', 8);
+
+					// 合計欄
+					$pdf->Cell($w1, $h2, ' ', "", 0);
+					$pdf->Cell($w2, $h2, ' ', "", 0);
+					$pdf->Cell($w3, $h2, '小　　計', "", 0, "C");
+					$pdf->Cell($w4, $h2, number_format($val["iv_subtotal"]), 1, 1, "R");
+					$pdf->Cell($w1, $h2, ' ', "", 0);
+					$pdf->Cell($w2, $h2, ' ', "", 0);
+					$pdf->Cell($w3, $h2, '消費税等', "", 0, "C");
+					$pdf->Cell($w4, $h2, number_format($val["iv_tax"]), 1, 1, "R");
+					$pdf->Cell($w1, $h2, ' ', "", 0);
+					$pdf->Cell($w2, $h2, ' ', "", 0);
+					$pdf->Cell($w3, $h2, '合　　計', "", 0, "C");
+					$pdf->Cell($w4, $h2, number_format($val["iv_total"]), 1, 1, "R");
+
+					$pdf->SetFont($font1, '', 9);
+					$pdf->SetDrawColor(0, 0, 0);
+
+					$pdf->Ln();
+					$pdf->MultiCell(185, 20, "【備　考】\n" . $val["iv_remark"], 1, 'L', 0);
+					$pdf->SetFont($font1, '', 8);
+					$x = $pdf->GetX();
+					$y = $pdf->GetY() + 5;
+					$pdf->Text(15, $y, "※支払期日までに下記口座までお振込みくださいますようお願いいたします。尚、振込手数料は貴社にてご負担願います。");
+
+					$w1 = $y+4;
+					$w2 = $y+8;
+					$w3 = $y+4;
+					$h1 = 13.0;
+
+					$pdf->SetFont($font1, '', 8);
+					$pdf->SetFillColor(211, 211, 211);
+					$pdf->Rect(15.0, $w1, 30.0, $h1, 'DF');
+					$pdf->Text(17.0, $w2, "お振込期日");
+
+					$pdf->SetFont($font1, '', 9);
+					$format = 'Y-m-d';
+					$date = DateTime::createFromFormat($format, $val["iv_pay_date"]);
+					$pdf->Rect(45.0, $w1, 50.0, $h1, 'D');
+					$pdf->Text(55.0, $w2, $date->format('Y年m月d日'));
+
+					$pdf->SetFont($font1, '', 8);
+
+					$pdf->Rect(95.0,  $w1,   30.0, $h1, 'DF');
+					$pdf->Text(97.0,  $w2,   "お振込先");
+					$pdf->Rect(125.0, $w1,   75.0, $h1, 'D');
+					$pdf->Text(127,   $w3,   "銀 行 名 ：　三井住友銀行（0009）");
+					$pdf->Text(127,   $w3+3, "支 店 名 ：　渋谷駅前支店（234）");
+					$pdf->Text(127,   $w3+6, "口座番号：　4792809（普通口座）");
+					$pdf->Text(127,   $w3+9, "口座名義：　株式会社ラベンダーマーケティング");
+
+				}
+			}
+		}
+
+
+		// 【複数枚 請求書の作成】
+		foreach ($iv_data as $key => $value) {
+			foreach ($value as $key_iv => $val) {
+
+				// 各明細行データを先に分析＆データ化する
+				$CI =& get_instance();
+				$CI->load->library('lib_pdf_invoice');
+				list($get_iv, $get_ivd, $line_cnt) = $CI->lib_pdf_invoice->create_detail_lines($val, $ivd_data[$key]);
+
+				// 明細がこれ以上の場合、別明細用のフォーマットで作成
+				if ($line_cnt >= 25)
+				{
+
+					$pdf->AddPage();                                                        // 空のページを追加
+
+					$pdf->SetFont($font1, '', 9);
+
+					$_slip_cnt = strlen($val['iv_slip_no']);
+					$_space_wd = "";
+					for ($i=$_slip_cnt; $i<=22; $i++)
+					{
+						$_space_wd .= " ";
+					}
+
+					$pdf->Text(146, 6, $_space_wd . "伝票No:" . $val['iv_slip_no']);
+
+					$format = 'Y-m-d';
+					$date = DateTime::createFromFormat($format, $val["iv_issue_date"]);
+					$pdf->Text(163, 11, "発行日:" . $date->format('Y年m月d日'));
+
+					$pdf->Text(25, 6, "〒" . $val["iv_zip01"] . '-' . $val["iv_zip02"]);
+					$pdf->Text(25, 10, $val["iv_pref"] . $val["iv_addr01"] . $val["iv_addr02"]);
+					$pdf->Text(25, 14, "　　　　　　" . $val["iv_buil"]);
+					if ($val["iv_person01"] == "")
+					{
+						$pdf->SetFont($font1, '', 10);
+						$pdf->Text(25, 20, $val["iv_company"] . " 御中");
+					} else {
+						$pdf->SetFont($font1, '', 10);
+						$pdf->Text(25, 20, $val["iv_company"]);
+						$pdf->SetFont($font1, '', 9);
+						$pdf->Text(25, 26, $val["iv_department"]);
+						$pdf->SetFont($font1, '', 10);
+						$pdf->Text(25, 29, $val["iv_person01"] . ' ' . $val["iv_person02"] . ' 様');
+					}
+// 					$pdf->Text(146, 10, $_space_wd . "伝票No:" . $val['iv_slip_no']);
+
+// 					$format = 'Y-m-d';
+// 					$date = DateTime::createFromFormat($format, $val["iv_issue_date"]);
+// 					$pdf->Text(163, 15, "発行日:" . $date->format('Y年m月d日'));
+
+// 					$pdf->Text(25, 10, "〒" . $val["iv_zip01"] . '-' . $val["iv_zip02"]);
+// 					$pdf->Text(25, 15, $val["iv_pref"] . $val["iv_addr01"] . $val["iv_addr02"] . " " . $val["iv_buil"]);
+// 					if ($val["iv_person01"] == "")
+// 					{
+// 						$pdf->Text(25, 20, $val["iv_company"] . " 御中");
+// 					} else {
+// 						$pdf->Text(25, 20, $val["iv_company"]);
+// 						$pdf->Text(25, 25, $val["iv_department"]);
+// 						$pdf->Text(25, 30, $val["iv_person01"] . ' ' . $val["iv_person02"] . ' 様');
+// 					}
+
+					$pdf->line(10, 40, 200, 40);
+
+					$pdf->SetFont($font1, 'B', 16);
+					$pdf->Text(10, 52, "御　請　求　書");
+
+					$pdf->SetFont($font1, 'BU', 12);
+					$pdf->Text(15, 70, $val["iv_company_cm"] . '　御中');
+					//$pdf->Text(15, 73, $val["iv_company"] . '　御中');
+
+					$pdf->SetFont($font1, '', 9);
+					$pdf->Text(149, 75, "株式会社ラベンダーマーケティング");
+					$pdf->SetFont($font1, '', 8);
+					$pdf->Text(161, 80, "〒150-0043");
+					$pdf->Text(161, 84, "東京都渋谷区道玄坂 1-19-12");
+					$pdf->Text(175, 88, "道玄坂今井ビル 4F");
+					$pdf->Text(173, 92, "tel. 03-3464-6115");
+
+					$pdf->Rect(165.0, 96.0, 17.0, 18.0, 'D');
+					$pdf->Rect(182.0, 96.0, 17.0, 18.0, 'D');
+
+					$pdf->SetFont($font1, '', 9);
+					$pdf->Text(15, 100, "下記の通りご請求いたします。");
+
+					$pdf->SetFont($font1, '', 12);
+					$pdf->SetFillColor(211, 211,  211);
+					$pdf->Rect(15.0, 105.0, 50.0, 9.0, 'DF');
+					$pdf->Text(20,   107,   "ご請求金額（税込み）");
+					$pdf->Rect(65.0, 105.0, 50.0, 9.0, 'D');
+					$pdf->Text(83,   107,   number_format($val["iv_total"]) . " 円");
+
+					$pdf->Ln();
+					$pdf->Ln();
+
+					$pdf->SetFont($font1, '', 8);
+					$pdf->SetDrawColor(0, 0, 255);
+
+					$w1 = 130;
+					$w2 = 10;
+					$w3 = 20;
+					$w4 = 25;
+					$h1 = 10;
+					$h2 = 5;
+					$h3 = 3;
+
+					// 表タイトル
+					$pdf->Cell($w1, $h2, '請　求　項　目', 1, 0, "C", 1);
+					$pdf->Cell($w2, $h2, '数量', 1, 0, "C", 1);
+					$pdf->Cell($w3, $h2, '単　価', 1, 0, "C", 1);
+					$pdf->Cell($w4, $h2, '金　額', 1, 1, "C", 1);
+
+					$pdf->SetFont($font1, '', 7);
+
+
+					// 明細 Ⅱ
+					$i = 0;
+					foreach ($get_iv as $key => $value) {
+
+						if (isset($value['subtitle']) && ($value['subtitle'] != ""))
+						{
+							$pdf->Cell($w1, $h3, $value['subtitle'], "LR", 0);
+							$pdf->Cell($w2, $h3, "", "LR", 0, "C");
+							$pdf->Cell($w3, $h3, "", "LR", 0, "R");
+							$pdf->Cell($w4, $h3, number_format($value['subtotal']), "LR", 1, "R");
+							$i++;
+						}
 
 						$pdf->Cell($w1, $h3, ' ', "LR", 0);
 						$pdf->Cell($w2, $h3, ' ', "LR", 0);
 						$pdf->Cell($w3, $h3, ' ', "LR", 0);
 						$pdf->Cell($w4, $h3, ' ', "LR", 1);
+						$i++;
 					}
-				}
 
-				// 明細：最後の空白行
-				$pdf->Cell($w1, $h3, ' ', "LRB", 0);
-				$pdf->Cell($w2, $h3, ' ', "LRB", 0);
-				$pdf->Cell($w3, $h3, ' ', "LRB", 0);
-				$pdf->Cell($w4, $h3, ' ', "LRB", 1);
+					$pdf->Cell($w1, $h3, ' ', "LR", 0);
+					$pdf->Cell($w2, $h3, ' ', "LR", 0);
+					$pdf->Cell($w3, $h3, ' ', "LR", 0);
+					$pdf->Cell($w4, $h3, ' ', "LR", 1);
+					$i++;
 
-				$pdf->SetFont($font1, '', 8);
+					$pdf->Cell($w1, $h3, '　明細は別紙参照。', "LR", 0, "L");
+					$pdf->Cell($w2, $h3, ' ', "LR", 0);
+					$pdf->Cell($w3, $h3, ' ', "LR", 0);
+					$pdf->Cell($w4, $h3, ' ', "LR", 1);
+					$i++;
 
-				// 合計欄
-				$pdf->Cell($w1, $h2, ' ', "", 0);
-				$pdf->Cell($w2, $h2, ' ', "", 0);
-				$pdf->Cell($w3, $h2, '小　　計', "", 0, "C");
-				$pdf->Cell($w4, $h2, number_format($val["iv_subtotal"]), 1, 1, "R");
-				$pdf->Cell($w1, $h2, ' ', "", 0);
-				$pdf->Cell($w2, $h2, ' ', "", 0);
-				$pdf->Cell($w3, $h2, '消費税等', "", 0, "C");
-				$pdf->Cell($w4, $h2, number_format($val["iv_tax"]), 1, 1, "R");
-				$pdf->Cell($w1, $h2, ' ', "", 0);
-				$pdf->Cell($w2, $h2, ' ', "", 0);
-				$pdf->Cell($w3, $h2, '合　　計', "", 0, "C");
-				$pdf->Cell($w4, $h2, number_format($val["iv_total"]), 1, 1, "R");
+					for ($i; $i<=25; $i++)
+					{
+						// 明細：空白行で埋める
+						$pdf->Cell($w1, $h3, ' ', "LR", 0);
+						$pdf->Cell($w2, $h3, ' ', "LR", 0);
+						$pdf->Cell($w3, $h3, ' ', "LR", 0);
+						$pdf->Cell($w4, $h3, ' ', "LR", 1);
+					}
 
+					// 明細：最後の空白行
+					$pdf->Cell($w1, $h3, ' ', "LRB", 0);
+					$pdf->Cell($w2, $h3, ' ', "LRB", 0);
+					$pdf->Cell($w3, $h3, ' ', "LRB", 0);
+					$pdf->Cell($w4, $h3, ' ', "LRB", 1);
 
-				// 空のページを追加
-// 				if (($_line_cnt >= 13) && ($_line_cnt <= 20))
-// 				{
-// 					$pdf->AddPage();
-// 				}
+					$pdf->SetFont($font1, '', 8);
 
-// 				$pdf->Ln();
+					// 合計欄
+					$pdf->Cell($w1, $h2, ' ', "", 0);
+					$pdf->Cell($w2, $h2, ' ', "", 0);
+					$pdf->Cell($w3, $h2, '小　　計', "", 0, "C");
+					$pdf->Cell($w4, $h2, number_format($val["iv_subtotal"]), 1, 1, "R");
+					$pdf->Cell($w1, $h2, ' ', "", 0);
+					$pdf->Cell($w2, $h2, ' ', "", 0);
+					$pdf->Cell($w3, $h2, '消費税等', "", 0, "C");
+					$pdf->Cell($w4, $h2, number_format($val["iv_tax"]), 1, 1, "R");
+					$pdf->Cell($w1, $h2, ' ', "", 0);
+					$pdf->Cell($w2, $h2, ' ', "", 0);
+					$pdf->Cell($w3, $h2, '合　　計', "", 0, "C");
+					$pdf->Cell($w4, $h2, number_format($val["iv_total"]), 1, 1, "R");
 
-				$pdf->SetFont($font1, '', 9);
-				$pdf->SetDrawColor(0, 0, 0);
+					$pdf->SetFont($font1, '', 9);
+					$pdf->SetDrawColor(0, 0, 0);
 
-				// 「備考」欄はmax4行まで考慮。
-				if (($_line_cnt <= 13) || ($_line_cnt >= 20))
-				{
+					// 「備考」欄はmax4行まで考慮。
 					$pdf->Ln();
-					$pdf->MultiCell(185, 20, "【備　考　】\n" . $val["iv_remark"], 1, 'L', 0);
+					$pdf->MultiCell(185, 20, "【備　考】\n" . $val["iv_remark"], 1, 'L', 0);
+
+					$pdf->SetFont($font1, '', 8);
+					$x = $pdf->GetX();
+					$y = $pdf->GetY() + 5;
+					$pdf->Text(15, $y, "※支払期日までに下記口座までお振込みくださいますようお願いいたします。尚、振込手数料は貴社にてご負担願います。");
+
+					$w1 = $y+4;
+					$w2 = $y+8;
+					$w3 = $y+4;
+					$h1 = 13.0;
+
+					$pdf->SetFont($font1, '', 8);
+					$pdf->SetFillColor(211, 211, 211);
+					$pdf->Rect(15.0, $w1, 30.0, $h1, 'DF');
+					$pdf->Text(17.0, $w2, "お振込期日");
+
+					$pdf->SetFont($font1, '', 9);
+					$format = 'Y-m-d';
+					$date = DateTime::createFromFormat($format, $val["iv_pay_date"]);
+					$pdf->Rect(45.0, $w1, 50.0, $h1, 'D');
+					$pdf->Text(55.0, $w2, $date->format('Y年m月d日'));
+
+					$pdf->SetFont($font1, '', 8);
+
+					$pdf->Rect(95.0,  $w1,   30.0, $h1, 'DF');
+					$pdf->Text(97.0,  $w2,   "お振込先");
+					$pdf->Rect(125.0, $w1,   75.0, $h1, 'D');
+					$pdf->Text(127,   $w3,   "銀 行 名 ：　三井住友銀行（0009）");
+					$pdf->Text(127,   $w3+3, "支 店 名 ：　渋谷駅前支店（234）");
+					$pdf->Text(127,   $w3+6, "口座番号：　4792809（普通口座）");
+					$pdf->Text(127,   $w3+9, "口座名義：　株式会社ラベンダーマーケティング");
+
+
+					// 別紙
+					$pdf->AddPage();
+
+					$pdf->SetFont($font1, '', 8);
+					$pdf->Text(153, 10, $_space_wd . "伝票No:" . $val['iv_slip_no']);
+
+// 					$format = 'Y-m-d';
+// 					$date = DateTime::createFromFormat($format, $val["iv_issue_date"]);
+// 					$pdf->Text(163, 15, "発行日:" . $date->format('Y年m月d日'));
+
+					$pdf->SetFont($font1, 'BU', 12);
+
+					$_subtitle_cnt = 1;
+					$pdf->Text(15, 17, '請 求 内 訳 書');									// 1ページ目はカウント非表示!？
+// 					$pdf->Text(15, 17, '請 求 内 訳 書' . "　（" . $_subtitle_cnt . "）");
+					$pdf->Ln();
+
+					$pdf->SetFont($font1, '', 8);
+					$pdf->SetDrawColor(0, 0, 255);
+
+					$w1 = 130;
+					$w2 = 10;
+					$w3 = 20;
+					$w4 = 25;
+					$h1 = 10;
+					$h2 = 5;
+					$h3 = 3;
+
+					// 表タイトル
+					$pdf->Cell($w1, $h2, '請　求　項　目', 1, 0, "C", 1);
+					$pdf->Cell($w2, $h2, '数量', 1, 0, "C", 1);
+					$pdf->Cell($w3, $h2, '単　価', 1, 0, "C", 1);
+					$pdf->Cell($w4, $h2, '金　額', 1, 1, "C", 1);
+
+					$pdf->SetFont($font1, '', 7);
+
+					// 明細
+					$_subtotal = 0;
+					$_total    = 0;
+					$i = 0;
+					foreach ($get_ivd as $key00 => $val00) {
+						foreach ($val00 as $key01 => $val01) {
+							foreach ($val01 as $key02 => $val02) {
+
+								if ((isset($val02[9])) && ($val02[9] = "LF"))
+								{
+									$pdf->Cell($w1, $h3, ' ', "LR", 0);
+									$pdf->Cell($w2, $h3, ' ', "LR", 0);
+									$pdf->Cell($w3, $h3, ' ', "LR", 0);
+									$pdf->Cell($w4, $h3, ' ', "LR", 1);
+									$i++;
+								}
+
+								$pdf->Cell($w1, $h3, $val02[0], "LR", 0);
+
+								if (isset($val02[3]) && ($val02[3] != 0))
+								{
+									$pdf->Cell($w2, $h3, $val02[1], "LR", 0, "C");
+									$pdf->Cell($w3, $h3, number_format($val02[2]), "LR", 0, "R");
+									$pdf->Cell($w4, $h3, number_format($val02[3]), "LR", 1, "R");
+
+									$_subtotal = $_subtotal + $val02[3];
+									$_total    = $_total    + $val02[3];
+
+									// 明細が複数枚になる場合
+// 									if (($i / 73) > 1)
+									if (($i / 71) > 1)
+									{
+
+										$pdf->Cell($w1, $h3, ' ', "LR", 0);
+										$pdf->Cell($w2, $h3, ' ', "LR", 0);
+										$pdf->Cell($w3, $h3, ' ', "LR", 0);
+										$pdf->Cell($w4, $h3, ' ', "LR", 1);
+
+										// 明細：最後の空白行
+										$pdf->Cell($w1, $h3, ' ', "LRB", 0);
+										$pdf->Cell($w2, $h3, ' ', "LRB", 0);
+										$pdf->Cell($w3, $h3, ' ', "LRB", 0);
+										$pdf->Cell($w4, $h3, ' ', "LRB", 1);
+
+										// 小計欄
+										//$pdf->Cell($w1, $h2, ' ', "", 0);
+										//$pdf->Cell($w2, $h2, ' ', "", 0);
+										//$pdf->Cell($w3, $h2, '小　　計', "", 0, "C");
+										//$pdf->Cell($w4, $h2, number_format($_subtotal), 1, 1, "R");
+
+										$_subtotal = 0;
+
+										$pdf->AddPage();
+
+										$pdf->SetFont($font1, '', 8);
+										$pdf->Text(153, 10, $_space_wd . "伝票No:" . $val['iv_slip_no']);
+
+										$pdf->SetFont($font1, 'BU', 12);
+										$_subtitle_cnt++;
+										$pdf->Text(15, 17, '請 求 内 訳 書' . "　（" . $_subtitle_cnt . "）");
+										$pdf->Ln();
+
+										$pdf->SetFont($font1, '', 8);
+										$pdf->SetDrawColor(0, 0, 255);
+
+										$w1 = 130;
+										$w2 = 10;
+										$w3 = 20;
+										$w4 = 25;
+										$h1 = 10;
+										$h2 = 5;
+										$h3 = 3;
+
+										// 表タイトル
+										$pdf->Cell($w1, $h2, '請　求　項　目', 1, 0, "C", 1);
+										$pdf->Cell($w2, $h2, '数量', 1, 0, "C", 1);
+										$pdf->Cell($w3, $h2, '単　価', 1, 0, "C", 1);
+										$pdf->Cell($w4, $h2, '金　額', 1, 1, "C", 1);
+
+										$pdf->SetFont($font1, '', 7);
+
+										$i = 0;
+									}
+
+								} else {
+									if (isset($val02[3]) && ($val02[3] == 0))
+									{
+										$pdf->Cell($w2, $h3, $val02[1], "LR", 0, "C");
+										$pdf->Cell($w3, $h3, number_format($val02[2]), "LR", 0, "R");
+										$pdf->Cell($w4, $h3, number_format($val02[3]), "LR", 1, "R");
+									} else {
+										$pdf->Cell($w2, $h3, "", "LR", 0, "C");
+										$pdf->Cell($w3, $h3, "", "LR", 0, "R");
+										$pdf->Cell($w4, $h3, "", "LR", 1, "R");
+									}
+								}
+
+								$i++;
+
+							}
+						}
+
+						$pdf->Cell($w1, $h3, ' ', "LR", 0);
+						$pdf->Cell($w2, $h3, ' ', "LR", 0);
+						$pdf->Cell($w3, $h3, ' ', "LR", 0);
+						$pdf->Cell($w4, $h3, ' ', "LR", 1);
+
+						$i++;
+					}
+
+// 					for ($i=$line_cnt; $i<=74; $i++)										// 発行日なし
+					for ($i=$line_cnt; $i<=75; $i++)										// 発行日なし
+					{
+						// 明細：空白行で埋める
+						$pdf->Cell($w1, $h3, ' ', "LR", 0);
+						$pdf->Cell($w2, $h3, ' ', "LR", 0);
+						$pdf->Cell($w3, $h3, ' ', "LR", 0);
+						$pdf->Cell($w4, $h3, ' ', "LR", 1);
+					}
+
+					// 明細：最後の空白行
+					$pdf->Cell($w1, $h3, ' ', "LRB", 0);
+					$pdf->Cell($w2, $h3, ' ', "LRB", 0);
+					$pdf->Cell($w3, $h3, ' ', "LRB", 0);
+					$pdf->Cell($w4, $h3, ' ', "LRB", 1);
+
+// 					$pdf->SetFont($font1, '', 8);
+
+					// 合計欄
+					//$pdf->Cell($w1, $h2, ' ', "", 0);
+					//$pdf->Cell($w2, $h2, ' ', "", 0);
+					//$pdf->Cell($w3, $h2, '小　　計', "", 0, "C");
+					//$pdf->Cell($w4, $h2, number_format($_subtotal), 1, 1, "R");
+
+					$pdf->Cell($w1, $h2, ' ', "", 0);
+					$pdf->Cell($w2, $h2, ' ', "", 0);
+					$pdf->Cell($w3, $h2, '合　　計', "", 0, "C");
+					$pdf->Cell($w4, $h2, number_format($_total), 1, 1, "R");
+
 				}
-
-				$pdf->SetFont($font1, '', 8);
-				$x = $pdf->GetX();
-				$y = $pdf->GetY() + 5;
-				$pdf->Text(15, $y, "※支払期日までに下記口座までお振込みくださいますようお願いいたします。尚、振込手数料は貴社にてご負担願います。");
-
-				$w1 = $y+4;
-				$w2 = $y+8;
-				$w3 = $y+4;
-				$h1 = 13.0;
-
-				$pdf->SetFont($font1, '', 8);
-				$pdf->SetFillColor(211, 211, 211);
-				$pdf->Rect(15.0, $w1, 30.0, $h1, 'DF');
-				$pdf->Text(17.0, $w2, "お振込期日");
-
-				$pdf->SetFont($font1, '', 9);
-				$format = 'Y-m-d';
-				$date = DateTime::createFromFormat($format, $val["iv_pay_date"]);
-				$pdf->Rect(45.0, $w1, 50.0, $h1, 'D');
-				$pdf->Text(55.0, $w2, $date->format('Y年m月d日'));
-
-				$pdf->SetFont($font1, '', 8);
-
-				$pdf->Rect(95.0, $w1, 30.0, $h1, 'DF');
-				$pdf->Text(97.0, $w2, "お振込先");
-				$pdf->Rect(125.0, $w1, 75.0, $h1, 'D');
-				$pdf->Text(127, $w3,    "銀 行 名 ：　三井住友銀行（0009）");
-				$pdf->Text(127, $w3+3,  "支 店 名 ：　渋谷駅前支店（234）");
-				$pdf->Text(127, $w3+6,  "口座番号：　4792809（普通口座）");
-				$pdf->Text(127, $w3+9, "口座名義：　株式会社ラベンダーマーケティング");
-
 			}
 		}
 
@@ -849,8 +717,8 @@ class Lib_pdf_invoice extends TCPDF {
 
 	}
 
-	private function cell_memo()
-	{
+	//private function cell_memo()
+	//{
 
 		//**********************************************************
 		// Cell メソッドの引数
@@ -889,42 +757,268 @@ class Lib_pdf_invoice extends TCPDF {
 		//
 		// $ignore_min_height 「true」とすると矩形領域の高さの最小値調整をしない
 
-	}
+	//}
 
+	/**
+	 * 各明細行データを先に分析＆再データ化する
+	 *
+	 * @param  array() : 請求書親データ
+	 * @param  array() : 請求書明細データ
+	 * @return array()
+	 */
+	public static function create_detail_lines($_iv_data, $_ivd_data)
+	{
 
-	private function MultiRow($left, $right) {
-		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=0, $ln=1, $x='', $y='', $reseth=true, $stretch=0)
+		$CI =& get_instance();
 
-		$page_start = $this->getPage();
-		$y_start = $this->GetY();
+		/*
+		 * ここはもう少し上手いやり方が無いか！？
+		 */
 
-		// write the left cell
-		$pdf->MultiCell(40, 0, $left, 1, 'R', 1, 2, '', '', true, 0);
+		$line_cnt  = 0;														// 明細行のカウンタ
 
-		$page_end_1 = $this->getPage();
-		$y_end_1 = $this->GetY();
+		$lcate_cnt = 0;														// 明細大項目カウント（代理店）
+		$mcate_cnt = 0;														// 明細中項目カウント（課金）
+		$scate_cnt = 0;														// 明細小項目カウント
 
-		$pdf->setPage($page_start);
+		$_subtotal = 0;														// 明細中項目小計
 
-		// write the right cell
-		$pdf->MultiCell(0, 0, $right, 1, 'J', 0, 1, $pdf->GetX() ,$y_start, true, 0);
+		$_tmp_accounting = "";
+		$_tmp_pjseq      = "";
+		$_tmp_cmseq      = "";
+		$_tmp_mcate_flg  = FALSE;
+		$_tmp_seokey_flg = FALSE;
+		$_tmp_res_flg    = FALSE;
 
-		$page_end_2 = $this->getPage();
-		$y_end_2 = $this->GetY();
+		$iv_data  = array();
+		$ivd_data = array();
 
-		// set the new row position by case
-		if (max($page_end_1,$page_end_2) == $page_start) {
-			$ynew = max($y_end_1, $y_end_2);
-		} elseif ($page_end_1 == $page_end_2) {
-			$ynew = max($y_end_1, $y_end_2);
-		} elseif ($page_end_1 > $page_end_2) {
-			$ynew = $y_end_1;
-		} else {
-			$ynew = $y_end_2;
+		foreach ($_ivd_data as $key => $value)
+		{
+
+			// 代理店チェック
+			if ($value['ivd_item_cmseq'] != 0)
+			{
+				if ($value['ivd_item_cmseq'] != $_tmp_cmseq)
+				{
+
+					$CI->load->model('Customer', 'cm', TRUE);
+					$get_cm_data = $CI->cm->get_cm_seq($value['ivd_item_cmseq']);
+
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '【' . $get_cm_data[0]['cm_company'] . ' 様向け】';
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][9] = "LF";							// 強制改行
+					$scate_cnt++;
+
+					$line_cnt = $line_cnt + 2;
+
+					$_tmp_cmseq = $value['ivd_item_cmseq'];
+				}
+			}
+
+			// 課金方式で判定
+			if ($value['ivd_iv_accounting'] != $_tmp_accounting)
+			{
+
+				$iv_data[$mcate_cnt]['subtotal'] = $_subtotal;
+				$_subtotal = 0;
+
+				$mcate_cnt++;
+				$scate_cnt = 0;
+
+				switch( $value['ivd_iv_accounting'] )
+				{
+					case 0:
+
+						$_subtitle = " SEO月額固定報酬";
+						break;
+
+					case 1:
+
+						$_subtitle = " 月額固定報酬";
+						break;
+
+					case 2:
+
+						$_subtitle = " 成功報酬";
+						break;
+
+					case 3:
+
+						$_subtitle = " 固定＆成功報酬";
+						break;
+
+					case 7:
+
+						$_subtitle = " 月額保守費用";
+						break;
+
+					case 10:
+
+						$_subtitle = " アフィリエイト　月額利用料金";
+						break;
+
+					case 11:
+
+						$_subtitle = " 広告運用代行サービス　月額利用料金";
+						break;
+
+					case 12:
+
+						$_subtitle = " その他　月額利用料金";
+						break;
+
+					default:
+
+						$_subtitle = " その他";
+						break;
+				}
+
+				$_salse_yymm = str_split($_iv_data["iv_salse_yymm"], 4);
+				$iv_data[$mcate_cnt]['subtitle'] = $_subtitle . ' 明細（' . $_salse_yymm[0] . '年' . $_salse_yymm[1] . '月度）';
+
+				$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = $_subtitle . ' 明細（' . $_salse_yymm[0] . '年' . $_salse_yymm[1] . '月度）';
+				$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][9] = "LF";
+				$scate_cnt++;
+
+				if ($_tmp_mcate_flg == FALSE)
+				{
+					$line_cnt++;
+					$_tmp_mcate_flg = TRUE;
+				} else {
+					$line_cnt = $line_cnt + 2;
+				}
+			}
+
+			// 対象URLの文字数チェック＆カット
+			$_word_cnt = mb_strlen($value['ivd_item_url']);
+// 			$_word_cnt = strlen($value['ivd_item_url']);
+			if ($_word_cnt >= 60)
+			{
+				$_url_word = substr($value['ivd_item_url'], 0, 60) . " ...";
+			} else {
+				$_url_word = $value['ivd_item_url'];
+			}
+
+			// 明細を追加
+			switch( $value['ivd_iv_accounting'] )
+			{
+				case 0:
+
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '・対象KW：' . $value['ivd_item'];
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][1] = $value['ivd_qty'];
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][2] = $value['ivd_price'];
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][3] = $value['ivd_total'];
+					$_subtotal = $_subtotal + $value['ivd_total'];
+					if (($value['ivd_total'] > 0) && ($_tmp_seokey_flg == FALSE))
+					{
+						$_tmp_seokey_flg = TRUE;
+					} elseif ($value['ivd_total'] > 0) {
+						$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][9] = "LF";
+						$line_cnt++;
+					}
+					$scate_cnt++;
+					$line_cnt++;
+
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '　対象URL：' . $_url_word;
+// 					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '　対象URL：' . $value['ivd_item_url'];
+					$scate_cnt++;
+					$line_cnt++;
+					break;
+
+				case 1:
+
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '・対象KW：' . $value['ivd_item'];
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][1] = $value['ivd_qty'];
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][2] = $value['ivd_price'];
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][3] = $value['ivd_total'];
+					$_subtotal = $_subtotal + $value['ivd_total'];
+					$scate_cnt++;
+					$line_cnt++;
+
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '　対象URL：' . $_url_word;
+// 					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '　対象URL：' . $value['ivd_item_url'];
+					$scate_cnt++;
+					$line_cnt++;
+					break;
+
+				case 2:
+
+					if ($value['ivd_pj_seq'] != $_tmp_pjseq)
+					{
+						$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '・対象KW：' . $value['ivd_item'];
+						if ($_tmp_res_flg == FALSE)
+						{
+							$_tmp_res_flg = TRUE;
+						} else {
+							$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][9] = "LF";
+							$line_cnt++;
+						}
+						$scate_cnt++;
+						$line_cnt++;
+
+						$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '　対象URL：' . $_url_word;
+// 						$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '　対象URL：' . $value['ivd_item_url'];
+						$scate_cnt++;
+						$line_cnt++;
+					}
+
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '　・' . $value['ivd_item_comment'];
+
+					// 売上月数から月末日数を計算
+					$_mouth_date = substr($_iv_data['iv_salse_yymm'], 0, 4) . '-' . substr($_iv_data['iv_salse_yymm'], 4, 2);
+					$date = new DateTime($_mouth_date);
+					$_nisuu = date($date->format('t'));
+					// 					$_nisuu = date($date->modify('-1 months')->format('t'));
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][1] = $value['ivd_qty'] . '/' . $_nisuu;
+
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][2] = $value['ivd_price'];
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][3] = $value['ivd_total'];
+					$_subtotal = $_subtotal + $value['ivd_total'];
+					$scate_cnt++;
+					$line_cnt++;
+
+					$_tmp_pjseq = $value['ivd_pj_seq'];
+
+					break;
+
+				case 3:
+
+					$_subtitle = "　固定＆成功報酬";
+					break;
+
+				case 7:
+
+				case 8:
+
+				case 9:
+
+				case 10:
+
+				case 11:
+
+				case 12:
+
+				default:
+
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '・' . $value['ivd_item'];
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][1] = $value['ivd_qty'];
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][2] = $value['ivd_price'];
+					$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][3] = $value['ivd_total'];
+					$_subtotal = $_subtotal + $value['ivd_total'];
+					$scate_cnt++;
+					$line_cnt++;
+
+					break;
+			}
+
+			$_tmp_accounting = $value['ivd_iv_accounting'];
+
 		}
 
-		$pdf->setPage(max($page_end_1,$page_end_2));
-		$pdf->SetXY($this->GetX(),$ynew);
+		$iv_data[$mcate_cnt]['subtotal'] = $_subtotal;
+
+		return array($iv_data, $ivd_data, $line_cnt);
+
 	}
 
 }

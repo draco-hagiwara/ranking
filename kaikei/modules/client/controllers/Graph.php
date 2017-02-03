@@ -36,7 +36,6 @@ class Graph extends MY_Controller
 
     	$this->_set_validation();
 
-
     	// グラフデータ (逆順)
     	$date = new DateTime();
     	$_end_day = date('t');														// 今月の末日を取得
@@ -45,9 +44,6 @@ class Graph extends MY_Controller
     	for ($cnt = $_end_day-1; $cnt >= 1; $cnt--)
     	{
     		$_x_data .= ',' . $date->modify('+1 days')->format('d');
-
-    		//print($_x_data);
-    		//print("<br>");
     	}
 
     	$_tbl_date = explode(",", $_x_data);
@@ -64,13 +60,12 @@ class Graph extends MY_Controller
     	$_tbl_data1 = explode(",", $_set_data1);
     	$_tbl_data2 = explode(",", $_set_data2);
 
-
-    	print("DATA1 : ");
-    	print($_set_data1);
-    	print("<br>");
-    	print("DATA2 : ");
-    	print($_set_data2);
-    	print("<br>");
+//     	print("DATA1 : ");
+//     	print($_set_data1);
+//     	print("<br>");
+//     	print("DATA2 : ");
+//     	print($_set_data2);
+//     	print("<br>");
 
     	$this->smarty->assign('x_data',  $_x_data);
     	$this->smarty->assign('set_data1',  $_set_data1);
@@ -94,7 +89,6 @@ class Graph extends MY_Controller
 
     	$this->_set_validation();
 
-
     	// グラフデータ (逆順)
     	$date = new DateTime();
     	$_end_day = date('t');														// 今月の末日を取得
@@ -103,9 +97,6 @@ class Graph extends MY_Controller
     	for ($cnt = $_end_day-1; $cnt >= 1; $cnt--)
     	{
     		$_x_data .= ',' . $date->modify('+1 days')->format('d');
-
-    		//print($_x_data);
-    		//print("<br>");
     	}
 
     	$_tbl_date = explode(",", $_x_data);

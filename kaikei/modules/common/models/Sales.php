@@ -118,7 +118,6 @@ class Sales extends CI_Model
     		default:
     	}
 
-
     	// WHERE文 作成
     	if ($set_select["sa_collect"] != '')
     	{
@@ -136,11 +135,6 @@ class Sales extends CI_Model
 
     	// BETWEEN文 作成
 		$sql .= ' AND `sa_sales_date` BETWEEN \'' . $set_between["sa_sales_date01"] . '\' AND \'' . $set_between["sa_sales_date02"] . '\'';
-
-
-
-
-
 
     	switch( $set_displine["displine"] )
     	{
@@ -185,13 +179,6 @@ class Sales extends CI_Model
     			break;
     		default:
     	}
-
-
-
-
-//     	print($sql);
-//     	print("<br><br>");
-
 
     	// 対象全件数を取得
     	$query = $this->db->query($sql);

@@ -12,7 +12,7 @@ class Customer extends CI_Model
      * 顧客情報SEQから登録情報を取得する
      *
      * @param    int
-     * @return   bool
+     * @return   array()
      */
     public function get_cm_seq($seq_no)
     {
@@ -28,19 +28,19 @@ class Customer extends CI_Model
     }
 
     /**
-     * 「有効」：顧客情報の取得
+     * 固定報酬：対象顧客情報の取得
      *
-     * @param    array() : 検索項目値
-     * @param    int     : 1ページ当たりの表示件数(LIMIT値)
-     * @param    int     : オフセット値(ページ番号)
+     * @param    none
      * @return   array()
      */
-    public function get_invoicelist()
+    public function get_ivlist($timing, $cmseq = FALSE)
     {
 
     	$sql = 'SELECT
     			  cm_seq,
     			  cm_status,
+    			  cm_agency_flg,
+    			  cm_agency_seq,
     			  cm_company,
     			  cm_department,
     			  cm_person01,
@@ -71,8 +71,24 @@ class Customer extends CI_Model
     			  cm_kind,
     			  cm_account_no,
     			  cm_account_nm,
-    			  cm_salesman
-    			FROM mt_customer WHERE cm_delflg = 0 AND cm_status = 0 ORDER BY cm_seq ASC';
+    			  cm_invo_timing,
+    			cm_salesman
+    			FROM mt_customer WHERE cm_delflg = 0 AND cm_status = 0 AND cm_invo_timing = ' . $timing
+    	;
+
+    	// 個別発行に対応
+    	if ($cmseq != FALSE)
+    	{
+    		$sql .= ' AND cm_seq = ' . $cmseq;
+    	}
+
+    	// 代理店対象顧客を抽出
+    	if ($timing == 2)
+    	{
+    		$sql .= ' AND cm_agency_flg = 1';
+    	}
+
+    	$sql .= ' ORDER BY cm_seq ASC';
 
     	// クエリー実行
     	$query = $this->db->query($sql);
@@ -82,8 +98,29 @@ class Customer extends CI_Model
 
     }
 
+    /**
+     * 代理店を取得する
+     *
+     * @param    int
+     * @return   array()
+     */
+    public function get_cm_agency()
+    {
 
+    	$set_where["cm_status"]     = 0;
+    	$set_where["cm_agency_flg"] = 1;
 
+    	$this->db->order_by('cm_seq', 'DESC');
+    	$query = $this->db->get_where('mt_customer', $set_where);
+
+//     	$_last_sql = $this->db->last_query();
+//     	print_r($_last_sql);
+
+    	$get_data = $query->result('array');
+
+    	return $get_data;
+
+    }
 
     /**
      * クライアントメンバーの取得
@@ -131,13 +168,17 @@ class Customer extends CI_Model
     	$sql = 'SELECT
     			  cm_seq,
     			  cm_status,
+    			  cm_agency_flg,
+    			  cm_agency_seq,
     			  cm_company,
     			  cm_person01,
     			  cm_person02,
     			  cm_tel01,
     			  cm_tel02,
     			  cm_mail,
-    			  cm_mailsub
+    			  cm_mailsub,
+    			  cm_collect,
+    			  cm_invo_timing
     			FROM mt_customer WHERE ';
 
     	// cm_delflg 判定
@@ -232,6 +273,88 @@ class Customer extends CI_Model
     }
 
     /**
+     * 請求書作成：顧客情報SEQから成功報酬情報を取得する
+     *
+     * @param    int  : 顧客情報seq
+     * @param    boolen
+     * @return   array()
+     */
+    public function get_ivlist_result($seq_no, $invo_status = FALSE)
+    {
+
+
+
+    	/*
+    	 * pj_invoice_status = 0
+    	 * 一括作成時には発行有無をチェックしている
+    	 */
+
+
+
+    	$sql = 'SELECT *
+    			FROM vw_pjlist_result '
+        		;
+
+        if ($invo_status == FALSE)
+        {
+        	$sql .= ' WHERE cm_seq = ' . $seq_no . ' AND pj_invoice_status = 0'
+        			;
+        } else {
+        	$sql .= ' WHERE cm_seq = ' . $seq_no
+        			;
+        }
+
+        // 接続先DBを選択 ＆ クエリー実行
+       	$query = $this->db->query($sql);
+
+        $invoice_list = $query->result('array');
+
+        return $invoice_list;
+
+    }
+
+    /**
+     * 請求書作成：顧客情報SEQから代理店情報を取得する
+     *
+     * @param    int  : 顧客情報seq
+     * @param    boolen
+     * @return   array()
+     */
+    public function get_ivlist_agency($seq_no, $invo_status = FALSE)
+    {
+
+
+
+    	/*
+    	 * pj_invoice_status = 0
+    	 * 一括作成時には発行有無をチェックしている
+    	 */
+
+
+
+    	$sql = 'SELECT *
+    			FROM vw_pjlist_agency '
+    			;
+
+    			if ($invo_status == FALSE)
+    			{
+    				$sql .= ' WHERE (cm_seq = ' . $seq_no . ' OR cm_agency_seq = ' . $seq_no . ') AND pj_invoice_status = 0'
+    						;
+    			} else {
+    				$sql .= ' WHERE (cm_seq = ' . $seq_no . ' OR cm_agency_seq = ' . $seq_no . ')'
+    						;
+    			}
+
+    			// 接続先DBを選択 ＆ クエリー実行
+    			$query = $this->db->query($sql);
+
+    			$invoice_list = $query->result('array');
+
+    			return $invoice_list;
+
+    }
+
+    /**
      * クライアント新規会員登録
      *
      * @param    array()
@@ -289,7 +412,12 @@ class Customer extends CI_Model
     		$setdata['cm_flg_iv'] = 1;
     		unset($setdata['chkinvoice']) ;
     	} else {
-    		$setdata['cm_flg_iv'] = 0;
+    		if (isset($setdata['cm_flg_iv']))
+    		{
+    			$setdata['cm_flg_iv'] = $setdata['cm_flg_iv'];
+    		} else {
+    			$setdata['cm_flg_iv'] = 0;
+    		}
     	}
 
     	$where = array(
@@ -306,275 +434,6 @@ class Customer extends CI_Model
 
     	return $result;
     }
-
-
-//     /**
-//      * 会社一覧を取得する
-//      *
-//      * @param    int
-//      * @return   bool
-//      */
-//     public function get_cl_company()
-//     {
-
-//     	$sql = 'SELECT
-//     			  cl_seq,
-//     			  cl_status,
-//     			  cl_company
-//     			FROM mt_client WHERE cl_delflg = 0 ORDER BY cl_seq DESC';
-
-//     	// クエリー実行
-//     	$query = $this->db->query($sql);
-//     	$get_data = $query->result('array');
-
-//     	return $get_data;
-
-//     }
-
-
-
-//     /**
-//      * 重複データのチェック：ログインID
-//      *
-//      * @param    char
-//      * @param    bool         :: FALSE => 新規登録時。 TRUE => 更新時使用。
-//      * @return   bool
-//      */
-//     public function check_loginid($cl_id, $seq = FALSE)
-//     {
-
-//     	if ($seq == FALSE)
-//     	{
-//     		$sql = 'SELECT cl_id FROM `mt_client` '
-//     				. 'WHERE `cl_id` = ? ';
-
-//     		$values = array(
-//     						$cl_id,
-//     		);
-//     	} else {
-//     		$sql = 'SELECT cl_id FROM `mt_client` '
-//         			. 'WHERE `cl_seq` != ? AND `cl_id` = ? ';
-
-//         	$values = array(
-//         					$seq,
-//         					$cl_id,
-//         	);
-//     	}
-
-//         $query = $this->db->query($sql, $values);
-
-//         if ($query->num_rows() > 0) {
-//         	return TRUE;
-//         } else {
-//         	return FALSE;
-//         }
-//     }
-
-
-
-//     /**
-//      * ログイン日時の更新
-//      *
-//      * @param    int
-//      * @return   bool
-//      */
-//     public function update_Logindate($cl_seq, $user_type=2)
-//     {
-
-//     	$time = time();
-//     	$setData = array(
-//     			'cl_lastlogin' => date("Y-m-d H:i:s", $time)
-//     	);
-//     	$where = array(
-//     			'cl_seq' => $cl_seq
-//     	);
-//     	$result = $this->db->update('mt_client', $setData, $where);
-
-//     	// ログ書き込み
-//     	$set_data['lg_func']      = 'update_Logindate';
-//     	$set_data['lg_detail']    = 'cl_seq = ' . $cl_seq;
-//     	$this->insert_log($set_data);
-
-//     	return $result;
-//     }
-
-
-//     /**
-//      * クライアントIDから登録情報を取得する
-//      *
-//      * @param    int
-//      * @return   bool
-//      */
-//     public function get_cl_id($cl_id)
-//     {
-
-//     	$set_where["cl_id"]    = $cl_id;
-
-//     	$query = $this->db->get_where('mb_client', $set_where);
-
-//     	$get_data = $query->result('array');
-
-//     	return $get_data;
-
-//     }
-
-//     /**
-//      * クライアントサイトIDから登録情報を取得する
-//      *
-//      * @param    int
-//      * @return   bool
-//      */
-//     public function get_cl_siteid($cl_siteid)
-//     {
-
-//     	$set_where["cl_siteid"]    = $cl_siteid;
-
-//     	$query = $this->db->get_where('mb_client', $set_where);
-
-//     	$get_data = $query->result('array');
-
-//     	return $get_data;
-
-//     }
-
-//     /**
-//      * クライアントSEQから営業＆編集者情報を取得する
-//      *
-//      * @param    int
-//      * @return   bool
-//      */
-//     public function get_clac_seq($cl_seq, $cl_id)
-//     {
-
-//     	if (isset($cl_seq))
-//     	{
-//     		$set_where["cl_seq"]    = $cl_seq;
-//     	} else {
-//     		$set_where["cl_id"]    = $cl_id;
-//     	}
-
-//     	$query = $this->db->get_where('vw_a_clientlist', $set_where);
-
-//     	$get_data = $query->result('array');
-
-//     	return $get_data;
-
-//     }
-
-
-//     /**
-//      * 重複データのチェック：サイトID(URL名)
-//      *
-//      * @param    char
-//      * @param    bool         :: FALSE => 新規登録時。 TRUE => 更新時使用。
-//      * @return   bool
-//      */
-//     public function check_siteid($seq = FALSE, $cl_siteid)
-//     {
-
-//     	if ($seq == FALSE)
-//     	{
-//     		$sql = 'SELECT * FROM `mb_client` '
-//     				. 'WHERE `cl_siteid` = ? ';
-
-//     		$values = array(
-//     				$cl_siteid,
-//     		);
-//     	} else {
-// 	    	$sql = 'SELECT * FROM `mb_client` '
-// 	    			. 'WHERE `cl_seq` != ? AND `cl_siteid` = ? ';
-
-// 	    	$values = array(
-// 	    			$seq,
-// 	    			$cl_siteid,
-// 	    	);
-//     	}
-
-//     	$query = $this->db->query($sql, $values);
-
-//     	if ($query->num_rows() > 0) {
-//     		return TRUE;
-//     	} else {
-//     		return FALSE;
-//     	}
-//     }
-
-
-
-//     /**
-//      * 重複データのチェック：メールアドレス
-//      *
-//      * @param    int
-//      * @param    varchar
-//      * @return   bool
-//      */
-//     public function check_mailaddr($seq, $mail)
-//     {
-
-//     	$sql = 'SELECT * FROM `mb_client` '
-//     			. 'WHERE `cl_seq` != ? AND `cl_mail` = ? ';
-
-//     	$values = array(
-//     			$seq,
-//     			$mail,
-//     	);
-
-//     	$query = $this->db->query($sql, $values);
-
-//     	if ($query->num_rows() > 0) {
-//     		return TRUE;
-//     	} else {
-//     		return FALSE;
-//     	}
-//     }
-
-//     /**
-//      * クライアントSEQから登録情報を取得する
-//      *
-//      * @param    int
-//      * @return   int
-//      */
-//     public function check_statusno($seq_no)
-//     {
-
-//     	$sql = 'SELECT cl_status FROM `mb_client` '
-//     			. 'WHERE `cl_seq` = ' . $seq_no;
-
-//     	$query = $this->db->query($sql);
-
-//     	$get_data = $query->result('array');
-
-//     	return $get_data;
-
-//     }
-
-
-
-
-//     /**
-//      * ログインIDによる更新
-//      *
-//      * @param    array()
-//      * @return   bool
-//      */
-//     public function update_client_id($setData, $user_type=2)
-//     {
-
-//     	$where = array(
-//     			'cl_id' => $setData['cl_id']
-//     	);
-
-//     	$result = $this->db->update('mb_client', $setData, $where);
-
-// //     	// ログ書き込み
-// //     	$set_data['lg_user_type'] = "";
-// //     	$set_data['lg_type']      = 'client_update';
-// //     	$set_data['lg_func']      = 'update_client_id';
-// //     	$set_data['lg_detail']    = 'cl_id = ' . $setData['cl_id'];
-// //     	$this->insert_log($set_data);
-
-//     	return $result;
-//     }
 
     /**
      * ログ書き込み

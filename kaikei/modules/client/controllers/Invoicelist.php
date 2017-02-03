@@ -14,22 +14,6 @@ class Invoicelist extends MY_Controller
         $this->load->library('lib_auth');
         $this->lib_auth->check_session();
 
-//         if ($_SESSION['c_login'] == TRUE)
-//         {
-//             $this->smarty->assign('login_chk', TRUE);
-//             $this->smarty->assign('mem_Type',  $_SESSION['c_memType']);
-//             $this->smarty->assign('mem_Seq',   $_SESSION['c_memSeq']);
-//             $this->smarty->assign('mem_Grp',   $_SESSION['c_memGrp']);
-//             $this->smarty->assign('mem_Name',  $_SESSION['c_memName']);
-//         } else {
-//             $this->smarty->assign('login_chk', FALSE);
-//             $this->smarty->assign('mem_Type',  "");
-//             $this->smarty->assign('mem_Seq',   "");
-//             $this->smarty->assign('mem_Grp',   "");
-
-//             redirect('/login/');
-//         }
-
         $this->smarty->assign('mess', FALSE);
 
     }
@@ -240,7 +224,7 @@ class Invoicelist extends MY_Controller
 		    $get_iv_data[0]['iv_seq']        = $input_post['iv_seq'];
 		    $get_iv_data[0]['iv_seq_suffix'] = $_suffix;									// 枝番
 
-		    // 売上データの更新有無を判定：「未発行」
+		    // ■売上データの更新有無を判定：「未発行」
 		    if ($input_post['iv_status'] == 0)
 		    {
 			    switch( $get_iv_data[0]['iv_status'] ){
@@ -260,7 +244,7 @@ class Invoicelist extends MY_Controller
 			    }
 		    }
 
-		    // 売上データの更新有無を判定：「発行済み」
+		    // ■売上データの更新有無を判定：「発行済み」
 		    if ($input_post['iv_status'] == 1)
 		    {
 		    	switch( $get_iv_data[0]['iv_status'] ){
@@ -280,7 +264,7 @@ class Invoicelist extends MY_Controller
 		    	}
 		    }
 
-		    // 売上データの更新有無を判定：「キャンセル」
+		    // ■売上データの更新有無を判定：「キャンセル」
 		    if ($input_post['iv_status'] == 9)
 		    {
 		    	switch( $get_iv_data[0]['iv_status'] ){
@@ -302,110 +286,55 @@ class Invoicelist extends MY_Controller
 
 		    	}
 		    }
-
 		    $get_iv_data[0]['iv_status']  = $input_post['iv_status'];
 
-
-
 		    // 請求書発行番号 :: 【LA101-KT-BX001-1611】
-		    $_issue_num['issue_num']        = $this->config->item('INVOICE_ISSUE_NUM');       		// 接頭語:L
-		    $_issue_num['issue_code']       = $this->lib_invoice->issue_code($get_iv_data[0]['iv_cm_seq']);		// 会社名かな⇒記号
-		    $_issue_num['issue_client']     = $_SESSION['c_memGrp'];                          		// クライアントNO
-		    $_issue_num['issue_customer']   = $get_iv_data[0]['iv_cm_seq'];                       	// 顧客NO
-		    $_issue_num['issue_kind']       = "KT";                       							// KT(SEO固定)、SK（SEO成功）、KK(広告)、SS(制作)、AF(アフィリエイト）、OT(その他)
-		    if ($get_iv_data[0]['iv_method'] == 1)													// 一括発行=B,個別発行=C
+		    $tmp_salse_info = explode("-", $get_iv_data[0]['iv_slip_no']);
+		    $_salse_info = $tmp_salse_info[1];
+// 		    $_salse_info = $get_iv_data[0]['iv_accounting'];
+
+		    if ($_salse_info == 8)
 		    {
-		    	$_issue_num['issue_class']    = "B";
+		    	$_invo_info = "Y";
+		    } elseif ($_salse_info == 9) {
+		    	$_invo_info = "Z";
 		    } else {
-		    	$_issue_num['issue_class']    = "C";
-		    }
-		    if ($get_iv_data[0]['iv_accounting'] == 0)												// X=通常(固定、成果)/Y=前受が含む場合/Z=赤伝用請求書（マイナス）
-		    {
-		    	$_issue_num['issue_accounting'] = 'X';
-		    	$_tmp_accounting = 0;																// 課金方式を一時保存
-		    } elseif ($get_iv_data[0]['iv_accounting'] == 1) {
-		    	$_issue_num['issue_accounting'] = 'X';
-		    	$_tmp_accounting = 1;
-		    } elseif ($get_iv_data[0]['iv_accounting'] == 2) {
-		    	$_issue_num['issue_accounting'] = 'X';
-		    	$_tmp_accounting = 2;
-		    } elseif ($get_iv_data[0]['iv_accounting'] == 7) {
-		    	$_issue_num['issue_accounting'] = 'H';
-		    	$_tmp_accounting = 7;
-		    } elseif ($get_iv_data[0]['iv_accounting'] == 8) {
-		    	$_issue_num['issue_accounting'] = 'Y';
-		    	$_tmp_accounting = 8;
-		    } elseif ($get_iv_data[0]['iv_accounting'] == 9) {
-		    	$_issue_num['issue_accounting'] = 'Z';
-		    	$_tmp_accounting = 9;
-		    } else {
-		    	$_issue_num['issue_accounting'] = 'EE';
-		    	$_tmp_accounting = 99;
-		    }
-		    $_issue_num['issue_suffix']     = $get_iv_data[0]['iv_seq_suffix'];                     // 枝番
-		    $_issue_num['issue_yymm']       = $get_iv_data[0]['iv_issue_yymm'];                   	// 発行年月
-		    $_issue_num['issue_re']         = $get_iv_data[0]['iv_reissue'];                  		// 再発行
-
-
-
-// 		    // 請求書発行番号の更新
-// 		    $_issue_num['issue_num']        = $this->config->item('INVOICE_ISSUE_NUM');		// 接頭語
-// 		    $_issue_num['client_no']        = $_SESSION['c_memGrp'];						// クライアントNO
-// 		    $_issue_num['customer_no']      = $get_iv_data[0]['iv_cm_seq'];					// 顧客NO
-// 		    $_issue_num['issue_class']      = $get_iv_data[0]['iv_method'];                 // 一括発行=1,個別発行=2
-//     		if ($get_iv_data[0]['iv_accounting'] == 0)                                      // 「通常（固定or成果）:A」/「前受:B」/「赤伝:C」
-// 		    {
-// 		    	$_issue_num['issue_accounting'] = 'A';
-// 		    } elseif ($get_iv_data[0]['iv_accounting'] == 1) {
-// 		    	$_issue_num['issue_accounting'] = 'B';
-// 		    } elseif ($get_iv_data[0]['iv_accounting'] == 2) {
-// 		    	$_issue_num['issue_accounting'] = 'C';
-// 		    } else {
-// 		    	$_issue_num['issue_accounting'] = 'x';
-//     	    }
-// 		    $_issue_num['issue_suffix']     = $get_iv_data[0]['iv_seq_suffix'];				// 枝番
-// 		    $_issue_num['issue_yymm']       = $get_iv_data[0]['iv_issue_yymm'];				// 発行年月
-// 		    $_issue_num['issue_re']         = $get_iv_data[0]['iv_reissue'];				// 再発行
-
-		    $get_iv_data[0]['iv_slip_no']   = $this->lib_invoice->issue_num($_issue_num);
-
-		    $get_iv_data[0]['iv_issue_date'] = $input_post['iv_issue_date'];				// 発効日指定
-		    $get_iv_data[0]['iv_pay_date']   = $input_post['iv_pay_date'];					// 振込期日指定
-		    $get_iv_data[0]['iv_remark']     = $input_post['iv_remark'];					// 備考
-		    $get_iv_data[0]['iv_memo']       = $input_post['iv_memo'];						// メモ
-
-		    if ($input_post['ivd_total0'] != 0)												// 小計
-		    {
-		    	$get_iv_data[0]['iv_subtotal']   = $get_iv_data[0]['iv_subtotal'] + $input_post['ivd_total0'];
-		    }
-    		if ($input_post['ivd_total1'] != 0)
-		    {
-		    	$get_iv_data[0]['iv_subtotal']   = $get_iv_data[0]['iv_subtotal'] + $input_post['ivd_total1'];
+		    	$_invo_info = "X";
 		    }
 
-		    // 消費税計算
-		    $_issue_tax['zeiritsu'] = $this->config->item('INVOICE_TAX');
-		    $_issue_tax['zeinuki']  = $this->config->item('INVOICE_TAXOUT');
-		    $_issue_tax['hasuu']    = $this->config->item('INVOICE_TAX_CAL');
+		    // 発行通番と一括/個別は現行のものを使用
+		    $_invo_serial_num = substr($get_iv_data[0]['iv_slip_no'], -8,  3);
+		    $_invo_class      = substr($get_iv_data[0]['iv_slip_no'], -10, 1);
+		    //$_invo_num = explode("-", $get_iv_data[0]['iv_slip_no']);
+			//$_invo_num = substr($_invo_num[2], 2, 4);
 
-		    $get_iv_data[0]['iv_tax'] = $this->lib_invoice->cal_tax($get_iv_data[0]['iv_subtotal'], $_issue_tax);
+		    $set_data_iv['iv_slip_no']    = $this->lib_invoice->issue_num(  $get_iv_data[0]['iv_cm_seq'],
+																    		$get_iv_data[0]['iv_issue_yymm'],
+																    		$_salse_info,
+																    		$_invo_serial_num,
+																    		$_invo_info,
+																    		$get_iv_data[0]['iv_reissue'],
+		    																$_invo_class
+										    );
 
-		    // 合計金額計算
-		    $get_iv_data[0]['iv_total'] = $get_iv_data[0]['iv_subtotal'] + $get_iv_data[0]['iv_tax'];
-
-		    // 不要パラメータ削除
-		    unset($get_iv_data[0]["iv_create_date"]) ;
-		    unset($get_iv_data[0]["iv_update_date"]) ;
-
-		    // tb_invoice 更新
-		    $this->iv->update_invoice($get_iv_data[0]);
-
-		    // tb_invoice_h 作成
-		    $this->iv->insert_invoice_history($get_iv_data[0]);
 
 		    // 明細データ更新
+		    $get_iv_data[0]['iv_subtotal'] = 0;
 		    foreach($get_ivd_data as $key => $val)
 		    {
+
+		    	// 金額の再計算
+		    	$_tmp_item_seq = 'seq' . ($key + 1);
+		    	$_tmp_item_qty = 'qty' . ($key + 1);
+		    	if ($val['ivd_seq'] == $input_post[$_tmp_item_seq])
+		    	{
+		    		$get_ivd_total    = $this->lib_invoice->issue_ivd_total($val, $input_post, $key);
+		    		$val['ivd_qty']   = $input_post[$_tmp_item_qty];
+		    		$val['ivd_total'] = $get_ivd_total;
+
+		    		// 小計の再計算
+		    		$get_iv_data[0]['iv_subtotal']   = $get_iv_data[0]['iv_subtotal'] + $get_ivd_total;
+		    	}
 
 			    // tb_invoice_detail 更新
 		    	$val['ivd_seq_suffix'] = $_suffix;
@@ -429,10 +358,51 @@ class Invoicelist extends MY_Controller
 		    	// tb_invoice_detail_h 作成
 		    	$this->ivd->insert_invoice_detail_history($val);
 
-// 		    	// 課金方式を一時保存
-// 		    	$_tmp_accounting = $val['ivd_iv_accounting'];
-
 		    }
+
+		    // 請求書データの更新
+		    $get_iv_data[0]['iv_issue_date'] = $input_post['iv_issue_date'];				// 発効日指定
+		    $get_iv_data[0]['iv_pay_date']   = $input_post['iv_pay_date'];					// 振込期日指定
+		    $get_iv_data[0]['iv_remark']     = $input_post['iv_remark'];					// 備考
+		    $get_iv_data[0]['iv_memo']       = $input_post['iv_memo'];						// メモ
+
+		    if ($input_post['ivd_total0'] != 0)												// 小計
+		    {
+		    	$get_iv_data[0]['iv_subtotal']   = $get_iv_data[0]['iv_subtotal'] + $input_post['ivd_total0'];
+		    }
+		    if ($input_post['ivd_total1'] != 0)
+		    {
+		    	$get_iv_data[0]['iv_subtotal']   = $get_iv_data[0]['iv_subtotal'] + $input_post['ivd_total1'];
+		    }
+
+		    // 消費税計算
+		    $_issue_tax['zeiritsu'] = $this->config->item('INVOICE_TAX');
+		    $_issue_tax['zeinuki']  = $this->config->item('INVOICE_TAXOUT');
+		    $_issue_tax['hasuu']    = $this->config->item('INVOICE_TAX_CAL');
+
+		    /*
+		     * 例外対応：「Themis Pte. Limited:181」
+		     *   もし今後増えるようなら、消費税フラグを追加する！
+		     */
+		    if ($get_iv_data[0]['iv_cm_seq'] != 181)
+		    {
+		    	$get_iv_data[0]['iv_tax'] = $this->lib_invoice->cal_tax($get_iv_data[0]['iv_subtotal'], $_issue_tax);
+		    } else {
+		    	$get_iv_data[0]['iv_tax'] = 0;
+		    }
+
+		    // 合計金額計算
+		    $get_iv_data[0]['iv_total'] = $get_iv_data[0]['iv_subtotal'] + $get_iv_data[0]['iv_tax'];
+
+		    // 不要パラメータ削除
+		    unset($get_iv_data[0]["iv_create_date"]) ;
+		    unset($get_iv_data[0]["iv_update_date"]) ;
+
+		    // tb_invoice 更新
+		    $this->iv->update_invoice($get_iv_data[0]);
+
+		    // tb_invoice_h 作成
+		    $this->iv->insert_invoice_history($get_iv_data[0]);
 
 		    // 明細データ新規レコードの追加
 		    if ($input_post['ivd_total0'] != 0)
@@ -443,7 +413,7 @@ class Invoicelist extends MY_Controller
 		    	$set_data_ivd['ivd_iv_seq']        = $get_iv_data[0]['iv_seq'];
 		    	$set_data_ivd['ivd_pj_seq']        = 0;										// 案件SEQ=「0」
 		    	$set_data_ivd['ivd_iv_issue_yymm'] = $get_iv_data[0]['iv_issue_yymm'];
-		    	$set_data_ivd['ivd_iv_accounting'] = $_tmp_accounting;
+		    	$set_data_ivd['ivd_iv_accounting'] = 12;									// その他
 		    	$set_data_ivd['ivd_item']          = $input_post['ivd_item0'];
 		    	$set_data_ivd['ivd_qty']           = $input_post['ivd_qty0'];
 		    	$set_data_ivd['ivd_price']         = $input_post['ivd_price0'];
@@ -464,7 +434,7 @@ class Invoicelist extends MY_Controller
 		    	$set_data_ivd['ivd_iv_seq']        = $get_iv_data[0]['iv_seq'];
 		    	$set_data_ivd['ivd_pj_seq']        = 0;										// 案件SEQ=「0」
 		    	$set_data_ivd['ivd_iv_issue_yymm'] = $get_iv_data[0]['iv_issue_yymm'];
-		    	$set_data_ivd['ivd_iv_accounting'] = $_tmp_accounting;
+		    	$set_data_ivd['ivd_iv_accounting'] = 12;									// その他
 		    	$set_data_ivd['ivd_item']          = $input_post['ivd_item1'];
 		    	$set_data_ivd['ivd_qty']           = $input_post['ivd_qty1'];
 		    	$set_data_ivd['ivd_price']         = $input_post['ivd_price1'];
@@ -629,8 +599,8 @@ class Invoicelist extends MY_Controller
     	$opt_iv_status = $this->config->item('PROJECT_IV_STATUS');
 
     	// 課金方式
-    	$this->config->load('config_comm');
-    	$opt_iv_accounting = $this->config->item('INVOICE_ACCOUNTING');
+//     	$this->config->load('config_comm');
+//     	$opt_iv_accounting = $this->config->item('INVOICE_ACCOUNTING');
 
     	// 回収サイトのセット
     	$opt_iv_collect = $this->config->item('CUSTOMER_CM_COLLECT');
@@ -639,7 +609,7 @@ class Invoicelist extends MY_Controller
     	$opt_iv_kind = $this->config->item('CUSTOMER_CM_KIND');
 
     	$this->smarty->assign('options_iv_status',     $opt_iv_status);
-    	$this->smarty->assign('options_iv_accounting', $opt_iv_accounting);
+//     	$this->smarty->assign('options_iv_accounting', $opt_iv_accounting);
     	$this->smarty->assign('options_iv_collect',    $opt_iv_collect);
     	$this->smarty->assign('options_iv_kind',       $opt_iv_kind);
 

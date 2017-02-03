@@ -40,7 +40,6 @@ class Lib_auth
 	    	$CI->smarty->assign('mem_Type',  $_SESSION['c_memType']);
 	    	$CI->smarty->assign('mem_Grp',   $_SESSION['c_memGrp']);
 	    	$CI->smarty->assign('mem_Name',  $_SESSION['c_memName']);
-	    	$CI->view('top/index.tpl');
 	    } else {
 
 	    	$CI->smarty->assign('login_chk', FALSE);
@@ -49,7 +48,6 @@ class Lib_auth
 	    	$CI->smarty->assign('mem_Grp',   "");
 	    	$CI->smarty->assign('mem_Name',  "");
 	    	$CI->smarty->assign('err_mess',  '');
-	    	$CI->view('login/index.tpl');
 	    }
 
     }
@@ -524,48 +522,66 @@ class Lib_auth
         $CI =& get_instance();
     	$CI->load->library('session');
 
+//     	if ((!isset($_SESSION['c_login'])) || ($_SESSION['c_login'] == FALSE))
+//     	{
+//     		redirect('/login/');
+//     	}
+
         switch ($login_member)
         {
             case 'client':
-                $backup_c_login   = $_SESSION['c_login'];
-                $backup_c_memSeq  = $_SESSION['c_memSeq'];
-                $backup_c_memType = $_SESSION['c_memType'];
-                $backup_c_memGrp  = $_SESSION['c_memGrp'];
-                $backup_c_memName = $_SESSION['c_memName'];
+            	if ((isset($_SESSION['c_login'])) && ($_SESSION['c_login'] == TRUE))
+            	{
+	                $backup_c_login   = $_SESSION['c_login'];
+	                $backup_c_memSeq  = $_SESSION['c_memSeq'];
+	                $backup_c_memType = $_SESSION['c_memType'];
+	                $backup_c_memGrp  = $_SESSION['c_memGrp'];
+	                $backup_c_memName = $_SESSION['c_memName'];
 
-                $get_data = $CI->session->all_userdata();
-                foreach ($get_data as $key => $val)
-                {
-                    if (substr($key, 0, 2) == 'c_')
-                    {
-                       $CI->session->unset_userdata($key);
-                    }
-                }
+	                $get_data = $CI->session->all_userdata();
+	                foreach ($get_data as $key => $val)
+	                {
+	                    if (substr($key, 0, 2) == 'c_')
+	                    {
+	                       $CI->session->unset_userdata($key);
+	                    }
+	                }
 
-                $_SESSION['c_login']   = $backup_c_login;         // ログイン有無
-                $_SESSION['c_memSeq']  = $backup_c_memSeq;        // メンバーID
-                $_SESSION['c_memType'] = $backup_c_memType;       // 0:一般,1:管理
-                $_SESSION['c_memGrp']  = $backup_c_memGrp;        // 親クライアントNO
-                $_SESSION['c_memName'] = $backup_c_memName;       // メンバー名前
+	                $_SESSION['c_login']   = $backup_c_login;         // ログイン有無
+	                $_SESSION['c_memSeq']  = $backup_c_memSeq;        // メンバーID
+	                $_SESSION['c_memType'] = $backup_c_memType;       // 0:一般,1:管理
+	                $_SESSION['c_memGrp']  = $backup_c_memGrp;        // 親クライアントNO
+	                $_SESSION['c_memName'] = $backup_c_memName;       // メンバー名前
+            	} else {
+            		$this->logout($login_member);
+            		redirect('/login/');
+//             		redirect(base_url());
+            	}
 
                 break;
             case 'admin':
-                $backup_a_login   = $_SESSION['a_login'];
-                $backup_a_memType = $_SESSION['a_memType'];
-                $backup_a_memSeq  = $_SESSION['a_memSeq'];
+            	if (isset($_SESSION['a_login']))
+            	{
+	            	$backup_a_login   = $_SESSION['a_login'];
+	                $backup_a_memType = $_SESSION['a_memType'];
+	                $backup_a_memSeq  = $_SESSION['a_memSeq'];
 
-                $get_data = $CI->session->all_userdata();
-                foreach ($get_data as $key => $val)
-                {
-                    if (substr($key, 0, 2) == 'a_')
-                    {
-                       $CI->session->unset_userdata($key);
-                    }
+	                $get_data = $CI->session->all_userdata();
+	                foreach ($get_data as $key => $val)
+	                {
+	                    if (substr($key, 0, 2) == 'a_')
+	                    {
+	                       $CI->session->unset_userdata($key);
+	                    }
+	                }
+
+	                $_SESSION['a_login']   = $backup_a_login;         // ログイン有無
+	                $_SESSION['a_memType'] = $backup_a_memType;       // メンバーID
+	                $_SESSION['a_memSeq']  = $backup_a_memSeq;        // メンバーID
+                } else {
+                	$this->logout($login_member);
+                	redirect(base_url());
                 }
-
-                $_SESSION['a_login']   = $backup_a_login;         // ログイン有無
-                $_SESSION['a_memType'] = $backup_a_memType;       // メンバーID
-                $_SESSION['a_memSeq']  = $backup_a_memSeq;        // メンバーID
 
                 break;
             default:
@@ -601,7 +617,7 @@ class Lib_auth
     public function insert_log($setData)
     {
 
-//     	$CI =& get_instance();
+    	$CI =& get_instance();
 
    		$setData['lg_user_id'] = "";
         $setData['lg_type']    = 'Comm_auth.php';

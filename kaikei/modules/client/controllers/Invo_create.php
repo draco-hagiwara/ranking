@@ -17,22 +17,6 @@ class Invo_create extends MY_Controller
         $this->load->library('lib_auth');
         $this->lib_auth->check_session();
 
-//         if ($_SESSION['c_login'] == TRUE)
-//         {
-//             $this->smarty->assign('login_chk', TRUE);
-//             $this->smarty->assign('mem_Type',  $_SESSION['c_memType']);
-//             $this->smarty->assign('mem_Seq',   $_SESSION['c_memSeq']);
-//             $this->smarty->assign('mem_Grp',   $_SESSION['c_memGrp']);
-//             $this->smarty->assign('mem_Name',  $_SESSION['c_memName']);
-//         } else {
-//             $this->smarty->assign('login_chk', FALSE);
-//             $this->smarty->assign('mem_Type',  "");
-//             $this->smarty->assign('mem_Seq',   "");
-//             $this->smarty->assign('mem_Grp',   "");
-
-//             redirect('/login/');
-//         }
-
         $this->smarty->assign('mess', FALSE);
 
     }
@@ -260,9 +244,7 @@ class Invo_create extends MY_Controller
 
     		$this->smarty->assign('info', $_set_input_post);
 
-
     		// 受注案件情報セット
-//     		for ($i=0; $input_post["ivd_item" . $i] != ""; $i++)
     		for ($i=0; isset($input_post["ivd_item" . $i]); $i++)
     		{
     			$set_pj_data[$i]['pj_keyword'] = $input_post["ivd_item" .  $i];
@@ -316,15 +298,13 @@ class Invo_create extends MY_Controller
     {
 
         // ステータス 選択項目セット
-//     	$this->config->load('config_status');
-//     	$opt_iv_status = $this->config->item('PROJECT_IV_STATUS');
     	$opt_iv_status = array(
     							"0" => "未　発　行",
-							);
+						);
 
     	// 課金方式
     	$this->config->load('config_comm');
-    	$opt_iv_accounting = $this->config->item('INVOICE_ACCOUNTING');
+    	$opt_iv_accounting = $this->config->item('INVOICE_ACCOUNTING_SINGLE');
 
     	// 回収サイトのセット
     	$opt_iv_collect = $this->config->item('CUSTOMER_CM_COLLECT');
@@ -346,7 +326,6 @@ class Invo_create extends MY_Controller
     	// 固定請求年月のセット（過去一年分）
     	$date = new DateTime();
     	$_date_ym = $date->modify('+1 months')->format('Ym');
-//     	$_date_ym = $date->format('Ym');
     	$opt_date_fix[$_date_ym] = substr($_date_ym, 0, 4) . '年' . substr($_date_ym, 4, 2) . '月分';
     	for ($i = 1; $i < 12; $i++) {
     		$_date_ym = $date->modify('-1 months')->format('Ym');
@@ -395,58 +374,34 @@ class Invo_create extends MY_Controller
     	$set_iv_data['iv_method'] = $method;                                            // 請求書発行方式:一括発行=B,個別発行=C
     	$set_iv_data['iv_issue_yymm'] = $input_post['iv_issue_yymm'];                   // 発行年月
 
-
-
-
-
-
-
     	// 売上月度計算
     	$_collect_date = $this->lib_invoice->issue_collect($input_post['iv_collect'], $input_post['iv_issue_yymm']);
     	$set_iv_data['iv_salse_yymm'] = $_collect_date['salse_yymm'];					// 売上月度
 
-
-
-
-
-
-
-
     	// 請求書発行番号 :: 【LA101-KT-BX001-1611】
-    	$_issue_num['issue_num']      = $this->config->item('INVOICE_ISSUE_NUM');       			// 接頭語:L
-    	$_issue_num['issue_code']     = $this->lib_invoice->issue_code($input_post['iv_cm_seq']);	// 会社名かな⇒記号
-    	$_issue_num['issue_client']   = $_SESSION['c_memGrp'];                          			// クライアントNO
-    	$_issue_num['issue_customer'] = $input_post['iv_cm_seq'];                       			// 顧客NO
-    	$_issue_num['issue_kind']     = "KT";                       								// KT(SEO固定)、SK（SEO成功）、KK(広告)、SS(制作)、AF(アフィリエイト）、OT(その他)
-    	$_issue_num['issue_class']    = $method;                                        			// 一括発行=B,個別発行=C
-    	if ($input_post['iv_accounting'] == 0)														// X=通常(固定、成果)/Y=前受が含む場合/Z=赤伝用請求書（マイナス）
+    	$_salse_info = $input_post['iv_accounting'];
+    	if ($_salse_info == 8)
     	{
-    		$_issue_num['issue_accounting'] = 'X';
-    		$_tmp_accounting = 0;
-    	} elseif ($input_post['iv_accounting'] == 1) {
-    		$_issue_num['issue_accounting'] = 'X';
-    		$_tmp_accounting = 1;
-    	} elseif ($input_post['iv_accounting'] == 2) {
-    		$_issue_num['issue_accounting'] = 'X';
-    		$_tmp_accounting = 2;
-    	} elseif ($input_post['iv_accounting'] == 7) {
-    		$_issue_num['issue_accounting'] = 'H';
-    		$_tmp_accounting = 7;
-    	} elseif ($input_post['iv_accounting'] == 8) {
-    		$_issue_num['issue_accounting'] = 'Y';
-    		$_tmp_accounting = 8;
-    	} elseif ($input_post['iv_accounting'] == 9) {
-    		$_issue_num['issue_accounting'] = 'Z';
-    		$_tmp_accounting = 9;
+    		$_invo_info = "Y";
+    	} elseif ($_salse_info == 9) {
+    		$_invo_info = "Z";
     	} else {
-    		$_issue_num['issue_accounting'] = 'EE';
-    		$_tmp_accounting = 99;
+    		$_invo_info = "X";
     	}
-    	$_issue_num['issue_suffix']   = $_suffix;                                       			// 枝番
-    	$_issue_num['issue_yymm']     = $input_post['iv_issue_yymm'];                   			// 発行年月
-    	$_issue_num['issue_re']       = $set_iv_data['iv_reissue'];                     			// 再発行
 
-    	$set_iv_data['iv_slip_no']    = $this->lib_invoice->issue_num($_issue_num);
+    	// 発行月の発行通番を取得
+    	$_invo_serial_num  = $this->lib_invoice->issue_serial_num($input_post['iv_issue_yymm']);
+
+    	$_invo_class      = "C";
+
+    	$set_iv_data['iv_slip_no']    = $this->lib_invoice->issue_num(  $input_post['iv_cm_seq'],
+														    			$input_post['iv_issue_yymm'],
+														    			$_salse_info,
+														    			$_invo_serial_num,
+														    			$_invo_info,
+														    			$set_iv_data['iv_reissue'],
+														    			$_invo_class
+								    	);
 
     	$set_iv_data['iv_remark']     = $input_post['iv_remark'];                       // 備考
     	$set_iv_data['iv_memo']       = $input_post['iv_memo'];                         // メモ
@@ -509,7 +464,7 @@ class Invo_create extends MY_Controller
     		$set_ivd_data['ivd_iv_seq']        = $set_iv_data['iv_seq'];
     		$set_ivd_data['ivd_pj_seq']        = 0;                                        // 案件SEQ=「0」
     		$set_ivd_data['ivd_iv_issue_yymm'] = $set_iv_data['iv_issue_yymm'];
-    		$set_ivd_data['ivd_iv_accounting'] = $_tmp_accounting;
+    		$set_ivd_data['ivd_iv_accounting'] = $input_post['iv_accounting'];
     		$set_ivd_data['ivd_item']          = $input_post["ivd_item" . $i];
     		$set_ivd_data['ivd_qty']           = $input_post["ivd_qty" . $i];
     		$set_ivd_data['ivd_price']         = $input_post["ivd_price" . $i];

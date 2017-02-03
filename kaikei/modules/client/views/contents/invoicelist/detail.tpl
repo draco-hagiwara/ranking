@@ -25,6 +25,10 @@
     <label for="iv_slip_no" class="col-xs-2 col-md-2 control-label">請求書NO</label>
     <div class="col-md-8">{$info.iv_slip_no}</div>
   </div>
+  <div class="form-group">
+    <label for="iv_salse_yymm" class="col-xs-2 col-md-2 control-label">売上月度</label>
+    <div class="col-md-8">{$info.iv_salse_yymm}</div>
+  </div>
 
   {if $info.iv_status==0}
     <div class="form-group">
@@ -60,10 +64,11 @@
   <div class="form-group">
     <label for="iv_pay_date" class="col-xs-2 col-md-2 control-label">送付先住所</label>
     <div class="col-md-8">〒{$info.iv_zip01}-{$info.iv_zip02}</div>
-    <div class="col-md-8">{$info.iv_pref} {$info.iv_addr01} {$info.iv_addr02} {$info.iv_buil}</div><br><br>
+    <div class="col-md-8">{$info.iv_pref} {$info.iv_addr01} {$info.iv_addr02} {$info.iv_buil}</div>
+    <br><br><br>
     <div class="col-md-8 col-md-offset-2">{$info.iv_company}</div>
-    <div class="col-md-8 col-md-offset-2">{$info.iv_department}</div><br>
-    <div class="col-md-8 col-md-offset-2">{$info.iv_person01} {$info.iv_person02}</div>
+    <div class="col-md-8 col-md-offset-2">　{$info.iv_department}</div><br>
+    <div class="col-md-8 col-md-offset-2">　{$info.iv_person01} {$info.iv_person02}</div>
   </div>
 
 {*
@@ -78,37 +83,58 @@
   <table class="table table-hover table-bordered">
     <tbody>
       <tr class="active">
-        <td class="col-md-7 text-center">請　求　項　目　（下段：対象URL）</td>
-        <td class="col-md-1 text-center">数 量</td>
+        <td class="col-md-7 text-center">請　求　項　目　（二段：対象URL，三段：ランクイン範囲）</td>
+        <td class="col-md-1 text-center">数量or日数</td>
         <td class="col-md-1 text-center">単 価（円）</td>
         <td class="col-md-1 text-center">金 額（円）</td>
       </tr>
 
-      {foreach from=$infodetail item=ivd}
+      {foreach from=$infodetail item=ivd  name="no"}
+        {form_hidden("seq{$smarty.foreach.no.iteration}" , $ivd.ivd_seq)}
       <tr>
         <td class="col-md-7 input-group-sm">
-          {if $ivd.ivd_iv_accounting==0}固定：対象キーワード：
-          {elseif $ivd.ivd_iv_accounting==1}成果：対象キーワード：
-          {elseif $ivd.ivd_iv_accounting==2}固+成：対象キーワード：
+          {if $ivd.ivd_item_cmseq}{$ivd.ivd_item_cmseq} => {/if}
+          {if $ivd.ivd_iv_accounting==0}SEO固定：対象キーワード：
+          {elseif $ivd.ivd_iv_accounting==1}固定：対象キーワード：
+          {elseif $ivd.ivd_iv_accounting==2}<font color=red>成果</font>：対象キーワード：
+          {elseif $ivd.ivd_iv_accounting==3}<font color=red>固+成</font>：対象キーワード：
           {else}{/if}
           「{$ivd.ivd_item}」
         </td>
-        <td class="col-md-1 input-group-sm text-center">
-          {$ivd.ivd_qty|number_format}
-        </td>
+
+        {if $info.iv_status==0}
+          <td class="col-md-1 input-group-sm">
+            {form_input("qty{$smarty.foreach.no.iteration}" , set_value('ivd_qty', $ivd.ivd_qty|number_format) , 'class="form-control text-center"')}
+            {if form_error('ivd_qty')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_qty')}</font></label>{/if}
+          </td>
+        {else}
+          <td class="col-md-1 input-group-sm text-center">
+            {$ivd.ivd_qty|number_format}
+            {form_hidden("qty{$smarty.foreach.no.iteration}"  , $ivd.ivd_qty)}
+          </td>
+        {/if}
         <td class="col-md-1 input-group-sm text-right">
           {$ivd.ivd_price|number_format}
         </td>
         <td class="col-md-1 input-group-sm text-right">
           {$ivd.ivd_total|number_format}
         </td>
+
       </tr>
       <tr>
         <td class="col-md-7 input-group-sm">
-          {$ivd.ivd_item_url}
+          　{$ivd.ivd_item_url}
         </td>
         <td colspan="3" class="col-md-1"></td>
       </tr>
+      {if $ivd.ivd_item_comment!=""}
+      <tr>
+        <td class="col-md-7 input-group-sm">
+          　{$ivd.ivd_item_comment}
+        </td>
+        <td colspan="3" class="col-md-1"></td>
+      </tr>
+      {/if}
       {/foreach}
 
       {if $info.iv_status==0}
@@ -130,7 +156,6 @@
           {if form_error('ivd_total0')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ivd_total0')}</font></label>{/if}
         </td>
       </tr>
-
       <tr>
         <td class="col-md-7 input-group-sm">
           {form_input("ivd_item_url0" , set_value("ivd_item_url0", '') , 'class="form-control" placeholder="追加対象URLを入力してください。"')}

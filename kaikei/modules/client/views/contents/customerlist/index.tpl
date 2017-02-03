@@ -72,10 +72,11 @@ function fmSubmit(formName, url, method, num) {
     <thead>
       <tr>
         <th>ID</th>
-        <th>ステータス</th>
+        <th>status</th>
         <th>会社名<br>代表電話番号</th>
         <th>担当者<br>担当電話番号</th>
         <th>メールアドレス</th>
+        <th>請求書<br>作成情報</th>
         <th></th>
       </tr>
     </thead>
@@ -95,21 +96,35 @@ function fmSubmit(formName, url, method, num) {
             {/if}
           </td>
           <td>
-            {$cm.cm_company|escape}<br>{$cm.cm_tel01|escape}
+            {if $cm.cm_agency_flg==1}[代]{/if}{if $cm.cm_agency_seq!=0}[{$cm.cm_agency_seq}⇒]{/if}{$cm.cm_company|escape}
+            <br>{$cm.cm_tel01|escape}
           </td>
           <td>
-            {$cm.cm_person01|escape} {$cm.cm_person02|escape}<br>{$cm.cm_tel02|escape}
+            {$cm.cm_person01|escape} {$cm.cm_person02|escape}
+            <br>{$cm.cm_tel02|escape}
           </td>
           <td>
-            {$cm.cm_mail}<br>{$cm.cm_mailsub}
+            {$cm.cm_mail}
+            <br>{$cm.cm_mailsub}
+          </td>
+          <td>
+            {if $cm.cm_invo_timing==0}[固定]{elseif $cm.cm_invo_timing==1}[成功]{elseif $cm.cm_invo_timing==2}[代理]{/if}
+            <br>
+            {if $cm.cm_collect==1}月末締め当月末
+            {elseif $cm.cm_collect==2}月末締め翌月末
+            {elseif $cm.cm_collect==3}月末締め翌々月10日
+            {elseif $cm.cm_collect==4}月末締め翌々月15日
+            {elseif $cm.cm_collect==5}月末締め翌々月25日
+            {elseif $cm.cm_collect==6}月末締め翌々月末
+            {/if}
           </td>
           <td class="text-right">
             {if $cm.cm_status == "0"}
               <button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/projectlist/add/', 'POST', '{$cm.cm_seq}', 'chg_seq');">受注登録</button>
-              <button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/invo_create/invoice_cm/', 'POST', '{$cm.cm_seq}', 'chg_seq');">請求書作成</button>
+              {*<button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/invo_create/invoice_cm/', 'POST', '{$cm.cm_seq}', 'chg_seq');">請求書作成</button>*}
             {else}
               <button type="button" class="btn btn-default btn-xs" >受注登録</button>
-              <button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/invo_create/invoice_cm/', 'POST', '{$cm.cm_seq}', 'chg_seq');">請求書作成</button>
+              {*<button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/invo_create/invoice_cm/', 'POST', '{$cm.cm_seq}', 'chg_seq');">請求書作成</button>*}
             {/if}
 
             <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/customerlist/detail/', 'POST', '{$cm.cm_seq}', 'chg_seq');">編　集</button>

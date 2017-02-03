@@ -107,21 +107,30 @@ function fmSubmit(formName, url, method, num) {
       <tbody>
         <tr>
           <td>
+            <label>
             <input type="checkbox" name="invoice{$smarty.foreach.seq.iteration}" id="invoice" value="{$iv.iv_seq}" class="invoice">
             {if $iv.iv_status == "0"}<font color="#ffffff" style="background-color:royalblue">[ 未発行 ]</font>
             {elseif $iv.iv_status == "1"}<font color="#ffffff" style="background-color:dimgray">[ 発行済 ]</font>
             {elseif $iv.iv_status == "9"}<font color="#ffffff" style="background-color:dimgray">[ ｷｬﾝｾﾙ  ]</font>
             {else}エラー
             {/if}
+            </label>
           </td>
           <td>
-            {$iv.iv_slip_no}
+            {* 顧客番号の桁が増えたら検索で対応？ *}
+            {if $iv.iv_slip_no|substr:7:2 == "KT"}<font color=blue>{$iv.iv_slip_no}</font>
+            {elseif $iv.iv_slip_no|substr:7:2 == "SK"}<font color=deeppink>{$iv.iv_slip_no}</font>
+            {else}<font color=green>{$iv.iv_slip_no}</font>
+            {/if}
           </td>
           <td>
+            {if $iv.iv_agency_flg==1}[代]{/if}
             {$iv.iv_company_cm}
           </td>
           <td>
-            {$iv.iv_total|number_format} 円
+            {if $iv.iv_total>=0}{$iv.iv_total|number_format} 円
+            {else}<font color=red>{$iv.iv_total|number_format} 円</font>
+            {/if}
           </td>
           <td>
             {$iv.iv_issue_date}

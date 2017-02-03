@@ -9,8 +9,6 @@ class Invoice_detail extends CI_Model
     }
 
 
-
-
     /**
      * 顧客情報SEQからデータの有無を判定
      *

@@ -32,6 +32,10 @@
     <div class="col-xs-10 col-md-10">{$list.iv_slip_no}</div>
   </div>
   <div class="row">
+    <label class="col-xs-2 col-md-2 control-label">売上月度</label>
+    <div class="col-xs-10 col-md-10">{$list.iv_salse_yymm}</div>
+  </div>
+  <div class="row">
     <label class="col-xs-2 col-md-2 control-label">発行日</label>
     <div class="col-xs-10 col-md-10">{$list.iv_issue_date}</div>
   </div>
@@ -42,10 +46,11 @@
   <div class="row">
     <label for="iv_pay_date" class="col-xs-2 col-md-2 control-label">送付先住所</label>
     <div class="col-md-8">〒{$list.iv_zip01}-{$list.iv_zip02}</div>
-    <div class="col-md-8">{$list.iv_pref} {$list.iv_addr01} {$list.iv_addr02} {$list.iv_buil}</div><br><br>
+    <div class="col-md-8">{$list.iv_pref} {$list.iv_addr01} {$list.iv_addr02} {$list.iv_buil}</div>
+    <br><br><br>
     <div class="col-md-8 col-md-offset-2">{$list.iv_company}</div>
-    <div class="col-md-8 col-md-offset-2">{$list.iv_department}</div><br>
-    <div class="col-md-8 col-md-offset-2">{$list.iv_person01} {$list.iv_person02}</div>
+    <div class="col-md-8 col-md-offset-2">　{$list.iv_department}</div><br>
+    <div class="col-md-8 col-md-offset-2">　{$list.iv_person01} {$list.iv_person02}</div>
   </div>
 
 {*
@@ -90,6 +95,14 @@
         </td>
         <td colspan="3" class="col-md-1"></td>
       </tr>
+      {if $ivd.ivd_item_comment!=""}
+      <tr>
+        <td class="col-md-7 input-group-sm">
+          {$ivd.ivd_item_comment}
+        </td>
+        <td colspan="3" class="col-md-1"></td>
+      </tr>
+      {/if}
       {/foreach}
 
       <tr>

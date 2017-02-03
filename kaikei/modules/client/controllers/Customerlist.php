@@ -14,22 +14,6 @@ class Customerlist extends MY_Controller
         $this->load->library('lib_auth');
         $this->lib_auth->check_session();
 
-//         if ($_SESSION['c_login'] == TRUE)
-//         {
-//             $this->smarty->assign('login_chk', TRUE);
-//             $this->smarty->assign('mem_Type',  $_SESSION['c_memType']);
-//             $this->smarty->assign('mem_Seq',   $_SESSION['c_memSeq']);
-//             $this->smarty->assign('mem_Grp',   $_SESSION['c_memGrp']);
-//             $this->smarty->assign('mem_Name',  $_SESSION['c_memName']);
-//         } else {
-//             $this->smarty->assign('login_chk', FALSE);
-//             $this->smarty->assign('mem_Type',  "");
-//             $this->smarty->assign('mem_Seq',   "");
-//             $this->smarty->assign('mem_Grp',   "");
-
-//             redirect('/login/');
-//         }
-
         $this->smarty->assign('mess', FALSE);
 
     }
@@ -182,6 +166,9 @@ class Customerlist extends MY_Controller
     	// 担当営業セット
     	$this->_sales_item_set();
 
+    	// 代理店一覧セット
+    	$this->_agency_item_set();
+
         $this->view('customerlist/detail.tpl');
 
     }
@@ -197,12 +184,13 @@ class Customerlist extends MY_Controller
     	if ($this->form_validation->run() == TRUE)
     	{
 
- 		$this->load->model('Customer', 'cm', TRUE);
+	 		$this->load->model('Customer', 'cm', TRUE);
+	 		$this->load->model('Project',  'pj', TRUE);
 
- 		// 口座名義カナの重複チェック
- 		$_account_cnt = $this->cm->get_cm_account_nm($input_post['cm_account_nm'], $input_post['cm_seq']);
- 		if ($_account_cnt == 0)
- 		{
+//  		// 口座名義カナの重複チェック
+//  		$_account_cnt = $this->cm->get_cm_account_nm($input_post['cm_account_nm'], $input_post['cm_seq']);
+//  		if ($_account_cnt == 0)
+//  		{
 
 			// 不要パラメータ削除
 			unset($input_post["submit"]) ;
@@ -211,6 +199,30 @@ class Customerlist extends MY_Controller
 			$this->db->trans_strict(FALSE);                                 		// StrictモードをOFF
 			$this->db->trans_start();                                       		// trans_begin
 
+			// 代理店チェック ⇒ 請求書作成順序の指定
+			if (($input_post['cm_agency_flg'] == 1) || ($input_post['cm_agency_seq'] != 0))
+			{
+				$input_post['cm_invo_timing'] = 2;
+			} else {
+
+				$input_post['cm_invo_timing'] = 0;
+
+				// 既存の受注案件のチェック
+				$_iv_type = 2;																		// 2：成功報酬
+				$get_pj_list = $this->pj->get_pj_cm_seq($input_post['cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'seorank', TRUE);
+				if (count($get_pj_list) != 0)
+				{
+					$input_post['cm_invo_timing'] = 1;
+				}
+
+				$_iv_type = 3;																		// 3：固定 + 成功報酬
+				$get_pj_list = $this->pj->get_pj_cm_seq($input_post['cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'seorank', TRUE);
+				if (count($get_pj_list) != 0)
+				{
+					$input_post['cm_invo_timing'] = 1;
+				}
+			}
+
 			// DB書き込み
 			$this->cm->update_customer($input_post);
 			$this->smarty->assign('mess',  "更新が完了しました。");
@@ -218,8 +230,6 @@ class Customerlist extends MY_Controller
 			// ステータス=「一時停止」「解約」：受注案件情報の更新
 			if ($input_post['cm_status'] != 0)
 			{
-
-				$this->load->model('Project', 'pj', TRUE);
 
 				// 受注案件情報データの有無チェック
 				$get_pj_list = $this->pj->get_pj_cm_status($input_post['cm_seq'], $_SESSION['c_memGrp'], 'seorank');
@@ -253,9 +263,9 @@ class Customerlist extends MY_Controller
 				log_message('error', 'CLIENT::[Customerlist -> detailchk()]：顧客ステータス「解約」処理 トランザクションエラー');
 			}
 
- 		} else {
- 			$this->smarty->assign('mess',  "<font color=red>口座名義カナ は既に登録されています。</font>");
- 		}
+//  		} else {
+//  			$this->smarty->assign('mess',  "<font color=red>口座名義カナ は既に登録されています。</font>");
+//  		}
     	}
 
     	// 初期値セット
@@ -263,6 +273,9 @@ class Customerlist extends MY_Controller
 
     	// 担当営業セット
     	$this->_sales_item_set();
+
+    	// 代理店一覧セット
+    	$this->_agency_item_set();
 
     	// 請求書の別住所有無フラグの判定
     	if (isset($input_post['chkinvoice']))
@@ -290,6 +303,9 @@ class Customerlist extends MY_Controller
     	// 担当営業セット
     	$this->_sales_item_set();
 
+    	// 代理店一覧セット
+    	$this->_agency_item_set();
+
     	$this->smarty->assign('tmp_pref',    NULL);
     	$this->smarty->assign('tmp_pref_iv', NULL);
     	$this->smarty->assign('tmp_memo',    NULL);
@@ -310,6 +326,9 @@ class Customerlist extends MY_Controller
 
     	// 担当営業セット
     	$this->_sales_item_set();
+
+    	// 代理店一覧セット
+    	$this->_agency_item_set();
 
     	// バリデーション・チェック
     	$this->_set_validation03();
@@ -341,10 +360,17 @@ class Customerlist extends MY_Controller
 
     		$this->load->model('Customer', 'cm', TRUE);
 
-    		// 口座名義カナの重複チェック
-    		$_account_cnt = $this->cm->get_cm_account_nm($input_post['cm_account_nm']);
-    		if ($_account_cnt == 0)
-    		{
+//     		// 口座名義カナの重複チェック
+//     		$_account_cnt = $this->cm->get_cm_account_nm($input_post['cm_account_nm']);
+//     		if ($_account_cnt == 0)
+//     		{
+
+    			// 代理店チェック ⇒ 請求書作成順序の指定
+    			if (($input_post['cm_agency_flg'] == 1) || ($input_post['cm_agency_seq'] != 0))
+    			{
+    				$input_post['cm_invo_timing'] = 2;
+    			}
+
 		    	// 不要パラメータ削除
 		    	unset($input_post["_submit"]) ;
 
@@ -354,9 +380,10 @@ class Customerlist extends MY_Controller
 	    		$this->smarty->assign('mess',  "登録が完了しました。");
 
 	    		redirect('/customerlist/');
-    		} else {
-    			$this->smarty->assign('mess',  "<font color=red>口座名義カナ は既に登録されています。</font>");
-    		}
+
+//     		} else {
+//     			$this->smarty->assign('mess',  "<font color=red>口座名義カナ は既に登録されています。</font>");
+//     		}
     	}
 
     	$this->smarty->assign('tmp_pref',    $input_post['cm_pref']);
@@ -499,10 +526,17 @@ class Customerlist extends MY_Controller
     			'ASC'  => '昇順',
     	);
 
-    	$this->smarty->assign('options_cm_status',  $opt_cm_status);
-    	$this->smarty->assign('options_cm_kind',    $opt_cm_kind);
-    	$this->smarty->assign('options_cm_collect', $opt_cm_collect);
-    	$this->smarty->assign('options_orderid',    $arropt_id);
+    	// 代理店有無のセット
+    	$arropt_agency = array (
+    			'0' => '代理店とならない',
+    			'1' => '代理店となる（請求先）',
+    	);
+
+    	$this->smarty->assign('options_cm_status',     $opt_cm_status);
+    	$this->smarty->assign('options_cm_kind',       $opt_cm_kind);
+    	$this->smarty->assign('options_cm_collect',    $opt_cm_collect);
+    	$this->smarty->assign('options_orderid',       $arropt_id);
+    	$this->smarty->assign('options_cm_agency_flg', $arropt_agency);
 
     }
 
@@ -546,6 +580,23 @@ class Customerlist extends MY_Controller
 
     }
 
+    // 代理店一覧セット
+    private function _agency_item_set()
+    {
+
+    	$this->load->model('Customer', 'cm', TRUE);
+    	$agency_list = $this->cm->get_cm_agency();
+
+    	$opt_cm_agency = array('0' => '-- 代理店クライアントの場合、選択してください --');
+    	foreach ($agency_list as $key => $val)
+    	{
+    		$opt_cm_agency[$val['cm_seq']] = $val['cm_company'];
+    	}
+
+    	$this->smarty->assign('options_cm_agency_seq', $opt_cm_agency);
+
+    }
+
     // フォーム・バリデーションチェック
     private function _set_validation()
     {
@@ -570,11 +621,6 @@ class Customerlist extends MY_Controller
     					'field'   => 'cm_status',
     					'label'   => 'ステータス選択',
     					'rules'   => 'trim|required|max_length[2]'
-    			),
-    			array(
-    					'field'   => 'cm_yayoi_cd',
-    					'label'   => '顧客コード',
-    					'rules'   => 'trim|required|max_length[20]'
     			),
     			array(
     					'field'   => 'cm_yayoi_name',
@@ -729,27 +775,27 @@ class Customerlist extends MY_Controller
     			array(
     					'field'   => 'cm_bank_cd',
     					'label'   => '銀行CD',
-    					'rules'   => 'trim|required|max_length[4]|is_numeric'
+    					'rules'   => 'trim|max_length[4]|is_numeric'
     			),
     			array(
     					'field'   => 'cm_bank_nm',
     					'label'   => '銀行名',
-    					'rules'   => 'trim|required|max_length[50]'
+    					'rules'   => 'trim|max_length[50]'
     			),
     			array(
     					'field'   => 'cm_branch_cd',
     					'label'   => '支店CD',
-    					'rules'   => 'trim|required|max_length[3]|is_numeric'
+    					'rules'   => 'trim|max_length[3]|is_numeric'
     			),
     			array(
     					'field'   => 'cm_branch_nm',
     					'label'   => '支店名',
-    					'rules'   => 'trim|required|max_length[50]'
+    					'rules'   => 'trim|max_length[50]'
     			),
     			array(
     					'field'   => 'cm_kind',
     					'label'   => '口座種別(普通/当座)',
-    					'rules'   => 'trim|required|max_length[1]'
+    					'rules'   => 'trim|max_length[1]'
     			),
     			array(
     					'field'   => 'cm_account_no',
@@ -759,7 +805,8 @@ class Customerlist extends MY_Controller
     			array(
     					'field'   => 'cm_account_nm',
     					'label'   => '口座名義',
-    					'rules'   => 'trim|required|max_length[48]|single_katakana'
+    					'rules'   => 'trim|required|max_length[48]|single_eisukana'
+    					//'rules'   => 'trim|required|max_length[48]|single_katakana'
     			),
     			array(
     					'field'   => 'cm_memo',
@@ -835,11 +882,6 @@ class Customerlist extends MY_Controller
     					'field'   => 'cm_status',
     					'label'   => 'ステータス選択',
     					'rules'   => 'trim|required|max_length[2]'
-    			),
-    			array(
-    					'field'   => 'cm_yayoi_cd',
-    					'label'   => '顧客コード',
-    					'rules'   => 'trim|required|max_length[20]'
     			),
     			array(
     					'field'   => 'cm_yayoi_name',
@@ -944,27 +986,27 @@ class Customerlist extends MY_Controller
     			array(
     					'field'   => 'cm_bank_cd',
     					'label'   => '銀行CD',
-    					'rules'   => 'trim|required|max_length[4]|is_numeric'
+    					'rules'   => 'trim|max_length[4]|is_numeric'
     			),
     			array(
     					'field'   => 'cm_bank_nm',
     					'label'   => '銀行名',
-    					'rules'   => 'trim|required|max_length[50]'
+    					'rules'   => 'trim|max_length[50]'
     			),
     			array(
     					'field'   => 'cm_branch_cd',
     					'label'   => '支店CD',
-    					'rules'   => 'trim|required|max_length[3]|is_numeric'
+    					'rules'   => 'trim|max_length[3]|is_numeric'
     			),
     			array(
     					'field'   => 'cm_branch_nm',
     					'label'   => '支店名',
-    					'rules'   => 'trim|required|max_length[50]'
+    					'rules'   => 'trim|max_length[50]'
     			),
     			array(
     					'field'   => 'cm_kind',
     					'label'   => '口座種別(普通/当座)',
-    					'rules'   => 'trim|required|max_length[1]'
+    					'rules'   => 'trim|max_length[1]'
     			),
     			array(
     					'field'   => 'cm_account_no',
@@ -974,7 +1016,8 @@ class Customerlist extends MY_Controller
     			array(
     					'field'   => 'cm_account_nm',
     					'label'   => '口座名義',
-    					'rules'   => 'trim|required|max_length[48]|single_katakana'
+    					'rules'   => 'trim|required|max_length[48]|single_eisukana'
+    					//'rules'   => 'trim|required|max_length[48]|single_katakana'
     			),
     			array(
     					'field'   => 'cm_memo',

@@ -31,7 +31,6 @@ class Invoice extends CI_Model
 
     }
 
-
     /**
      * 顧客情報SEQからデータの有無を判定
      *
@@ -46,16 +45,11 @@ class Invoice extends CI_Model
 //     	$set_where["iv_cm_seq"]     = $seq_no;
 //     	$set_where["iv_issue_yymm"] = $issue_yymm;
 
-    	$set_where = '`iv_cm_seq` = ' . $seq_no . ' AND `iv_issue_yymm` = ' . $issue_yymm;
+    	$set_where = '`iv_cm_seq` = ' . $seq_no . ' AND `iv_issue_yymm` = ' . $issue_yymm . ' AND `iv_status` <> 9';
 
 		$query = $this->db->get_where('tb_invoice', $set_where);
 //     	$_num_rows = $query->num_rows();
 		$get_data = $query->result('array');
-
-
-//     	print("<br><br>");
-//     	$_last_sql = $this->db->last_query();
-//     	print($_last_sql);
 
 //     	return $_num_rows;
     	return $get_data;
@@ -119,6 +113,8 @@ class Invoice extends CI_Model
     			  iv_seq_suffix,
     			  iv_status,
     			  iv_cm_seq,
+    			  iv_accounting,
+    			  iv_agency_flg,
     			  iv_issue_yymm,
     			  iv_slip_no,
     			  iv_total,
@@ -202,45 +198,6 @@ class Invoice extends CI_Model
     public function get_historylist($get_post, $tmp_per_page, $tmp_offset=0)
     {
 
-//     	// 各SQL項目へセット
-//     	// WHERE
-//     	$set_select_like["iv_slip_no"] = $get_post['iv_slip_no'];
-//     	$set_select_like["iv_cm_seq"]  = $get_post['iv_cm_seq'];
-//     	$set_select_like["iv_company"] = $get_post['iv_company'];
-
-//     	$set_select["iv_status"]       = $get_post['iv_status'];
-//     	$set_select["iv_issue_yymm"]   = $get_post['iv_issue_yymm'];
-
-//     	// ORDER BY
-//     	if ($get_post['orderid'] == 'ASC')
-//     	{
-//     		$set_orderby["iv_cm_seq"]     = $get_post['orderid'];
-//     	}elseif ($get_post['orderid'] == 'DESC') {
-//     		$set_orderby["iv_cm_seq"]     = $get_post['orderid'];
-//     	}else {
-//     		$set_orderby["iv_issue_date"] = 'DESC';
-//     		$set_orderby["iv_cm_seq"]     = 'DESC';
-//     	}
-
-//     	// 対象クアカウントメンバーの取得
-//     	$invoice_list = $this->_select_invoicelist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset);
-
-//     	return $invoice_list;
-
-//     }
-
-//     /**
-//      * 請求書情報の取得
-//      *
-//      * @param    array() : WHERE句項目
-//      * @param    array() : ORDER BY句項目
-//      * @param    int     : 1ページ当たりの表示件数
-//      * @param    int     : オフセット値(ページ番号)
-//      * @return   array()
-//      */
-//     public function _select_invoicelist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset=0)
-//     {
-
     	$sql = 'SELECT
 					T1.iv_seq,
 					T1.iv_seq_suffix,
@@ -248,7 +205,8 @@ class Invoice extends CI_Model
 					T1.iv_cm_seq,
 					T1.iv_accounting,
 					T1.iv_method,
-					T1.iv_issue_yymm,
+    				T1.iv_method,
+					T1.iv_salse_yymm,
 					T1.iv_slip_no,
 					T1.iv_subtotal,
 					T1.iv_tax,
@@ -274,19 +232,6 @@ class Invoice extends CI_Model
 					WHERE T1.iv_seq = ? AND T1.iv_issue_yymm = ?
 					  ORDER BY T1.iv_seq_suffix DESC
 				';
-
-					//T1.iv_bank_cd,
-					//T1.iv_bank_nm,
-					//T1.iv_branch_cd,
-					//T1.iv_branch_nm,
-					//T1.iv_kind,
-					//T1.iv_account_no,
-					//T1.iv_account_nm,
-// 		    		from tb_invoice_h AS T1
-// 		    			LEFT JOIN tb_invoice_detail_h AS T2 ON T1.iv_seq = T2.ivd_iv_seq AND T1.iv_seq_suffix = T2.ivd_seq_suffix
-// 		    		WHERE T1.iv_seq = ? AND T1.iv_issue_yymm = ?
-// 		    			ORDER BY T1.iv_seq_suffix DESC
-// 		    	';
 
     	$_set_values = array(
     			$get_post['iv_seq'],

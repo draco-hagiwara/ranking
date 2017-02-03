@@ -66,6 +66,9 @@ class MY_Form_validation extends CI_Form_validation {
             case 'single_katakana': // 半角カタカナ
                 return mb_convert_kana($str, 'kh');
                 break;
+            case 'single_eisukana': // 半角英数字カナ
+                return mb_convert_kana($str, 'kh');
+                break;
             case 'phone': // 電話番号
                 $str = mb_convert_kana($str, 'ras');
                 return str_replace(array('ー','―','‐'), '-', $str);
@@ -206,6 +209,26 @@ class MY_Form_validation extends CI_Form_validation {
         }
         $str = mb_convert_encoding($str, 'UTF-8');
         return ( ! preg_match("/^(?:\xEF\xBD[\xA1-\xBF]|\xEF\xBE[\x80-\x9F])+$/", $str)) ? FALSE : TRUE;
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * 半角英数記号カナ チェック
+     *
+     * @access public
+     * @param    string
+     * @return bool
+     *
+     */
+    function single_eisukana($str)
+    {
+        if ($str == '')
+        {
+            return TRUE;
+        }
+        $str = mb_convert_encoding($str, 'UTF-8');
+        return ( ! preg_match("/^(?:\xEF\xBD[\xA1-\xBF]|\xEF\xBE[\x80-\x9F]|[ -\~]|[\)])+$/", $str)) ? FALSE : TRUE;
     }
 
     // --------------------------------------------------------------------

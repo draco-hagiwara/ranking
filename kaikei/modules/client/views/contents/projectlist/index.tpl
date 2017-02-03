@@ -102,8 +102,7 @@ function fmSubmit(formName, url, method, num) {
         <th>status</th>
         <th>請求書</th>
         <th>課 金</th>
-        <th>CD</th>
-        <th>会 社 名</th>
+        <th>会 社 名 (下段：キーワード)</th>
         <th>契約期間</th>
         <th>固定金額</th>
         <th>担当営業</th>
@@ -132,30 +131,36 @@ function fmSubmit(formName, url, method, num) {
             {/if}
           </td>
           <td>
-            {if $pj.pj_accounting == "0"}<font color="blue">【固定】</font>
-            {elseif $pj.pj_accounting == "1"}<font color="deeppink">【成果】</font>
-            {elseif $pj.pj_accounting == "2"}<font color="darkolivegreen">【固+成】</font>
+            {if $pj.pj_accounting == "0"}<font color="blue">【SEO】</font>
+            {elseif $pj.pj_accounting == "1"}<font color="blue">【月額】</font>
+            {elseif $pj.pj_accounting == "2"}<font color="deeppink">【成功】</font>
+            {elseif $pj.pj_accounting == "3"}<font color="deeppink">【固+成】</font>
+            {elseif $pj.pj_accounting == "10"}<font color="darkolivegreen">【アフィ】</font>
+            {elseif $pj.pj_accounting == "11"}<font color="darkolivegreen">【広告】</font>
+            {elseif $pj.pj_accounting == "12"}<font color="darkolivegreen">【その他】</font>
+            {elseif $pj.pj_accounting == "7"}<font color="darkolivegreen">【保守】</font>
+            {elseif $pj.pj_accounting == "8"}<font color="darkolivegreen">【前受】</font>
+            {elseif $pj.pj_accounting == "9"}<font color="darkolivegreen">【赤伝】</font>
             {else}エラー
             {/if}
           </td>
           <td>
-            {$pj.pj_cm_seq}
+            [{$pj.pj_cm_seq}]{$pj.pj_cm_company}<br>> {$pj.pj_keyword}
           </td>
           <td>
-            {$pj.pj_cm_company}
-          </td>
-          <td>
-            {$pj.pj_start_date} ～ {$pj.pj_end_date}
+            {$pj.pj_start_date}<br> ～ {if $pj.pj_end_date<=$chk_end}<font color="red">{$pj.pj_end_date}</font>{else}{$pj.pj_end_date}{/if}
           </td>
           <td>
             {$pj.pj_billing|number_format} 円
           </td>
           <td>
             {$options_pj_salesman[$pj.pj_salesman]}
+            <br>{if $pj.pj_renew_chk==1}自動延長{/if}
           </td>
           <td class="text-right">
             {*<button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/projectlist/detail/', 'POST', '{$pj.pj_seq}', 'chg_seq');">個別請求書作成</button>*}
-            <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/projectlist/detail/', 'POST', '{$pj.pj_seq}', 'chg_seq');">編　集</button>
+            <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/projectlist/detail/', 'POST', '{$pj.pj_seq}', 'chg_seq');">編　集</button><br>
+            <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/projectlist/cp/', 'POST', '{$pj.pj_seq}', 'chg_seq');">複　写</button>
           </td>
         </tr>
       </tbody>

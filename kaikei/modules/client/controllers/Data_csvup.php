@@ -14,22 +14,6 @@ class Data_csvup extends MY_Controller
         $this->load->library('lib_auth');
         $this->lib_auth->check_session();
 
-//         if ($_SESSION['c_login'] == TRUE)
-//         {
-//             $this->smarty->assign('login_chk', TRUE);
-//             $this->smarty->assign('mem_Type',  $_SESSION['c_memType']);
-//             $this->smarty->assign('mem_Seq',   $_SESSION['c_memSeq']);
-//             $this->smarty->assign('mem_Grp',   $_SESSION['c_memGrp']);
-//             $this->smarty->assign('mem_Name',  $_SESSION['c_memName']);
-//         } else {
-//             $this->smarty->assign('login_chk', FALSE);
-//             $this->smarty->assign('mem_Type',  "");
-//             $this->smarty->assign('mem_Seq',   "");
-//             $this->smarty->assign('mem_Grp',   "");
-
-//             redirect('/login/');
-//         }
-
         $this->smarty->assign('up_mess01', NULL);
 
     }

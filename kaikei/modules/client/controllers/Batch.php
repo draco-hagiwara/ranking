@@ -50,7 +50,7 @@ class Batch extends MY_Controller
     	$this->_sales_summary();
 
     	$_ed_day = date("Y-m-d H:i:s", time());
-    	log_message('info', 'bat::** 夜間バッチ ** ' . $_st_day . ' => ' . $_ed_day);
+    	log_message('info', 'hour_bat::** 夜間バッチ ** ' . $_st_day . ' => ' . $_ed_day);
     }
 
     /**
@@ -59,6 +59,19 @@ class Batch extends MY_Controller
     public function day_bat()
     {
 
+    }
+
+    /**
+     *  「月」間隔バッチのメイン処理
+     */
+    public function month_bat()
+    {
+
+    	$_st_day = date("Y-m-d H:i:s", time());
+
+
+    	$_ed_day = date("Y-m-d H:i:s", time());
+   		log_message('info', 'month_bat::** 夜間バッチ ** ' . $_st_day . ' => ' . $_ed_day);
     }
 
 
@@ -144,7 +157,7 @@ class Batch extends MY_Controller
 				$set_sales['sa_iv_seq']      = $value['iv_seq'];
 				$set_sales['sa_slip_no']     = $value['iv_slip_no'];
 				$set_sales['sa_tax']         = $value['iv_tax'];
-				$set_sales['sa_total']       = $value['iv_total'];
+				$set_sales['sa_total']       = $value['iv_subtotal'];				// 消費税抜き売上金額
 				$set_sales['sa_company']     = $value['iv_company_cm'];
 				$set_sales['sa_collect']     = $value['iv_collect'];
 				$set_sales['sa_salesman']    = $value['iv_salesman'];
@@ -168,5 +181,13 @@ class Batch extends MY_Controller
     	log_message('info', 'bat::売上データの集計が実行されました。' . $_set_time . ' => ' . $_ed_time);
 
     }
+
+
+
+
+
+
+
+
 
 }

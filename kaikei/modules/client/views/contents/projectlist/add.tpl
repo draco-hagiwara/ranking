@@ -60,6 +60,43 @@
       {if $err_date==TRUE}<span class="label label-danger">Error : </span><label><font color=red>「契約期間」欄で入力した日付が不整合です。</font></label>{/if}
     </div>
   </div>
+
+  <div class="form-group">
+    <label for="pj_renew" class="col-xs-3 col-md-3 control-label">契約自動延長有無</label>
+    <div class="col-md-2">
+      <label>{form_checkbox('pj_renew_chk','1',"{if $renew==1}1{else}0{/if}")}契約延長する</label>
+    </div>
+    <div class="col-xs-2 col-md-1">
+      {form_input('pj_renew_mm' , set_value('pj_renew_mm', $renew_mm) , 'class="form-control"')}
+    </div>
+    <div class="col-xs-3 col-md-3">
+      ヶ月自動で延長
+      {if form_error('pj_renew_mm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_renew_mm')}</font></label>{/if}
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="pj_accounting" class="col-xs-3 col-md-3 control-label">課金方式<font color=red> *</font></label>
+    <div class="col-xs-2 col-md-2 btn-lg">
+      {form_dropdown('pj_accounting', $options_pj_accounting, set_value('pj_accounting', ''))}
+      {if form_error('pj_accounting')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_accounting')}</font></label>{/if}
+    </div>
+  </div>
+{*<div class="form-group">
+    <label for="pj_accounting" class="col-xs-3 col-md-3 control-label">課金方式<font color=red> *</font></label>
+    <div class="radio">
+      <label class="col-xs-2 col-md-2 control-label">
+        <input type="radio" name="pj_accounting" id="optionsRadios1" value="0" checked>固定
+      </label>
+      <label class="col-xs-2 col-md-2 control-label">
+        <input type="radio" name="pj_accounting" id="optionsRadios2" value="1">成果報酬
+      </label>
+      <label class="col-xs-2 col-md-2 control-label">
+        <input type="radio" name="pj_accounting" id="optionsRadios3" value="2">固定+成果
+      </label>
+    </div>
+  </div>
+*}
   <div class="form-group">
     <label for="pj_keyword" class="col-xs-3 col-md-3 control-label">検索キーワード<font color=red> *</font></label>
     <div class="col-xs-8 col-md-8">
@@ -85,20 +122,6 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="pj_accounting" class="col-xs-3 col-md-3 control-label">課金方式<font color=red> *</font></label>
-    <div class="radio">
-      <label class="col-xs-2 col-md-2 control-label">
-        <input type="radio" name="pj_accounting" id="optionsRadios1" value="0" checked>固定
-      </label>
-      <label class="col-xs-2 col-md-2 control-label">
-        <input type="radio" name="pj_accounting" id="optionsRadios2" value="1">成果報酬
-      </label>
-      <label class="col-xs-2 col-md-2 control-label">
-        <input type="radio" name="pj_accounting" id="optionsRadios3" value="2">固定+成果
-      </label>
-    </div>
-  </div>
-  <div class="form-group">
     <label for="pj_url_match" class="col-xs-3 col-md-3 control-label">URL一致方式<font color=red> *</font></label>
     <div class="col-xs-4 col-md-4">
     </div>
@@ -113,6 +136,41 @@
       <p class="redText">円</p>
     </div>
   </div>
+  <div class="form-group">
+    <label for="pjd_rank" class="col-xs-3 col-md-3 control-label">順位チェック調査対象</label>
+    <div class="col-md-offset-3 col-md-8">■ 検索エンジン選択：<br />
+      <label>{form_checkbox('chkengine[]','0',set_checkbox('chkengine[]','0'))} google.co.jp</label>
+      <br />
+      <label>{form_checkbox('chkengine[]','1',set_checkbox('chkengine[]','1'))} yahoo.co.jp</label>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-md-offset-3 col-md-8">■ 成果報酬選択時は以下を設定：</div>
+  </div>
+  <div class="form-group">
+    <div class="col-xs-2 col-md-1 col-md-offset-3 text-right"></div>
+    <div class="col-xs-2 col-md-1">開始順位</div>
+    <div class="col-xs-2 col-md-1">終了順位</div>
+    <div class="col-xs-4 col-md-2">報酬金額（円）</div>
+  </div>
+  {section name=counter loop=10}
+    {$num=$smarty.section.counter.index|string_format:"%02d"}
+    <div class="form-group">
+      <div class="col-xs-2 col-md-1 col-md-offset-3 text-right">{$num+1}</div>
+      <div class="col-xs-2 col-md-1">
+        {form_input("pjd_rank_str01{$num}" , set_value("pjd_rank_str01{$num}", '') , 'class="form-control"')}
+        {if form_error("pjd_rank_str01{$num}")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("pjd_rank_str01{$num}")}</font></label>{/if}
+      </div>
+      <div class="col-xs-2 col-md-1">
+        {form_input("pjd_rank_end01{$num}" , set_value("pjd_rank_end01{$num}", '') , 'class="form-control"')}
+        {if form_error("pjd_rank_end01{$num}")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("pjd_rank_end01{$num}")}</font></label>{/if}
+      </div>
+      <div class="col-xs-4 col-md-2 text-right">
+        {form_input("pjd_billing01{$num}" , set_value("pjd_billing01{$num}", '') , 'class="form-control"')}
+        {if form_error("pjd_billing01{$num}")}<span class="label label-danger">Error : </span><label><font color=red>{form_error("pjd_billing01{$num}")}</font></label>{/if}
+      </div>
+    </div>
+    {/section}
   <div class="form-group">
     <label for="pj_salesman" class="col-md-3 control-label">担当営業<font color=red> *</font></label>
     <div class="col-md-2 btn-lg">

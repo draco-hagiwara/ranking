@@ -14,7 +14,7 @@ class Project extends CI_Model
      * @param    int
      * @param    int  : クライアントSEQ（接続先テーブルを切替）
      * @param    char : 接続先DB
-     * @return   bool
+     * @return   array()
      */
     public function get_pj_seq($seq_no, $client_no, $db_name='default')
     {
@@ -50,7 +50,7 @@ class Project extends CI_Model
      * @param    int  : クライアントSEQ（接続先テーブルを切替）
      * @param    char : 接続先DB
      * @param    bool : 請求書発行有無のチェック
-     * @return   bool
+     * @return   array()
      */
     public function get_pj_cm_seq($seq_no, $iv_type, $client_no, $db_name='default', $invo_status = FALSE)
     {
@@ -108,7 +108,7 @@ class Project extends CI_Model
      * @param    int  : 顧客情報seq
      * @param    int  : クライアントSEQ（接続先テーブルを切替）
      * @param    char : 接続先DB
-     * @return   bool
+     * @return   array()
      */
     public function get_pj_cm_status($seq_no, $client_no, $db_name='default')
     {
@@ -210,6 +210,7 @@ class Project extends CI_Model
     			  pj_invoice_status,
     			  pj_start_date,
     			  pj_end_date,
+    			  pj_renew_chk,
     			  pj_keyword,
     			  pj_url,
     			  pj_target,
@@ -343,6 +344,178 @@ class Project extends CI_Model
     	return $project_count;
 
     }
+
+    /**
+     * 請求書作成：顧客情報SEQから情報を取得する
+     *
+     * @param    int  : 顧客情報seq
+     * @param    int  : クライアントSEQ（接続先テーブルを切替）
+     * @param    char : 接続先DB
+     * @return   array()
+     */
+    public function get_ivlist_fix($seq_no, $client_no, $db_name='default', $invo_status = FALSE)
+    {
+
+
+
+    	/*
+    	 * pj_invoice_status = 0
+    	 * 一括作成時には発行有無をチェックしている
+    	 */
+
+
+
+    	$tb_name = 'tb_project_' . $client_no;
+
+    	$sql = 'SELECT
+    			  pj_seq,
+    			  pj_status,
+    			  pj_invoice_status,
+    			  pj_start_date,
+    			  pj_end_date,
+    			  pj_keyword,
+    			  pj_url,
+    			  pj_accounting,
+    			  pj_tax_cal,
+    			  pj_billing,
+    			  pj_cm_seq,
+    			  pj_salesman
+    			FROM ' . $tb_name
+//     			. ' WHERE pj_cm_seq = ' . $seq_no . ' AND pj_status = 0 AND pj_invoice_status = 0 AND pj_delflg = 0'
+//     			. ' ORDER BY pj_accounting ASC'
+        ;
+
+
+
+        if ($invo_status == FALSE)
+        {
+        	$sql .= ' WHERE pj_cm_seq = ' . $seq_no . ' AND pj_status = 0 AND pj_invoice_status = 0 AND pj_delflg = 0';
+        } else {
+        	$sql .= ' WHERE pj_cm_seq = ' . $seq_no . ' AND pj_status = 0 AND pj_delflg = 0';
+        }
+
+        $sql .= ' ORDER BY pj_accounting, pj_seq ASC';
+
+
+
+        // 接続先DBを選択 ＆ クエリー実行
+        if ($db_name == 'default')
+        {
+        	$query = $this->db->query($sql);
+        } else {
+        	$slave_db = $this->load->database($db_name, TRUE);						// 順位チェックツールDBへ接続
+        	$query = $slave_db->query($sql);
+        }
+
+        $invoice_list = $query->result('array');
+
+        return $invoice_list;
+
+    }
+
+    /**
+     * 請求書作成：顧客情報SEQから情報を取得する
+     *
+     * @param    int  : 顧客情報seq
+     * @param    int  : クライアントSEQ（接続先テーブルを切替）
+     * @param    char : 接続先DB
+     * @return   array()
+     */
+    public function get_invoice_list($seq_no, $client_no, $db_name='default', $invo_status = FALSE)
+    {
+
+
+
+//     	/*
+//     	 * pj_invoice_status = 0
+//     	 * 一括作成時には発行有無をチェックしている
+//     	 */
+
+
+
+//     	$tb_name = 'tb_project_' . $client_no;
+
+//     	$sql = 'SELECT
+//     			  pj_seq,
+//     			  pj_status,
+//     			  pj_invoice_status,
+//     			  pj_start_date,
+//     			  pj_end_date,
+//     			  pj_keyword,
+//     			  pj_url,
+//     			  pj_accounting,
+//     			  pj_tax_cal,
+//     			  pj_billing,
+//     			  pj_cm_seq,
+//     			  pj_salesman
+//     			FROM ' . $tb_name
+//         			. ' WHERE pj_cm_seq = ' . $seq_no . ' AND pj_status = 0 AND pj_invoice_status = 0 AND pj_delflg = 0'
+//         					. ' ORDER BY pj_accounting ASC'
+//         							;
+
+
+
+//         							if ($invo_status == FALSE)
+//         							{
+//         								$sql .= ' WHERE pj_cm_seq = ' . $seq_no . ' AND pj_accounting = ' . $iv_type . ' AND pj_invoice_status = 0  AND pj_status = 0 AND pj_delflg = 0'
+//         										. ' ORDER BY pj_seq ASC';
+//         							} else {
+//         								$sql .= ' WHERE pj_cm_seq = ' . $seq_no . ' AND pj_accounting = ' . $iv_type . ' AND pj_status = 0 AND pj_delflg = 0'
+//         										. ' ORDER BY pj_seq ASC';
+//         							}
+
+
+
+
+//         							// 接続先DBを選択 ＆ クエリー実行
+//         							if ($db_name == 'default')
+//         							{
+//         								$query = $this->db->query($sql);
+//         							} else {
+//         								$slave_db = $this->load->database($db_name, TRUE);						// 順位チェックツールDBへ接続
+//         								$query = $slave_db->query($sql);
+//         							}
+
+//         							$invoice_list = $query->result('array');
+
+//         							return $invoice_list;
+
+    }
+
+    /**
+     * 契約終了日が該当する案件を取得
+     *
+     * @param    array()
+     * @return   array()
+     */
+    public function get_renew_data($set_date, $client_no, $db_name='default')
+    {
+
+    	$tb_name = 'tb_project_' . $client_no;
+
+    	$set_where = '`pj_delflg` = 0 AND `pj_status` = 0 AND `pj_end_date` BETWEEN \''
+    			     . $set_date['str'] . '\' AND \'' . $set_date['end'] . '\' ORDER BY pj_seq ASC';
+
+    	// 接続先DBを選択 ＆ クエリー実行
+    	if ($db_name == 'default')
+    	{
+
+    		$query = $this->db->get_where($tb_name, $set_where);
+
+    	} else {
+
+    		$slave_db = $this->load->database($db_name, TRUE);						// 順位チェックツールDBへ接続
+
+    		$query = $slave_db->get_where($tb_name, $set_where);
+
+    	}
+
+    	$get_data = $query->result('array');
+
+    	return $get_data;
+
+    }
+
     /**
      * 案件情報新規登録
      *

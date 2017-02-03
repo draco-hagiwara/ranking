@@ -33,11 +33,6 @@ class Account extends CI_Model
 
     }
 
-
-
-
-
-
     /**
      * 重複データのチェック：メールアドレス
      *
@@ -81,33 +76,6 @@ class Account extends CI_Model
 
     	// WHERE文 作成
     	$sql .= ' AND `ac_status` = 0 AND `ac_delflg` = 0 ORDER BY `ac_seq` ASC ';
-
-
-// 		// 接続確認
-// 		$this->load->database();
-//     	if ($this->db->conn_id === FALSE)
-//     	{
-//     		// データベースに接続されていません。
-//     		print("default NG");
-//     	}
-//     	else
-//     	{
-//     		// データベースに接続されています。
-//     		print("default OK");
-//     	}
-
-//     	$slave_db = $this->load->database('seorank', TRUE);
-//     	if ($slave_db->conn_id === FALSE)
-//     	{
-//     		// データベースに接続されていません。
-//     		print("seorank NG");
-//     	}
-//     	else
-//     	{
-//     		// データベースに接続されています。
-//     		print("seorank OK");
-//     	}
-
 
     	// 接続先DBを選択 ＆ クエリー実行
 		if ($db_name == 'default')
@@ -366,76 +334,6 @@ class Account extends CI_Model
 
         return $result;
     }
-
-
-
-
-
-
-
-
-
-//     /**
-//      * 編集者アカウント情報を1件取得する
-//      *
-//      * @param    int
-//      * @return   bool
-//      */
-//     public function get_ac_editor_limit()
-//     {
-
-//     	$sql = 'SELECT
-//     			  ac_seq,
-//     			  ac_status,
-//     			  ac_type,
-//     			  ac_name01,
-//     			  ac_name02,
-//     			  ac_mail
-//     			FROM mb_account ';
-
-//     	$sql .= 'where ac_type = 0 AND ac_status = 1 ORDER BY ac_seq DESC LIMIT 1';
-
-//     	$query = $this->db->query($sql);
-
-//     	$get_data = $query->result('array');
-
-//     	return $get_data;
-
-//     }
-
-
-
-//     /**
-//      * 重複データのチェック：メールアドレス
-//      *
-//      * @param    int
-//      * @param    varchar
-//      * @return   bool
-//      */
-//     public function check_mailaddr($seq, $mail)
-//     {
-
-//     	$sql = 'SELECT * FROM `mb_account` '
-//     			. 'WHERE `ac_seq` != ? AND `ac_mail` = ? ';
-
-//     	$values = array(
-//     			$seq,
-//     			$mail,
-//     	);
-
-//     	$query = $this->db->query($sql, $values);
-
-//     	if ($query->num_rows() > 0) {
-//     		return TRUE;
-//     	} else {
-//     		return FALSE;
-//     	}
-//     }
-
-
-
-
-
 
     /**
      * ログ書き込み
