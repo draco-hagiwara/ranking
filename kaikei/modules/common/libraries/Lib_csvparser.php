@@ -70,12 +70,12 @@ class Lib_csvparser
             if($this->header)
             {
 
-            	if (count($row) == 1)
-            	{
-            		throw new Exception(sprintf('%s', "ファイルが不正です(空行が含まれています)。"));
-            	}
+                if (count($row) == 1)
+                {
+                    throw new Exception(sprintf('%s', "ファイルが不正です(空行が含まれています)。"));
+                }
 
-            	// 配列名にヘッダー項目名
+                // 配列名にヘッダー項目名
                 foreach($this->header as $i => $heading_i)
                 {
                     if(isset($row[$i])){
@@ -87,7 +87,7 @@ class Lib_csvparser
 
                 $data[] = $line;
 
-            	// 配列名が 0～
+                // 配列名が 0～
                 //$data[] = $row;
             }
             else

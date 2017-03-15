@@ -99,6 +99,7 @@ function fmSubmit(formName, url, method, num) {
         <th>請求金額</th>
         <th>発 行 日</th>
         <th>振込期日</th>
+        <th>売上作成日</th>
         <th></th>
       </tr>
     </thead>
@@ -137,6 +138,9 @@ function fmSubmit(formName, url, method, num) {
           </td>
           <td>
             {$iv.iv_pay_date}
+          </td>
+          <td class="text-center">
+            {if $iv.iv_sales_date}{$iv.iv_sales_date}{else}-{/if}
           </td>
           <td class="text-right">
             <button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/invo_create/invoice_iv/', 'POST', '{$iv.iv_seq}', 'chg_seq');">個別作成</button>

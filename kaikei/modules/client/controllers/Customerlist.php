@@ -3,9 +3,9 @@
 class Customerlist extends MY_Controller
 {
 
-	/*
-	 *  顧客情報処理
-	 */
+    /*
+     *  顧客情報処理
+     */
 
     public function __construct()
     {
@@ -22,12 +22,12 @@ class Customerlist extends MY_Controller
     public function index()
     {
 
-    	// セッションデータをクリア
-    	$this->load->library('lib_auth');
-    	$this->lib_auth->delete_session('client');
+        // セッションデータをクリア
+        $this->load->library('lib_auth');
+        $this->lib_auth->delete_session('client');
 
         // バリデーション・チェック
-        $this->_set_validation();												// バリデーション設定
+        $this->_set_validation();                                               // バリデーション設定
         $this->form_validation->run();
 
         // 1ページ当たりの表示件数
@@ -39,22 +39,22 @@ class Customerlist extends MY_Controller
         if (isset($segments[3]))
         {
             $tmp_offset = $segments[3];
-			$tmp_inputpost = $this->input->post();
+            $tmp_inputpost = $this->input->post();
         } else {
             $tmp_offset = 0;
-			$tmp_inputpost = array(
-								'cm_status'  => '',
-								'cm_company' => '',
-								'orderid'    => '',
-			);
+            $tmp_inputpost = array(
+                                'cm_status'  => '',
+                                'cm_company' => '',
+                                'orderid'    => '',
+            );
 
-			// セッションをフラッシュデータとして保存
-			$data = array(
-							'c_cm_company' => "",
-							'c_cm_status'  => "",
-							'c_orderid'    => "",
-			);
-			$this->session->set_userdata($data);
+            // セッションをフラッシュデータとして保存
+            $data = array(
+                            'c_cm_company' => "",
+                            'c_cm_status'  => "",
+                            'c_orderid'    => "",
+            );
+            $this->session->set_userdata($data);
         }
 
         // 顧客情報の取得
@@ -89,9 +89,9 @@ class Customerlist extends MY_Controller
         {
             // セッションをフラッシュデータとして保存
             $data = array(
-                    		'c_cm_company' => $this->input->post('cm_company'),
-                    		'c_cm_status'  => $this->input->post('cm_status'),
-                    		'c_orderid'    => $this->input->post('orderid'),
+                            'c_cm_company' => $this->input->post('cm_company'),
+                            'c_cm_status'  => $this->input->post('cm_status'),
+                            'c_orderid'    => $this->input->post('orderid'),
             );
             $this->session->set_userdata($data);
 
@@ -106,7 +106,7 @@ class Customerlist extends MY_Controller
         }
 
         // バリデーション・チェック
-        $this->_set_validation();												// バリデーション設定
+        $this->_set_validation();                                               // バリデーション設定
         $this->form_validation->run();
 
         // Pagination 現在ページ数の取得：：URIセグメントの取得
@@ -149,25 +149,25 @@ class Customerlist extends MY_Controller
     public function detail()
     {
 
-    	// 更新対象アカウントのデータ取得
-    	$input_post = $this->input->post();
+        // 更新対象アカウントのデータ取得
+        $input_post = $this->input->post();
 
-    	$this->load->model('Customer', 'cm', TRUE);
-    	$cm_data = $this->cm->get_cm_seq($input_post['chg_seq']);
+        $this->load->model('Customer', 'cm', TRUE);
+        $cm_data = $this->cm->get_cm_seq($input_post['chg_seq']);
 
-    	$this->smarty->assign('info', $cm_data[0]);
+        $this->smarty->assign('info', $cm_data[0]);
 
-    	// バリデーション設定
-    	$this->_set_validation02();
+        // バリデーション設定
+        $this->_set_validation02();
 
-    	// 初期値セット
-    	$this->_item_set();
+        // 初期値セット
+        $this->_item_set();
 
-    	// 担当営業セット
-    	$this->_sales_item_set();
+        // 担当営業セット
+        $this->_sales_item_set();
 
-    	// 代理店一覧セット
-    	$this->_agency_item_set();
+        // 代理店一覧セット
+        $this->_agency_item_set();
 
         $this->view('customerlist/detail.tpl');
 
@@ -177,116 +177,151 @@ class Customerlist extends MY_Controller
     public function detailchk()
     {
 
-    	$input_post = $this->input->post();
+        $input_post = $this->input->post();
 
-    	// バリデーション・チェック
-    	$this->_set_validation02();
-    	if ($this->form_validation->run() == TRUE)
-    	{
+        // バリデーション・チェック
+        $this->_set_validation02();
+        if ($this->form_validation->run() == TRUE)
+        {
 
-	 		$this->load->model('Customer', 'cm', TRUE);
-	 		$this->load->model('Project',  'pj', TRUE);
+            $this->load->model('Customer', 'cm', TRUE);
+            $this->load->model('Project',  'pj', TRUE);
 
-//  		// 口座名義カナの重複チェック
-//  		$_account_cnt = $this->cm->get_cm_account_nm($input_post['cm_account_nm'], $input_post['cm_seq']);
-//  		if ($_account_cnt == 0)
-//  		{
+//          // 口座名義カナの重複チェック
+//          $_account_cnt = $this->cm->get_cm_account_nm($input_post['cm_account_nm'], $input_post['cm_seq']);
+//          if ($_account_cnt == 0)
+//          {
 
-			// 不要パラメータ削除
-			unset($input_post["submit"]) ;
+            // 不要パラメータ削除
+            unset($input_post["submit"]) ;
 
-			// トランザクション・START
-			$this->db->trans_strict(FALSE);                                 		// StrictモードをOFF
-			$this->db->trans_start();                                       		// trans_begin
+            // トランザクション・START
+            $this->db->trans_strict(FALSE);                                         // StrictモードをOFF
+            $this->db->trans_start();                                               // trans_begin
 
-			// 代理店チェック ⇒ 請求書作成順序の指定
-			if (($input_post['cm_agency_flg'] == 1) || ($input_post['cm_agency_seq'] != 0))
-			{
-				$input_post['cm_invo_timing'] = 2;
-			} else {
+            // 代理店チェック ⇒ 請求書作成順序の指定
+            if (($input_post['cm_agency_flg'] == 1) || ($input_post['cm_agency_seq'] != 0))
+            {
+                $input_post['cm_invo_timing'] = 2;
+            } else {
 
-				$input_post['cm_invo_timing'] = 0;
+                $input_post['cm_invo_timing'] = 0;
 
-				// 既存の受注案件のチェック
-				$_iv_type = 2;																		// 2：成功報酬
-				$get_pj_list = $this->pj->get_pj_cm_seq($input_post['cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'seorank', TRUE);
-				if (count($get_pj_list) != 0)
-				{
-					$input_post['cm_invo_timing'] = 1;
-				}
+                // 既存の受注案件のチェック
+                $_iv_type = 2;                                                                      // 2：成功報酬
+                $get_pj_list = $this->pj->get_pj_cm_seq($input_post['cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'seorank', TRUE);
+                if (count($get_pj_list) != 0)
+                {
+                    $input_post['cm_invo_timing'] = 1;
+                }
 
-				$_iv_type = 3;																		// 3：固定 + 成功報酬
-				$get_pj_list = $this->pj->get_pj_cm_seq($input_post['cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'seorank', TRUE);
-				if (count($get_pj_list) != 0)
-				{
-					$input_post['cm_invo_timing'] = 1;
-				}
-			}
+                $_iv_type = 3;                                                                      // 3：固定 + 成功報酬
+                $get_pj_list = $this->pj->get_pj_cm_seq($input_post['cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'seorank', TRUE);
+                if (count($get_pj_list) != 0)
+                {
+                    $input_post['cm_invo_timing'] = 1;
+                }
+            }
 
-			// DB書き込み
-			$this->cm->update_customer($input_post);
-			$this->smarty->assign('mess',  "更新が完了しました。");
+            // DB書き込み
+            $this->cm->update_customer($input_post);
+            $this->smarty->assign('mess',  "<font color=blue>更新が完了しました。</font>");
 
-			// ステータス=「一時停止」「解約」：受注案件情報の更新
-			if ($input_post['cm_status'] != 0)
-			{
+            // ステータス=「一時停止」「解約」：受注案件情報の更新
+            if ($input_post['cm_status'] != 0)
+            {
 
-				// 受注案件情報データの有無チェック
-				$get_pj_list = $this->pj->get_pj_cm_status($input_post['cm_seq'], $_SESSION['c_memGrp'], 'seorank');
+                // 受注案件情報データの有無チェック
+                $get_pj_list = $this->pj->get_pj_cm_status($input_post['cm_seq'], $_SESSION['c_memGrp'], 'seorank');
 
-				if (count($get_pj_list))
-				{
+                if (count($get_pj_list))
+                {
 
-					// 更新
-				    foreach($get_pj_list as $key => $value)
-				    {
+                    // 更新
+                    foreach($get_pj_list as $key => $value)
+                    {
 
-				    	if ($input_post['cm_status'] == 1)
-				    	{
-				    		$set_pj_data["pj_status"] = 1;
-				    		$set_pj_data["pj_invoice_status"] = 1;
-				    	} else {
-				    		$set_pj_data["pj_status"] = 2;
-				    	}
-				    	$set_pj_data["pj_seq"]    = $value['pj_seq'];
+                        if ($input_post['cm_status'] == 1)
+                        {
+                            $set_pj_data["pj_status"] = 1;
+                            $set_pj_data["pj_invoice_status"] = 1;
+                        } else {
+                            $set_pj_data["pj_status"] = 2;
+                        }
+                        $set_pj_data["pj_seq"]    = $value['pj_seq'];
 
-				    	$this->pj->update_project($set_pj_data, $_SESSION['c_memGrp'], 'seorank');
+                        $this->pj->update_project($set_pj_data, $_SESSION['c_memGrp'], 'seorank');
 
-				    }
-				}
-			}
+                    }
+                }
+            }
 
-			// トランザクション・COMMIT
-			$this->db->trans_complete();                                    		// trans_rollback & trans_commit
-			if ($this->db->trans_status() === FALSE)
-			{
-				log_message('error', 'CLIENT::[Customerlist -> detailchk()]：顧客ステータス「解約」処理 トランザクションエラー');
-			}
+            // 「会社名全角カナ（弥生）」をキーとして共通レコードの口座名義人を同時に更新する
+            $get_comp_list = $this->cm->get_company_kana($input_post['cm_company_kana']);
+            if (count($get_comp_list) >= 2)
+            {
+                foreach ($get_comp_list as $key => $value)
+                {
+                    if ($value['cm_seq'] != $input_post['cm_seq'])
+                    {
+                        // DB書き込み
+                        $set_data['cm_seq']          = $value['cm_seq'];
+                        $set_data['cm_status']       = $value['cm_status'];
+                        $set_data['cm_flg_iv']       = $value['cm_flg_iv'];
+                        $set_data['cm_account_nm']   = $input_post['cm_account_nm'];
 
-//  		} else {
-//  			$this->smarty->assign('mess',  "<font color=red>口座名義カナ は既に登録されています。</font>");
-//  		}
-    	}
+                        $this->cm->update_customer($set_data);
 
-    	// 初期値セット
-    	$this->_item_set();
 
-    	// 担当営業セット
-    	$this->_sales_item_set();
 
-    	// 代理店一覧セット
-    	$this->_agency_item_set();
 
-    	// 請求書の別住所有無フラグの判定
-    	if (isset($input_post['chkinvoice']))
-    	{
-    		$input_post['cm_flg_iv'] = 1;
-    	} else {
-    		$input_post['cm_flg_iv'] = 0;
-    	}
 
-    	$this->smarty->assign('info', $input_post);
-    	$this->view('customerlist/detail.tpl');
+                        // 債権データもチェックして更新
+
+
+
+
+
+
+
+
+                    }
+                }
+            }
+
+            // トランザクション・COMMIT
+            $this->db->trans_complete();                                            // trans_rollback & trans_commit
+            if ($this->db->trans_status() === FALSE)
+            {
+                log_message('error', 'CLIENT::[Customerlist -> detailchk()]：顧客ステータス「解約」処理 トランザクションエラー');
+            }
+
+//          } else {
+//              $this->smarty->assign('mess',  "<font color=red>口座名義カナ は既に登録されています。</font>");
+//          }
+        } else {
+            $this->smarty->assign('mess',  "<font color=red>項目に入力エラーが発生しました。</font>");
+        }
+
+        // 初期値セット
+        $this->_item_set();
+
+        // 担当営業セット
+        $this->_sales_item_set();
+
+        // 代理店一覧セット
+        $this->_agency_item_set();
+
+        // 請求書の別住所有無フラグの判定
+        if (isset($input_post['chkinvoice']))
+        {
+            $input_post['cm_flg_iv'] = 1;
+        } else {
+            $input_post['cm_flg_iv'] = 0;
+        }
+
+        $this->smarty->assign('info', $input_post);
+        $this->view('customerlist/detail.tpl');
 
     }
 
@@ -294,24 +329,24 @@ class Customerlist extends MY_Controller
     public function add()
     {
 
-    	// バリデーション・チェック
-    	$this->_set_validation03();
+        // バリデーション・チェック
+        $this->_set_validation03();
 
-    	// 初期値セット
-    	$this->_item_set();
+        // 初期値セット
+        $this->_item_set();
 
-    	// 担当営業セット
-    	$this->_sales_item_set();
+        // 担当営業セット
+        $this->_sales_item_set();
 
-    	// 代理店一覧セット
-    	$this->_agency_item_set();
+        // 代理店一覧セット
+        $this->_agency_item_set();
 
-    	$this->smarty->assign('tmp_pref',    NULL);
-    	$this->smarty->assign('tmp_pref_iv', NULL);
-    	$this->smarty->assign('tmp_memo',    NULL);
-    	$this->smarty->assign('tmp_memo_iv', NULL);
+        $this->smarty->assign('tmp_pref',    NULL);
+        $this->smarty->assign('tmp_pref_iv', NULL);
+        $this->smarty->assign('tmp_memo',    NULL);
+        $this->smarty->assign('tmp_memo_iv', NULL);
 
-    	$this->view('customerlist/add.tpl');
+        $this->view('customerlist/add.tpl');
 
     }
 
@@ -319,79 +354,100 @@ class Customerlist extends MY_Controller
     public function addchk()
     {
 
-    	$input_post = $this->input->post();
+        $input_post = $this->input->post();
 
-    	// 初期値セット
-    	$this->_item_set();
+        // 初期値セット
+        $this->_item_set();
 
-    	// 担当営業セット
-    	$this->_sales_item_set();
+        // 担当営業セット
+        $this->_sales_item_set();
 
-    	// 代理店一覧セット
-    	$this->_agency_item_set();
+        // 代理店一覧セット
+        $this->_agency_item_set();
 
-    	// バリデーション・チェック
-    	$this->_set_validation03();
-    	if ($this->form_validation->run() == FALSE)
-    	{
-    		$this->smarty->assign('tmp_pref',    $input_post['cm_pref']);
-    		$this->smarty->assign('tmp_pref_iv', $input_post['cm_pref_iv']);
-    		$this->smarty->assign('tmp_memo',    $input_post['cm_memo']);
-    		$this->smarty->assign('tmp_memo_iv', $input_post['cm_memo_iv']);
+        // バリデーション・チェック
+        $this->_set_validation03();
+        if ($this->form_validation->run() == FALSE)
+        {
+            $this->smarty->assign('tmp_pref',    $input_post['cm_pref']);
+            $this->smarty->assign('tmp_pref_iv', $input_post['cm_pref_iv']);
+            $this->smarty->assign('tmp_memo',    $input_post['cm_memo']);
+            $this->smarty->assign('tmp_memo_iv', $input_post['cm_memo_iv']);
 
-    		if ($input_post['cm_pref'] != "")
-    		{
-    			$this->smarty->assign('tmp_pref', $input_post['cm_pref']);				// 都道府県を保持
-    		}
-    	    if ($input_post['cm_pref_iv'] != "")
-    		{
-    			$this->smarty->assign('tmp_pref_iv', $input_post['cm_pref_iv']);		// 都道府県を保持
-    		}
-    		if ($input_post['cm_memo'] != "")
-    		{
-    			$this->smarty->assign('tmp_memo', $input_post['cm_memo']);				// 備考を保持
-    		}
-    		if ($input_post['cm_memo_iv'] != "")
-    		{
-    			$this->smarty->assign('tmp_memo_iv', $input_post['cm_memo_iv']);		// 備考を保持
-    		}
+            if ($input_post['cm_pref'] != "")
+            {
+                $this->smarty->assign('tmp_pref', $input_post['cm_pref']);              // 都道府県を保持
+            }
+            if ($input_post['cm_pref_iv'] != "")
+            {
+                $this->smarty->assign('tmp_pref_iv', $input_post['cm_pref_iv']);        // 都道府県を保持
+            }
+            if ($input_post['cm_memo'] != "")
+            {
+                $this->smarty->assign('tmp_memo', $input_post['cm_memo']);              // 備考を保持
+            }
+            if ($input_post['cm_memo_iv'] != "")
+            {
+                $this->smarty->assign('tmp_memo_iv', $input_post['cm_memo_iv']);        // 備考を保持
+            }
 
-    	} else {
+            $this->smarty->assign('mess',  "<font color=red>項目に入力エラーが発生しました。</font>");
 
-    		$this->load->model('Customer', 'cm', TRUE);
+        } else {
 
-//     		// 口座名義カナの重複チェック
-//     		$_account_cnt = $this->cm->get_cm_account_nm($input_post['cm_account_nm']);
-//     		if ($_account_cnt == 0)
-//     		{
+            $this->load->model('Customer', 'cm', TRUE);
 
-    			// 代理店チェック ⇒ 請求書作成順序の指定
-    			if (($input_post['cm_agency_flg'] == 1) || ($input_post['cm_agency_seq'] != 0))
-    			{
-    				$input_post['cm_invo_timing'] = 2;
-    			}
+//          // 口座名義カナの重複チェック
+//          $_account_cnt = $this->cm->get_cm_account_nm($input_post['cm_account_nm']);
+//          if ($_account_cnt == 0)
+//          {
 
-		    	// 不要パラメータ削除
-		    	unset($input_post["_submit"]) ;
+                // 代理店チェック ⇒ 請求書作成順序の指定
+                if (($input_post['cm_agency_flg'] == 1) || ($input_post['cm_agency_seq'] != 0))
+                {
+                    $input_post['cm_invo_timing'] = 2;
+                }
 
-		    	// DB書き込み
-		    	$_row_id = $this->cm->insert_customer($input_post);
+                // 不要パラメータ削除
+                unset($input_post["_submit"]) ;
 
-	    		$this->smarty->assign('mess',  "登録が完了しました。");
+                // DB書き込み
+                $_row_id = $this->cm->insert_customer($input_post);
 
-	    		redirect('/customerlist/');
+                $this->smarty->assign('mess',  "<font color=blue>登録が完了しました。</font>");
 
-//     		} else {
-//     			$this->smarty->assign('mess',  "<font color=red>口座名義カナ は既に登録されています。</font>");
-//     		}
-    	}
+                // 「会社名全角カナ（弥生）」をキーとして共通レコードの口座名義人を同時に更新する
+                $get_comp_list = $this->cm->get_company_kana($input_post['cm_company_kana']);
+                if (count($get_comp_list) >= 2)
+                {
+                    foreach ($get_comp_list as $key => $value)
+                    {
+                        if ($value['cm_seq'] != $_row_id)
+                        {
+                            // DB書き込み
+                            $set_data['cm_seq']          = $value['cm_seq'];
+                            $set_data['cm_status']       = $value['cm_status'];
+                            $set_data['cm_flg_iv']       = $value['cm_flg_iv'];
+                            $set_data['cm_account_nm']   = $input_post['cm_account_nm'];
 
-    	$this->smarty->assign('tmp_pref',    $input_post['cm_pref']);
-    	$this->smarty->assign('tmp_pref_iv', $input_post['cm_pref_iv']);
-    	$this->smarty->assign('tmp_memo',    $input_post['cm_memo']);
-    	$this->smarty->assign('tmp_memo_iv', $input_post['cm_memo_iv']);
+                            $this->cm->update_customer($set_data);
+                        }
+                    }
+                }
 
-    	$this->view('customerlist/add.tpl');
+                redirect('/customerlist/');
+
+//          } else {
+//              $this->smarty->assign('mess',  "<font color=red>口座名義カナ は既に登録されています。</font>");
+//          }
+        }
+
+        $this->smarty->assign('tmp_pref',    $input_post['cm_pref']);
+        $this->smarty->assign('tmp_pref_iv', $input_post['cm_pref_iv']);
+        $this->smarty->assign('tmp_memo',    $input_post['cm_memo']);
+        $this->smarty->assign('tmp_memo_iv', $input_post['cm_memo_iv']);
+
+        $this->view('customerlist/add.tpl');
 
     }
 
@@ -399,24 +455,27 @@ class Customerlist extends MY_Controller
     public function cp()
     {
 
-    	// 更新対象アカウントのデータ取得
-    	$input_post = $this->input->post();
+        // 更新対象アカウントのデータ取得
+        $input_post = $this->input->post();
 
-    	$this->load->model('Customer', 'cm', TRUE);
-    	$cm_data = $this->cm->get_cm_seq($input_post['chg_seq']);
+        $this->load->model('Customer', 'cm', TRUE);
+        $cm_data = $this->cm->get_cm_seq($input_post['chg_seq']);
 
-    	$this->smarty->assign('info', $cm_data[0]);
+        $this->smarty->assign('info', $cm_data[0]);
 
-    	// バリデーション設定
-    	$this->_set_validation02();
+        // バリデーション設定
+        $this->_set_validation02();
 
-    	// 初期値セット
-    	$this->_item_set();
+        // 初期値セット
+        $this->_item_set();
 
-    	// 担当営業セット
-    	$this->_sales_item_set();
+        // 担当営業セット
+        $this->_sales_item_set();
 
-    	$this->view('customerlist/copy.tpl');
+        // 代理店一覧セット
+        $this->_agency_item_set();
+
+        $this->view('customerlist/copy.tpl');
 
     }
 
@@ -424,60 +483,84 @@ class Customerlist extends MY_Controller
     public function cpchk()
     {
 
-    	$input_post = $this->input->post();
+        $input_post = $this->input->post();
 
-    	// 初期値セット
-    	$this->_item_set();
+        // 初期値セット
+        $this->_item_set();
 
-    	// 担当営業セット
-    	$this->_sales_item_set();
+        // 担当営業セット
+        $this->_sales_item_set();
 
-    	// バリデーション・チェック
-    	$this->_set_validation03();
-    	if ($this->form_validation->run() == FALSE)
-    	{
-    		$this->smarty->assign('tmp_pref',    $input_post['cm_pref']);
-    		$this->smarty->assign('tmp_pref_iv', $input_post['cm_pref_iv']);
-    		$this->smarty->assign('tmp_memo',    $input_post['cm_memo']);
-    		$this->smarty->assign('tmp_memo_iv', $input_post['cm_memo_iv']);
+        // 代理店一覧セット
+        $this->_agency_item_set();
 
-    		if ($input_post['cm_pref'] != "")
-    		{
-    			$this->smarty->assign('tmp_pref', $input_post['cm_pref']);				// 都道府県を保持
-    		}
-    		if ($input_post['cm_pref_iv'] != "")
-    		{
-    			$this->smarty->assign('tmp_pref_iv', $input_post['cm_pref_iv']);		// 都道府県を保持
-    		}
-    		if ($input_post['cm_memo'] != "")
-    		{
-    			$this->smarty->assign('tmp_memo', $input_post['cm_memo']);				// 備考を保持
-    		}
-    		if ($input_post['cm_memo_iv'] != "")
-    		{
-    			$this->smarty->assign('tmp_memo_iv', $input_post['cm_memo_iv']);		// 備考を保持
-    		}
+        // バリデーション・チェック
+        $this->_set_validation03();
+        if ($this->form_validation->run() == FALSE)
+        {
+            $this->smarty->assign('tmp_pref',    $input_post['cm_pref']);
+            $this->smarty->assign('tmp_pref_iv', $input_post['cm_pref_iv']);
+            $this->smarty->assign('tmp_memo',    $input_post['cm_memo']);
+            $this->smarty->assign('tmp_memo_iv', $input_post['cm_memo_iv']);
 
-    	} else {
+            if ($input_post['cm_pref'] != "")
+            {
+                $this->smarty->assign('tmp_pref', $input_post['cm_pref']);              // 都道府県を保持
+            }
+            if ($input_post['cm_pref_iv'] != "")
+            {
+                $this->smarty->assign('tmp_pref_iv', $input_post['cm_pref_iv']);        // 都道府県を保持
+            }
+            if ($input_post['cm_memo'] != "")
+            {
+                $this->smarty->assign('tmp_memo', $input_post['cm_memo']);              // 備考を保持
+            }
+            if ($input_post['cm_memo_iv'] != "")
+            {
+                $this->smarty->assign('tmp_memo_iv', $input_post['cm_memo_iv']);        // 備考を保持
+            }
 
-    		$this->load->model('Customer', 'cm', TRUE);
+            $this->smarty->assign('mess',  "<font color=red>項目に入力エラーが発生しました。</font>");
 
-    		// 不要パラメータ削除
-    		unset($input_post["submit"]) ;
+        } else {
 
-    		// DB書き込み
-    		$_row_id = $this->cm->insert_customer($input_post);
+            $this->load->model('Customer', 'cm', TRUE);
 
-    		$this->smarty->assign('mess',  "登録が完了しました。");
-    	}
+            // 不要パラメータ削除
+            unset($input_post["submit"]) ;
 
-    	$this->smarty->assign('tmp_pref',    $input_post['cm_pref']);
-    	$this->smarty->assign('tmp_pref_iv', $input_post['cm_pref_iv']);
-    	$this->smarty->assign('tmp_memo',    $input_post['cm_memo']);
-    	$this->smarty->assign('tmp_memo_iv', $input_post['cm_memo_iv']);
+            // DB書き込み
+            $_row_id = $this->cm->insert_customer($input_post);
 
-    	//$this->view('customerlist/index.tpl');
-    	$this->view('customerlist/add.tpl');
+            $this->smarty->assign('mess',  "<font color=blue>複写が完了しました。</font>");
+
+            // 「会社名全角カナ（弥生）」をキーとして共通レコードの口座名義人を同時に更新する
+            $get_comp_list = $this->cm->get_company_kana($input_post['cm_company_kana']);
+            if (count($get_comp_list) >= 2)
+            {
+                foreach ($get_comp_list as $key => $value)
+                {
+                    if ($value['cm_seq'] != $_row_id)
+                    {
+                        // DB書き込み
+                        $set_data['cm_seq']          = $value['cm_seq'];
+                        $set_data['cm_status']       = $value['cm_status'];
+                        $set_data['cm_flg_iv']       = $value['cm_flg_iv'];
+                        $set_data['cm_account_nm']   = $input_post['cm_account_nm'];
+
+                        $this->cm->update_customer($set_data);
+                    }
+                }
+            }
+        }
+
+        $this->smarty->assign('tmp_pref',    $input_post['cm_pref']);
+        $this->smarty->assign('tmp_pref_iv', $input_post['cm_pref_iv']);
+        $this->smarty->assign('tmp_memo',    $input_post['cm_memo']);
+        $this->smarty->assign('tmp_memo_iv', $input_post['cm_memo_iv']);
+
+        //$this->view('customerlist/index.tpl');
+        $this->view('customerlist/add.tpl');
 
     }
 
@@ -485,22 +568,22 @@ class Customerlist extends MY_Controller
     private function _get_Pagination($countall, $tmp_per_page)
     {
 
-    	$config['base_url']       = base_url() . '/customerlist/search/';		// ページの基本URIパス。「/コントローラクラス/アクションメソッド/」
-    	$config['per_page']       = $tmp_per_page;								// 1ページ当たりの表示件数。
-    	$config['total_rows']     = $countall;									// 総件数。where指定するか？
-    	//$config['uri_segment']    = 4;										// オフセット値がURIパスの何セグメント目とするか設定
-    	$config['num_links']      = 5;											//現在のページ番号の左右にいくつのページ番号リンクを生成するか設定
-    	$config['full_tag_open']  = '<p class="pagination">';					// ページネーションリンク全体を階層化するHTMLタグの先頭タグ文字列を指定
-    	$config['full_tag_close'] = '</p>';										// ページネーションリンク全体を階層化するHTMLタグの閉じタグ文字列を指定
-    	$config['first_link']     = '最初へ';									// 最初のページを表すテキスト。
-    	$config['last_link']      = '最後へ';									// 最後のページを表すテキスト。
-    	$config['prev_link']      = '前へ';										// 前のページへのリンクを表わす文字列を指定
-    	$config['next_link']      = '次へ';										// 次のページへのリンクを表わす文字列を指定
+        $config['base_url']       = base_url() . '/customerlist/search/';       // ページの基本URIパス。「/コントローラクラス/アクションメソッド/」
+        $config['per_page']       = $tmp_per_page;                              // 1ページ当たりの表示件数。
+        $config['total_rows']     = $countall;                                  // 総件数。where指定するか？
+        //$config['uri_segment']    = 4;                                        // オフセット値がURIパスの何セグメント目とするか設定
+        $config['num_links']      = 5;                                          // 現在のページ番号の左右にいくつのページ番号リンクを生成するか設定
+        $config['full_tag_open']  = '<p class="pagination">';                   // ページネーションリンク全体を階層化するHTMLタグの先頭タグ文字列を指定
+        $config['full_tag_close'] = '</p>';                                     // ページネーションリンク全体を階層化するHTMLタグの閉じタグ文字列を指定
+        $config['first_link']     = '最初へ';                                   // 最初のページを表すテキスト。
+        $config['last_link']      = '最後へ';                                   // 最後のページを表すテキスト。
+        $config['prev_link']      = '前へ';                                     // 前のページへのリンクを表わす文字列を指定
+        $config['next_link']      = '次へ';                                     // 次のページへのリンクを表わす文字列を指定
 
-    	$this->load->library('pagination', $config);							// Paginationクラス読み込み
-    	$set_page['page_link'] = $this->pagination->create_links();
+        $this->load->library('pagination', $config);                            // Paginationクラス読み込み
+        $set_page['page_link'] = $this->pagination->create_links();
 
-    	return $set_page;
+        return $set_page;
 
     }
 
@@ -508,35 +591,39 @@ class Customerlist extends MY_Controller
     private function _item_set()
     {
 
-    	// ステータスのセット
-    	$this->config->load('config_status');
-    	$opt_cm_status = $this->config->item('CUSTOMER_CM_STATUS');
+        // ステータスのセット
+        $this->config->load('config_status');
+        $opt_cm_status = $this->config->item('CUSTOMER_CM_STATUS');
 
-    	// 口座種別のセット
-    	$this->config->load('config_comm');
-    	$opt_cm_kind = $this->config->item('CUSTOMER_CM_KIND');
+        // 口座種別のセット
+        $this->config->load('config_comm');
+        $opt_cm_kind = $this->config->item('CUSTOMER_CM_KIND');
 
-    	// 回収サイトのセット
-    	$opt_cm_collect = $this->config->item('CUSTOMER_CM_COLLECT');
+        // 回収サイトのセット
+        $opt_cm_collect = $this->config->item('CUSTOMER_CM_COLLECT');
 
-    	// 顧客情報ID 並び替え選択項目セット
-    	$arropt_id = array (
-    			''     => '-- 選択してください --',
-    			'DESC' => '降順',
-    			'ASC'  => '昇順',
-    	);
+        // 上場有無のセット
+        $opt_cm_pub_company = $this->config->item('CUSTOMER_CM_PUBLIC');
 
-    	// 代理店有無のセット
-    	$arropt_agency = array (
-    			'0' => '代理店とならない',
-    			'1' => '代理店となる（請求先）',
-    	);
+        // 顧客情報ID 並び替え選択項目セット
+        $arropt_id = array (
+                ''     => '-- 選択してください --',
+                'DESC' => '降順',
+                'ASC'  => '昇順',
+        );
 
-    	$this->smarty->assign('options_cm_status',     $opt_cm_status);
-    	$this->smarty->assign('options_cm_kind',       $opt_cm_kind);
-    	$this->smarty->assign('options_cm_collect',    $opt_cm_collect);
-    	$this->smarty->assign('options_orderid',       $arropt_id);
-    	$this->smarty->assign('options_cm_agency_flg', $arropt_agency);
+        // 代理店有無のセット
+        $arropt_agency = array (
+                '0' => '代理店とならない',
+                '1' => '代理店となる（請求先）',
+        );
+
+        $this->smarty->assign('options_cm_status',      $opt_cm_status);
+        $this->smarty->assign('options_cm_kind',        $opt_cm_kind);
+        $this->smarty->assign('options_cm_collect',     $opt_cm_collect);
+        $this->smarty->assign('options_cm_pub_company', $opt_cm_pub_company);
+        $this->smarty->assign('options_orderid',        $arropt_id);
+        $this->smarty->assign('options_cm_agency_flg',  $arropt_agency);
 
     }
 
@@ -545,17 +632,17 @@ class Customerlist extends MY_Controller
     {
 
         // ステータス 選択項目セット
-    	$this->config->load('config_status');
-    	$opt_cm_status = $this->config->item('CUSTOMER_CM_STATUS');
+        $this->config->load('config_status');
+        $opt_cm_status = $this->config->item('CUSTOMER_CM_STATUS');
 
-    	// 顧客情報ID 並び替え選択項目セット
+        // 顧客情報ID 並び替え選択項目セット
         $arropt_id = array (
                 ''     => '-- 選択してください --',
                 'DESC' => '降順',
                 'ASC'  => '昇順',
         );
 
-    	$this->smarty->assign('options_cm_status', $opt_cm_status);
+        $this->smarty->assign('options_cm_status', $opt_cm_status);
         $this->smarty->assign('options_orderid',   $arropt_id);
 
     }
@@ -564,19 +651,19 @@ class Customerlist extends MY_Controller
     private function _sales_item_set()
     {
 
-    	// 請求書発行対象企業
-    	$this->config->load('config_comm');
-    	$opt_cl_seq = $this->config->item('PROJECT_CL_SEQ');
+        // 請求書発行対象企業
+        $this->config->load('config_comm');
+        $opt_cl_seq = $this->config->item('PROJECT_CL_SEQ');
 
-    	$this->load->model('Account', 'ac', TRUE);
-    	$salesman_list = $this->ac->get_salesman($opt_cl_seq, 'seorank');		// 「ラベンダー」固定 : ac_cl_seq = 2
+        $this->load->model('Account', 'ac', TRUE);
+        $salesman_list = $this->ac->get_salesman($opt_cl_seq, 'seorank');       // 「ラベンダー」固定 : ac_cl_seq = 2
 
-    	foreach ($salesman_list as $key => $val)
-    	{
-    		$opt_cm_salesman[$val['ac_seq']] = $val['ac_name01'] . ' ' . $val['ac_name02'];
-    	}
+        foreach ($salesman_list as $key => $val)
+        {
+            $opt_cm_salesman[$val['ac_seq']] = $val['ac_name01'] . ' ' . $val['ac_name02'];
+        }
 
-    	$this->smarty->assign('options_cm_salesman', $opt_cm_salesman);
+        $this->smarty->assign('options_cm_salesman', $opt_cm_salesman);
 
     }
 
@@ -584,16 +671,16 @@ class Customerlist extends MY_Controller
     private function _agency_item_set()
     {
 
-    	$this->load->model('Customer', 'cm', TRUE);
-    	$agency_list = $this->cm->get_cm_agency();
+        $this->load->model('Customer', 'cm', TRUE);
+        $agency_list = $this->cm->get_cm_agency();
 
-    	$opt_cm_agency = array('0' => '-- 代理店クライアントの場合、選択してください --');
-    	foreach ($agency_list as $key => $val)
-    	{
-    		$opt_cm_agency[$val['cm_seq']] = $val['cm_company'];
-    	}
+        $opt_cm_agency = array('0' => '-- 代理店クライアントの場合、選択してください --');
+        foreach ($agency_list as $key => $val)
+        {
+            $opt_cm_agency[$val['cm_seq']] = $val['cm_company'];
+        }
 
-    	$this->smarty->assign('options_cm_agency_seq', $opt_cm_agency);
+        $this->smarty->assign('options_cm_agency_seq', $opt_cm_agency);
 
     }
 
@@ -601,489 +688,489 @@ class Customerlist extends MY_Controller
     private function _set_validation()
     {
 
-    	$rule_set = array(
-    			array(
-    					'field'   => 'cm_company',
-    					'label'   => '会社名',
-    					'rules'   => 'trim|max_length[50]'
-    			),
-    	);
+        $rule_set = array(
+                array(
+                        'field'   => 'cm_company',
+                        'label'   => '会社名',
+                        'rules'   => 'trim|max_length[50]'
+                ),
+        );
 
-    	$this->load->library('form_validation', $rule_set);                     // バリデーションクラス読み込み
+        $this->load->library('form_validation', $rule_set);                     // バリデーションクラス読み込み
 
     }
 
     // フォーム・バリデーションチェック : クライアント更新
     private function _set_validation02()
     {
-    	$rule_set = array(
-    			array(
-    					'field'   => 'cm_status',
-    					'label'   => 'ステータス選択',
-    					'rules'   => 'trim|required|max_length[2]'
-    			),
-    			array(
-    					'field'   => 'cm_yayoi_name',
-    					'label'   => '弥生名称',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_company',
-    					'label'   => '会社名',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_company_kana',
-    					'label'   => '会社名全角カナ',
-    					'rules'   => 'trim|required|max_length[4]|katakana'
-    			),
-    			array(
-    					'field'   => 'cm_zip01',
-    					'label'   => '郵便番号（3ケタ）',
-    					'rules'   => 'trim|required|exact_length[3]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_zip02',
-    					'label'   => '郵便番号（4ケタ）',
-    					'rules'   => 'trim|required|exact_length[4]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_pref',
-    					'label'   => '都道府県',
-    					'rules'   => 'trim|required|max_length[4]'
-    			),
-    			array(
-    					'field'   => 'cm_addr01',
-    					'label'   => '市区町村',
-    					'rules'   => 'trim|required|max_length[100]'
-    			),
-    			array(
-    					'field'   => 'cm_addr02',
-    					'label'   => '町名・番地',
-    					'rules'   => 'trim|required|max_length[100]'
-    			),
-    			array(
-    					'field'   => 'cm_buil',
-    					'label'   => 'ビル・マンション名など',
-    					'rules'   => 'trim|max_length[100]'
-    			),
-    			array(
-    					'field'   => 'cm_president01',
-    					'label'   => '代表者姓',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_president02',
-    					'label'   => '代表者名',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_tel01',
-    					'label'   => '代表電話番号',
-    					'rules'   => 'trim|required|regex_match[/^[0-9\-]+$/]|max_length[15]'
-    			),
-    			array(
-    					'field'   => 'cm_seturitu',
-    					'label'   => '設立年月日',
-    					'rules'   => 'trim|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_capital',
-    					'label'   => '資本金',
-    					'rules'   => 'trim|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_seturitu',
-    					'label'   => '設立年月日',
-    					'rules'   => 'trim|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_closingdate',
-    					'label'   => '決算日',
-    					'rules'   => 'trim|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_employee',
-    					'label'   => '従業員数',
-    					'rules'   => 'trim|max_length[10]'
-    			),
-    			array(
-    					'field'   => 'cm_collect',
-    					'label'   => '回収サイト',
-    					'rules'   => 'trim|max_length[1]'
-    			),
-    			array(
-    					'field'   => 'cm_credit_chk',
-    					'label'   => '与信チェック日',
-    					'rules'   => 'trim|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_antisocial_chk',
-    					'label'   => '反社チェック日',
-    					'rules'   => 'trim|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_credit_max',
-    					'label'   => '与信限度額',
-    					'rules'   => 'trim|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_trade_no',
-    					'label'   => '取引申請番号',
-    					'rules'   => 'trim|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_mail',
-    					'label'   => 'メールアドレス',
-    					'rules'   => 'trim|required|max_length[100]|valid_email'
-    			),
-    			array(
-    					'field'   => 'cm_mailsub',
-    					'label'   => 'メールアドレス(サブ)',
-    					'rules'   => 'trim|max_length[100]|valid_email'
-    			),
-    			array(
-    					'field'   => 'cm_department',
-    					'label'   => '担当所属部署／役職',
-    					'rules'   => 'trim|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_person01',
-    					'label'   => '担当者姓',
-    					'rules'   => 'trim|required|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_person02',
-    					'label'   => '担当者名',
-    					'rules'   => 'trim|required|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_tel02',
-    					'label'   => '担当者電話番号',
-    					'rules'   => 'trim|required|regex_match[/^[0-9\-]+$/]|max_length[15]'
-    			),
-    			array(
-    					'field'   => 'cm_mobile',
-    					'label'   => '担当者携帯番号',
-    					'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
-    			),
-    			array(
-    					'field'   => 'cm_fax',
-    					'label'   => 'FAX番号',
-    					'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
-    			),
-    			array(
-    					'field'   => 'cm_bank_cd',
-    					'label'   => '銀行CD',
-    					'rules'   => 'trim|max_length[4]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_bank_nm',
-    					'label'   => '銀行名',
-    					'rules'   => 'trim|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_branch_cd',
-    					'label'   => '支店CD',
-    					'rules'   => 'trim|max_length[3]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_branch_nm',
-    					'label'   => '支店名',
-    					'rules'   => 'trim|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_kind',
-    					'label'   => '口座種別(普通/当座)',
-    					'rules'   => 'trim|max_length[1]'
-    			),
-    			array(
-    					'field'   => 'cm_account_no',
-    					'label'   => '口座番号',
-    					'rules'   => 'trim|max_length[10]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_account_nm',
-    					'label'   => '口座名義',
-    					'rules'   => 'trim|required|max_length[48]|single_eisukana'
-    					//'rules'   => 'trim|required|max_length[48]|single_katakana'
-    			),
-    			array(
-    					'field'   => 'cm_memo',
-    					'label'   => '備考',
-    					'rules'   => 'trim|max_length[1000]'
-    			),
-    			array(
-    					'field'   => 'cm_memo_iv',
-    					'label'   => '請求書：備考',
-    					'rules'   => 'trim|max_length[100]'
-    			),
+        $rule_set = array(
+                array(
+                        'field'   => 'cm_status',
+                        'label'   => 'ステータス選択',
+                        'rules'   => 'trim|required|max_length[2]'
+                ),
+                array(
+                        'field'   => 'cm_yayoi_name',
+                        'label'   => '弥生名称',
+                        'rules'   => 'trim|required|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_company',
+                        'label'   => '会社名',
+                        'rules'   => 'trim|required|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_company_kana',
+                        'label'   => '会社名全角カナ',
+                        'rules'   => 'trim|required|max_length[4]|katakana'
+                ),
+                array(
+                        'field'   => 'cm_zip01',
+                        'label'   => '郵便番号（3ケタ）',
+                        'rules'   => 'trim|required|exact_length[3]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_zip02',
+                        'label'   => '郵便番号（4ケタ）',
+                        'rules'   => 'trim|required|exact_length[4]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_pref',
+                        'label'   => '都道府県',
+                        'rules'   => 'trim|required|max_length[4]'
+                ),
+                array(
+                        'field'   => 'cm_addr01',
+                        'label'   => '市区町村',
+                        'rules'   => 'trim|required|max_length[100]'
+                ),
+                array(
+                        'field'   => 'cm_addr02',
+                        'label'   => '町名・番地',
+                        'rules'   => 'trim|required|max_length[100]'
+                ),
+                array(
+                        'field'   => 'cm_buil',
+                        'label'   => 'ビル・マンション名など',
+                        'rules'   => 'trim|max_length[100]'
+                ),
+                array(
+                        'field'   => 'cm_president01',
+                        'label'   => '代表者姓',
+                        'rules'   => 'trim|required|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_president02',
+                        'label'   => '代表者名',
+                        'rules'   => 'trim|required|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_tel01',
+                        'label'   => '代表電話番号',
+                        'rules'   => 'trim|required|regex_match[/^[0-9\-]+$/]|max_length[15]'
+                ),
+                array(
+                        'field'   => 'cm_seturitu',
+                        'label'   => '設立年月日',
+                        'rules'   => 'trim|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_capital',
+                        'label'   => '資本金',
+                        'rules'   => 'trim|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_seturitu',
+                        'label'   => '設立年月日',
+                        'rules'   => 'trim|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_closingdate',
+                        'label'   => '決算日',
+                        'rules'   => 'trim|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_employee',
+                        'label'   => '従業員数',
+                        'rules'   => 'trim|max_length[10]'
+                ),
+                array(
+                        'field'   => 'cm_collect',
+                        'label'   => '回収サイト',
+                        'rules'   => 'trim|max_length[1]'
+                ),
+                array(
+                        'field'   => 'cm_credit_chk',
+                        'label'   => '与信チェック日',
+                        'rules'   => 'trim|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_antisocial_chk',
+                        'label'   => '反社チェック日',
+                        'rules'   => 'trim|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_credit_max',
+                        'label'   => '与信限度額',
+                        'rules'   => 'trim|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_trade_no',
+                        'label'   => '取引申請番号',
+                        'rules'   => 'trim|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_mail',
+                        'label'   => 'メールアドレス',
+                        'rules'   => 'trim|required|max_length[100]|valid_email'
+                ),
+                array(
+                        'field'   => 'cm_mailsub',
+                        'label'   => 'メールアドレス(サブ)',
+                        'rules'   => 'trim|max_length[100]|valid_email'
+                ),
+                array(
+                        'field'   => 'cm_department',
+                        'label'   => '担当所属部署／役職',
+                        'rules'   => 'trim|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_person01',
+                        'label'   => '担当者姓',
+                        'rules'   => 'trim|required|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_person02',
+                        'label'   => '担当者名',
+                        'rules'   => 'trim|required|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_tel02',
+                        'label'   => '担当者電話番号',
+                        'rules'   => 'trim|required|regex_match[/^[0-9\-]+$/]|max_length[15]'
+                ),
+                array(
+                        'field'   => 'cm_mobile',
+                        'label'   => '担当者携帯番号',
+                        'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
+                ),
+                array(
+                        'field'   => 'cm_fax',
+                        'label'   => 'FAX番号',
+                        'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
+                ),
+                array(
+                        'field'   => 'cm_bank_cd',
+                        'label'   => '銀行CD',
+                        'rules'   => 'trim|max_length[4]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_bank_nm',
+                        'label'   => '銀行名',
+                        'rules'   => 'trim|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_branch_cd',
+                        'label'   => '支店CD',
+                        'rules'   => 'trim|max_length[3]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_branch_nm',
+                        'label'   => '支店名',
+                        'rules'   => 'trim|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_kind',
+                        'label'   => '口座種別(普通/当座)',
+                        'rules'   => 'trim|max_length[1]'
+                ),
+                array(
+                        'field'   => 'cm_account_no',
+                        'label'   => '口座番号',
+                        'rules'   => 'trim|max_length[10]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_account_nm',
+                        'label'   => '口座名義',
+                        'rules'   => 'trim|required|max_length[48]|single_eisukana'
+                        //'rules'   => 'trim|required|max_length[48]|single_katakana'
+                ),
+                array(
+                        'field'   => 'cm_memo',
+                        'label'   => '備考',
+                        'rules'   => 'trim|max_length[1000]'
+                ),
+                array(
+                        'field'   => 'cm_memo_iv',
+                        'label'   => '請求書：備考',
+                        'rules'   => 'trim|max_length[100]'
+                ),
 
-    			array(
-    					'field'   => 'cm_company_iv',
-    					'label'   => '会社名',
-    					'rules'   => 'trim|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_zip01_iv',
-    					'label'   => '郵便番号（3ケタ）',
-    					'rules'   => 'trim|exact_length[3]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_zip02_iv',
-    					'label'   => '郵便番号（4ケタ）',
-    					'rules'   => 'trim|exact_length[4]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_pref_iv',
-    					'label'   => '都道府県',
-    					'rules'   => 'trim|max_length[4]'
-    			),
-    			array(
-    					'field'   => 'cm_addr01_iv',
-    					'label'   => '市区町村',
-    					'rules'   => 'trim|max_length[100]'
-    			),
-    			array(
-    					'field'   => 'cm_addr02_iv',
-    					'label'   => '町名・番地',
-    					'rules'   => 'trim|max_length[100]'
-    			),
-    			array(
-    					'field'   => 'cm_buil_iv',
-    					'label'   => 'ビル・マンション名など',
-    					'rules'   => 'trim|max_length[100]'
-    			),
-    			array(
-    					'field'   => 'cm_department_iv',
-    					'label'   => '所属部署',
-    					'rules'   => 'trim|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_person01_iv',
-    					'label'   => '担当者姓',
-    					'rules'   => 'trim|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_person02_iv',
-    					'label'   => '担当者名',
-    					'rules'   => 'trim|max_length[20]'
-    			),
-    	);
+                array(
+                        'field'   => 'cm_company_iv',
+                        'label'   => '会社名',
+                        'rules'   => 'trim|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_zip01_iv',
+                        'label'   => '郵便番号（3ケタ）',
+                        'rules'   => 'trim|exact_length[3]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_zip02_iv',
+                        'label'   => '郵便番号（4ケタ）',
+                        'rules'   => 'trim|exact_length[4]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_pref_iv',
+                        'label'   => '都道府県',
+                        'rules'   => 'trim|max_length[4]'
+                ),
+                array(
+                        'field'   => 'cm_addr01_iv',
+                        'label'   => '市区町村',
+                        'rules'   => 'trim|max_length[100]'
+                ),
+                array(
+                        'field'   => 'cm_addr02_iv',
+                        'label'   => '町名・番地',
+                        'rules'   => 'trim|max_length[100]'
+                ),
+                array(
+                        'field'   => 'cm_buil_iv',
+                        'label'   => 'ビル・マンション名など',
+                        'rules'   => 'trim|max_length[100]'
+                ),
+                array(
+                        'field'   => 'cm_department_iv',
+                        'label'   => '所属部署',
+                        'rules'   => 'trim|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_person01_iv',
+                        'label'   => '担当者姓',
+                        'rules'   => 'trim|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_person02_iv',
+                        'label'   => '担当者名',
+                        'rules'   => 'trim|max_length[20]'
+                ),
+        );
 
-    	$this->load->library('form_validation', $rule_set);                     // バリデーションクラス読み込み
+        $this->load->library('form_validation', $rule_set);                     // バリデーションクラス読み込み
     }
 
     // フォーム・バリデーションチェック : クライアント追加
     private function _set_validation03()
     {
-    	$rule_set = array(
-    			array(
-    					'field'   => 'cm_status',
-    					'label'   => 'ステータス選択',
-    					'rules'   => 'trim|required|max_length[2]'
-    			),
-    			array(
-    					'field'   => 'cm_yayoi_name',
-    					'label'   => '弥生名称',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_company',
-    					'label'   => '会社名',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_company_kana',
-    					'label'   => '会社名全角カナ',
-    					'rules'   => 'trim|required|max_length[4]|katakana'
-    			),
-    			array(
-    					'field'   => 'cm_zip01',
-    					'label'   => '郵便番号（3ケタ）',
-    					'rules'   => 'trim|required|exact_length[3]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_zip02',
-    					'label'   => '郵便番号（4ケタ）',
-    					'rules'   => 'trim|required|exact_length[4]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_pref',
-    					'label'   => '都道府県',
-    					'rules'   => 'trim|required|max_length[4]'
-    			),
-    			array(
-    					'field'   => 'cm_addr01',
-    					'label'   => '市区町村',
-    					'rules'   => 'trim|required|max_length[100]'
-    			),
-    			array(
-    					'field'   => 'cm_addr02',
-    					'label'   => '町名・番地',
-    					'rules'   => 'trim|required|max_length[100]'
-    			),
-    			array(
-    					'field'   => 'cm_buil',
-    					'label'   => 'ビル・マンション名など',
-    					'rules'   => 'trim|max_length[100]'
-    			),
-    			array(
-    					'field'   => 'cm_president01',
-    					'label'   => '代表者姓',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_president02',
-    					'label'   => '代表者名',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_tel01',
-    					'label'   => '代表電話番号',
-    					'rules'   => 'trim|required|regex_match[/^[0-9\-]+$/]|max_length[15]'
-    			),
-    			array(
-    					'field'   => 'cm_mail',
-    					'label'   => 'メールアドレス',
-    					'rules'   => 'trim|required|max_length[100]|valid_email'
-    			),
-    			array(
-    					'field'   => 'cm_mailsub',
-    					'label'   => 'メールアドレス(サブ)',
-    					'rules'   => 'trim|max_length[100]|valid_email'
-    			),
-    			array(
-    					'field'   => 'cm_department',
-    					'label'   => '所属部署',
-    					'rules'   => 'trim|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_person01',
-    					'label'   => '担当者姓',
-    					'rules'   => 'trim|required|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_person02',
-    					'label'   => '担当者名',
-    					'rules'   => 'trim|required|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_tel02',
-    					'label'   => '担当者電話番号',
-    					'rules'   => 'trim|required|regex_match[/^[0-9\-]+$/]|max_length[15]'
-    			),
-    			array(
-    					'field'   => 'cm_mobile',
-    					'label'   => '担当者携帯番号',
-    					'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
-    			),
-    			array(
-    					'field'   => 'cm_fax',
-    					'label'   => 'FAX番号',
-    					'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
-    			),
-    			array(
-    					'field'   => 'cm_bank_cd',
-    					'label'   => '銀行CD',
-    					'rules'   => 'trim|max_length[4]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_bank_nm',
-    					'label'   => '銀行名',
-    					'rules'   => 'trim|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_branch_cd',
-    					'label'   => '支店CD',
-    					'rules'   => 'trim|max_length[3]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_branch_nm',
-    					'label'   => '支店名',
-    					'rules'   => 'trim|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_kind',
-    					'label'   => '口座種別(普通/当座)',
-    					'rules'   => 'trim|max_length[1]'
-    			),
-    			array(
-    					'field'   => 'cm_account_no',
-    					'label'   => '口座番号',
-    					'rules'   => 'trim|max_length[10]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_account_nm',
-    					'label'   => '口座名義',
-    					'rules'   => 'trim|required|max_length[48]|single_eisukana'
-    					//'rules'   => 'trim|required|max_length[48]|single_katakana'
-    			),
-    			array(
-    					'field'   => 'cm_memo',
-    					'label'   => '備考',
-    					'rules'   => 'trim|max_length[1000]'
-    			),
-    			array(
-    					'field'   => 'cm_memo_iv',
-    					'label'   => '請求書：備考',
-    					'rules'   => 'trim|max_length[100]'
-    			),
+        $rule_set = array(
+                array(
+                        'field'   => 'cm_status',
+                        'label'   => 'ステータス選択',
+                        'rules'   => 'trim|required|max_length[2]'
+                ),
+                array(
+                        'field'   => 'cm_yayoi_name',
+                        'label'   => '弥生名称',
+                        'rules'   => 'trim|required|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_company',
+                        'label'   => '会社名',
+                        'rules'   => 'trim|required|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_company_kana',
+                        'label'   => '会社名全角カナ',
+                        'rules'   => 'trim|required|max_length[4]|katakana'
+                ),
+                array(
+                        'field'   => 'cm_zip01',
+                        'label'   => '郵便番号（3ケタ）',
+                        'rules'   => 'trim|required|exact_length[3]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_zip02',
+                        'label'   => '郵便番号（4ケタ）',
+                        'rules'   => 'trim|required|exact_length[4]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_pref',
+                        'label'   => '都道府県',
+                        'rules'   => 'trim|required|max_length[4]'
+                ),
+                array(
+                        'field'   => 'cm_addr01',
+                        'label'   => '市区町村',
+                        'rules'   => 'trim|required|max_length[100]'
+                ),
+                array(
+                        'field'   => 'cm_addr02',
+                        'label'   => '町名・番地',
+                        'rules'   => 'trim|required|max_length[100]'
+                ),
+                array(
+                        'field'   => 'cm_buil',
+                        'label'   => 'ビル・マンション名など',
+                        'rules'   => 'trim|max_length[100]'
+                ),
+                array(
+                        'field'   => 'cm_president01',
+                        'label'   => '代表者姓',
+                        'rules'   => 'trim|required|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_president02',
+                        'label'   => '代表者名',
+                        'rules'   => 'trim|required|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_tel01',
+                        'label'   => '代表電話番号',
+                        'rules'   => 'trim|required|regex_match[/^[0-9\-]+$/]|max_length[15]'
+                ),
+                array(
+                        'field'   => 'cm_mail',
+                        'label'   => 'メールアドレス',
+                        'rules'   => 'trim|required|max_length[100]|valid_email'
+                ),
+                array(
+                        'field'   => 'cm_mailsub',
+                        'label'   => 'メールアドレス(サブ)',
+                        'rules'   => 'trim|max_length[100]|valid_email'
+                ),
+                array(
+                        'field'   => 'cm_department',
+                        'label'   => '所属部署',
+                        'rules'   => 'trim|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_person01',
+                        'label'   => '担当者姓',
+                        'rules'   => 'trim|required|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_person02',
+                        'label'   => '担当者名',
+                        'rules'   => 'trim|required|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_tel02',
+                        'label'   => '担当者電話番号',
+                        'rules'   => 'trim|required|regex_match[/^[0-9\-]+$/]|max_length[15]'
+                ),
+                array(
+                        'field'   => 'cm_mobile',
+                        'label'   => '担当者携帯番号',
+                        'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
+                ),
+                array(
+                        'field'   => 'cm_fax',
+                        'label'   => 'FAX番号',
+                        'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
+                ),
+                array(
+                        'field'   => 'cm_bank_cd',
+                        'label'   => '銀行CD',
+                        'rules'   => 'trim|max_length[4]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_bank_nm',
+                        'label'   => '銀行名',
+                        'rules'   => 'trim|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_branch_cd',
+                        'label'   => '支店CD',
+                        'rules'   => 'trim|max_length[3]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_branch_nm',
+                        'label'   => '支店名',
+                        'rules'   => 'trim|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_kind',
+                        'label'   => '口座種別(普通/当座)',
+                        'rules'   => 'trim|max_length[1]'
+                ),
+                array(
+                        'field'   => 'cm_account_no',
+                        'label'   => '口座番号',
+                        'rules'   => 'trim|max_length[10]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_account_nm',
+                        'label'   => '口座名義',
+                        'rules'   => 'trim|required|max_length[48]|single_eisukana'
+                        //'rules'   => 'trim|required|max_length[48]|single_katakana'
+                ),
+                array(
+                        'field'   => 'cm_memo',
+                        'label'   => '備考',
+                        'rules'   => 'trim|max_length[1000]'
+                ),
+                array(
+                        'field'   => 'cm_memo_iv',
+                        'label'   => '請求書：備考',
+                        'rules'   => 'trim|max_length[100]'
+                ),
 
-    			array(
-    					'field'   => 'cm_company_iv',
-    					'label'   => '会社名',
-    					'rules'   => 'trim|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_zip01_iv',
-    					'label'   => '郵便番号（3ケタ）',
-    					'rules'   => 'trim|exact_length[3]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_zip02_iv',
-    					'label'   => '郵便番号（4ケタ）',
-    					'rules'   => 'trim|exact_length[4]|is_numeric'
-    			),
-    			array(
-    					'field'   => 'cm_pref_iv',
-    					'label'   => '都道府県',
-    					'rules'   => 'trim|max_length[4]'
-    			),
-    			array(
-    					'field'   => 'cm_addr01_iv',
-    					'label'   => '市区町村',
-    					'rules'   => 'trim|max_length[100]'
-    			),
-    			array(
-    					'field'   => 'cm_addr02_iv',
-    					'label'   => '町名・番地',
-    					'rules'   => 'trim|max_length[100]'
-    			),
-    			array(
-    					'field'   => 'cm_buil_iv',
-    					'label'   => 'ビル・マンション名など',
-    					'rules'   => 'trim|max_length[100]'
-    			),
-    			array(
-    					'field'   => 'cm_department_iv',
-    					'label'   => '所属部署',
-    					'rules'   => 'trim|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'cm_person01_iv',
-    					'label'   => '担当者姓',
-    					'rules'   => 'trim|max_length[20]'
-    			),
-    			array(
-    					'field'   => 'cm_person02_iv',
-    					'label'   => '担当者名',
-    					'rules'   => 'trim|max_length[20]'
-    			),
+                array(
+                        'field'   => 'cm_company_iv',
+                        'label'   => '会社名',
+                        'rules'   => 'trim|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_zip01_iv',
+                        'label'   => '郵便番号（3ケタ）',
+                        'rules'   => 'trim|exact_length[3]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_zip02_iv',
+                        'label'   => '郵便番号（4ケタ）',
+                        'rules'   => 'trim|exact_length[4]|is_numeric'
+                ),
+                array(
+                        'field'   => 'cm_pref_iv',
+                        'label'   => '都道府県',
+                        'rules'   => 'trim|max_length[4]'
+                ),
+                array(
+                        'field'   => 'cm_addr01_iv',
+                        'label'   => '市区町村',
+                        'rules'   => 'trim|max_length[100]'
+                ),
+                array(
+                        'field'   => 'cm_addr02_iv',
+                        'label'   => '町名・番地',
+                        'rules'   => 'trim|max_length[100]'
+                ),
+                array(
+                        'field'   => 'cm_buil_iv',
+                        'label'   => 'ビル・マンション名など',
+                        'rules'   => 'trim|max_length[100]'
+                ),
+                array(
+                        'field'   => 'cm_department_iv',
+                        'label'   => '所属部署',
+                        'rules'   => 'trim|max_length[50]'
+                ),
+                array(
+                        'field'   => 'cm_person01_iv',
+                        'label'   => '担当者姓',
+                        'rules'   => 'trim|max_length[20]'
+                ),
+                array(
+                        'field'   => 'cm_person02_iv',
+                        'label'   => '担当者名',
+                        'rules'   => 'trim|max_length[20]'
+                ),
 
-    	);
+        );
 
-    	$this->load->library('form_validation', $rule_set);                     // バリデーションクラス読み込み
+        $this->load->library('form_validation', $rule_set);                     // バリデーションクラス読み込み
     }
 
 }

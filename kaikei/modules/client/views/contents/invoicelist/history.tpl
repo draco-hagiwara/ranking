@@ -33,7 +33,7 @@
   </div>
   <div class="row">
     <label class="col-xs-2 col-md-2 control-label">売上月度</label>
-    <div class="col-xs-10 col-md-10">{$list.iv_salse_yymm}</div>
+    <div class="col-xs-10 col-md-10">{$list.iv_sales_yymm}</div>
   </div>
   <div class="row">
     <label class="col-xs-2 col-md-2 control-label">発行日</label>

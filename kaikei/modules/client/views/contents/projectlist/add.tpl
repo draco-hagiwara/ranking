@@ -35,14 +35,18 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="pj_orders_ymd" class="col-xs-3 col-md-3 control-label">受注年月日<font color=red> *</font></label>
+    <label for="pj_orders_ymd" class="col-xs-6 col-md-3 control-label">受注年月日<font color=red> *</font></label>
     <div class="col-xs-4 col-md-2">
       {form_input('pj_orders_ymd' , set_value('pj_orders_ymd', '') , 'id="mydate3" class="form-control" placeholder="受注年月日"')}
       {if form_error('pj_orders_ymd')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_orders_ymd')}</font></label>{/if}
     </div>
-    <div class="col-md-5 col-md-offset-2">
-      <p class="redText"><small>※入力フォーマット（ yyyy/dd/mm　または　yyyy-dd-mm ）</small></p>
-      {if $err_date==TRUE}<span class="label label-danger">Error : </span><label><font color=red>「契約期間」欄で入力した日付が不整合です。</font></label>{/if}
+    <label for="pj_orders_start" class="col-xs-4 col-md-2 control-label">当初契約開始日</label>
+    <div class="col-xs-4 col-md-2">
+      {form_input('pj_orders_start' , set_value('pj_orders_start', '') , 'id="mydate4" class="form-control" placeholder="契約開始年月日"')}
+      {if form_error('pj_orders_start')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_orders_start')}</font></label>{/if}
+    </div><br>
+    <div class="col-md-5 col-md-offset-3">
+      <p class="redText"><small>※入力フォーマット（ yyyy-dd-mm　または　yyyy/dd/mm ）</small></p>
     </div>
   </div>
   <div class="form-group">
@@ -54,17 +58,16 @@
     <div class="col-xs-4 col-md-2">
       {form_input('pj_end_date' , set_value('pj_end_date', '') , 'id="mydate2" class="form-control" placeholder="終了日"')}
       {if form_error('pj_end_date')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_end_date')}</font></label>{/if}
-    </div>
-    <div class="col-md-5">
-      <p class="redText"><small>※入力フォーマット（ yyyy/dd/mm　または　yyyy-dd-mm ）</small></p>
+    </div><br>
+    <div class="col-md-5 col-md-offset-3">
+      <p class="redText"><small>※入力フォーマット（ yyyy-dd-mm　または　yyyy/dd/mm ）</small></p>
       {if $err_date==TRUE}<span class="label label-danger">Error : </span><label><font color=red>「契約期間」欄で入力した日付が不整合です。</font></label>{/if}
     </div>
   </div>
-
   <div class="form-group">
     <label for="pj_renew" class="col-xs-3 col-md-3 control-label">契約自動延長有無</label>
     <div class="col-md-2">
-      <label>{form_checkbox('pj_renew_chk','1',"{if $renew==1}1{else}0{/if}")}契約延長する</label>
+      <label>{form_checkbox('pj_renew_chk','1',"{if $renew==1}1{else}0{/if}")}契約延長する　⇒⇒</label>
     </div>
     <div class="col-xs-2 col-md-1">
       {form_input('pj_renew_mm' , set_value('pj_renew_mm', $renew_mm) , 'class="form-control"')}
@@ -178,6 +181,28 @@
       {if form_error('pj_salesman')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_salesman')}</font></label>{/if}
     </div>
   </div>
+
+
+  <hr>
+
+  <div class="form-group">
+    <label for="pj_paycal" class="col-md-3 control-label">紹介料計算情報設定</label>
+    <div class="col-md-2">
+      固定金額：{form_input('pj_paycal_fix' , set_value('pj_paycal_fix', '') , 'class="form-control" placeholder="固定金額"')}
+      {if form_error('pj_paycal_fix')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_paycal_fix')}</font></label>{/if}
+    </div>
+    <div class="col-md-2">
+      料率：{form_input('pj_paycal_rate' , set_value('pj_paycal_rate', '') , 'class="form-control" placeholder="料率"')}
+      {if form_error('pj_paycal_rate')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_paycal_rate')}</font></label>{/if}
+    </div>
+    <div class="col-md-4">
+      ⇒⇒　<u><font color=blue>固定金額</font>　+（<font color=blue> 料率</font>　×　売上高 ）</u>
+    </div>
+  </div>
+
+  <hr>
+
+
   <div class="form-group">
     <label for="pj_memo" class="col-sm-3 control-label">備　　考</label>
     <div class="col-md-8">
@@ -247,6 +272,15 @@ $('#mydate2').datepicker({
   clearBtn: true
 });
 $('#mydate3').datepicker({
+  format: "yyyy-mm-dd",
+  //language: "ja",
+  daysOfWeekHighlighted: "0",
+  todayBtn: "linked",
+  autoclose: true,
+  orientation: "bottom auto",
+  clearBtn: true
+});
+$('#mydate4').datepicker({
   format: "yyyy-mm-dd",
   //language: "ja",
   daysOfWeekHighlighted: "0",

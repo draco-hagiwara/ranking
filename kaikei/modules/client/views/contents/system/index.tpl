@@ -5,11 +5,12 @@
 {* ヘッダー部分　END *}
 
 <div class="jumbotron">
-  <h3>システム管理　　<span class="label label-danger">バックアップ</span></h3>
+  <h3>システム管理</h3>
 </div>
 
+<p class="bg-success">　処理が完了しました。</p>
 
-
+<br><br>
 {* フッター部分　START *}
     <!-- Bootstrapのグリッドシステムclass="row"で終了 -->
     </div>

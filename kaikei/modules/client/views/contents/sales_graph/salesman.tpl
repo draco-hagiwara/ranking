@@ -32,7 +32,7 @@ var SalesChart01 = new Chart(ctx01, {
 		{foreach from=$y_data item=ydata name=mycnt}
 
 		        {
-		            label: "{$salse_name[$smarty.foreach.mycnt.index]}",
+		            label: "{$sales_name[$smarty.foreach.mycnt.index]}",
 		            fill: false,
 		            backgroundColor: "rgba({$line_color_r[$smarty.foreach.mycnt.index]}, {$line_color_g[$smarty.foreach.mycnt.index]}, {$line_color_b[$smarty.foreach.mycnt.index]}, 0.2)",
 		            borderColor : "rgba({$line_color_r[$smarty.foreach.mycnt.index]}, {$line_color_g[$smarty.foreach.mycnt.index]}, {$line_color_b[$smarty.foreach.mycnt.index]}, 1)",
@@ -68,7 +68,7 @@ var SalesChart01 = new Chart(ctx01, {
                    //},
                    //max: 3000000,
                    min: 0,
-                   stepSize: 500000,
+                   stepSize: 2500000,
                 }
              }]
         }
@@ -90,7 +90,7 @@ var SalesChart01 = new Chart(ctx01, {
       </thead>
 
       <tbody>
-      {foreach from=$salse_name item=name_data name=mycnt}
+      {foreach from=$sales_name item=name_data name=mycnt}
         <tr>
           <td>
             ■ {$name_data}

@@ -26,8 +26,8 @@
     <div class="col-md-8">{$info.iv_slip_no}</div>
   </div>
   <div class="form-group">
-    <label for="iv_salse_yymm" class="col-xs-2 col-md-2 control-label">売上月度</label>
-    <div class="col-md-8">{$info.iv_salse_yymm}</div>
+    <label for="iv_sales_yymm" class="col-xs-2 col-md-2 control-label">売上月度</label>
+    <div class="col-md-8">{$info.iv_sales_yymm}</div>
   </div>
 
   {if $info.iv_status==0}

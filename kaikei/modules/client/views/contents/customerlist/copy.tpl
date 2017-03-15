@@ -23,13 +23,20 @@
       {form_dropdown('cm_salesman', $options_cm_salesman, set_value('cm_salesman', $info.cm_salesman))}
     </div>
   </div>
+
   <div class="form-group">
-    <label for="cm_yayoi_cd" class="col-xs-3 col-md-3 control-label">顧客コード<font color=red> *</font></label>
-    <div class="col-xs-2 col-md-2">
-      {form_input('cm_yayoi_cd' , set_value('cm_yayoi_cd', $info.cm_yayoi_cd) , 'class="form-control" placeholder="顧客コードを入力"')}
-      {if form_error('cm_yayoi_cd')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_yayoi_cd')}</font></label>{/if}
+    <label for="cm_agency_flg" class="col-xs-3 col-md-3 control-label">代理店　有無</label>
+    <div class="col-xs-4 col-md-2 btn-lg">
+      {form_dropdown('cm_agency_flg', $options_cm_agency_flg, set_value('cm_agency_flg', $info.cm_agency_flg))}
     </div>
   </div>
+  <div class="form-group">
+    <label for="cm_agency_seq" class="col-xs-3 col-md-3 control-label">代理店　選択</label>
+    <div class="col-xs-4 col-md-4 btn-lg">
+      {form_dropdown('cm_agency_seq', $options_cm_agency_seq, set_value('cm_agency_seq', $info.cm_agency_seq))}
+    </div>
+  </div>
+
   <div class="form-group">
     <label for="cm_yayoi_name" class="col-md-3 control-label">弥生名称<font color=red> *</font></label>
     <div class="col-md-8">
@@ -45,10 +52,13 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_company_kana" class="col-md-3 control-label">会社名カナ</label>
-    <div class="col-md-8">
+    <label for="cm_company_kana" class="col-md-3 control-label">会社名全角カナ（弥生）<font color=red> *</font></label>
+    <div class="col-md-2">
       {form_input('cm_company_kana' , set_value('cm_company_kana', $info.cm_company_kana) , 'class="form-control" placeholder="会社名カナを入力してください。max.50文字"')}
       {if form_error('cm_company_kana')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_company_kana')}</font></label>{/if}
+    </div>
+    <div class="col-md-4">
+      <font color=deeppink>※債権データ集計のキーとなります。</font>
     </div>
   </div>
   <div class="form-group">
@@ -187,7 +197,14 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_collect" class="col-sm-3 control-label">回収サイト</label>
+    <label for="cm_collect" class="col-sm-3 control-label">上場有無</label>
+    <div class="col-sm-2 btn-lg">
+      {form_dropdown('cm_pub_company', $options_cm_pub_company, set_value('cm_pub_company', $info.cm_pub_company))}
+      {if form_error('cm_pub_company')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_pub_company')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_collect" class="col-sm-3 control-label">回収サイト<font color=red> *</font></label>
     <div class="col-sm-2 btn-lg">
       {form_dropdown('cm_collect', $options_cm_collect, set_value('cm_collect', $info.cm_collect))}
       {if form_error('cm_collect')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_collect')}</font></label>{/if}
@@ -276,35 +293,35 @@
   </div>
 
   <div class="form-group">
-    <label for="cm_bank_cd" class="col-xs-3 col-md-3 control-label">銀行CD<font color=red> *</font></label>
+    <label for="cm_bank_cd" class="col-xs-3 col-md-3 control-label">銀行CD</label>
     <div class="col-xs-4 col-md-4">
       {form_input('cm_bank_cd' , set_value('cm_bank_cd', $info.cm_bank_cd) , 'class="form-control" placeholder="銀行CDを入力"')}
       {if form_error('cm_bank_cd')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_bank_cd')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_bank_nm" class="col-xs-3 col-md-3 control-label">銀行名<font color=red> *</font></label>
+    <label for="cm_bank_nm" class="col-xs-3 col-md-3 control-label">銀行名</label>
     <div class="col-xs-4 col-md-4">
       {form_input('cm_bank_nm' , set_value('cm_bank_nm', $info.cm_bank_nm) , 'class="form-control" placeholder="銀行名を入力してください"')}
       {if form_error('cm_bank_nm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_bank_nm')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_branch_cd" class="col-xs-3 col-md-3 control-label">支店CD<font color=red> *</font></label>
+    <label for="cm_branch_cd" class="col-xs-3 col-md-3 control-label">支店CD</label>
     <div class="col-xs-4 col-md-4">
       {form_input('cm_branch_cd' , set_value('cm_branch_cd', $info.cm_branch_cd) , 'class="form-control" placeholder="支店CDを入力"')}
       {if form_error('cm_branch_cd')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_branch_cd')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_branch_nm" class="col-xs-3 col-md-3 control-label">支店名<font color=red> *</font></label>
+    <label for="cm_branch_nm" class="col-xs-3 col-md-3 control-label">支店名</label>
     <div class="col-xs-4 col-md-4">
       {form_input('cm_branch_nm' , set_value('cm_branch_nm', $info.cm_branch_nm) , 'class="form-control" placeholder="支店名を入力してください"')}
       {if form_error('cm_branch_nm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_branch_nm')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_kind" class="col-sm-3 control-label">口座種別選択<font color=red> *</font></label>
+    <label for="cm_kind" class="col-sm-3 control-label">口座種別選択</label>
     <div class="col-sm-2 btn-lg">
       {form_dropdown('cm_kind', $options_cm_kind, set_value('cm_kind', $info.cm_kind))}
       {if form_error('cm_kind')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_kind')}</font></label>{/if}

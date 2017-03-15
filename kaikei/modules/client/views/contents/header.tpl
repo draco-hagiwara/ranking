@@ -42,7 +42,7 @@
                 <li><a href="/client/customerlist/"><i class="glyphicon glyphicon-list-alt"></i> 顧客一覧</a></li>
                 <li><a href="/client/customerlist/add/"><i class="glyphicon glyphicon-pencil"></i> 顧客登録</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href="/client/data_csvup/customer/"><i class="glyphicon glyphicon-cloud-upload"></i> 顧客データCSV取込</a></li>
+                <li><a href="/client/data_csvup/customer/"><i class="glyphicon glyphicon-duplicate"></i> 顧客データCSV</a></li>
               </ul>
             </li>
             <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-list-alt"></i> 受注案件<b class="caret"></b></a>
@@ -59,33 +59,37 @@
                 <li><a href="/client/invo_create_fix/"><i class="glyphicon glyphicon-save-file"></i> 請求書 データ作成</a></li>
               </ul>
             </li>
-            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-stats"></i> 売上・債権データ<b class="caret"></b></a>
+            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-stats"></i> 売上情報<b class="caret"></b></a>
               <ul class="dropdown-menu right">
-                <li><a href="/client/saleslist/"><i class="glyphicon glyphicon-usd"></i> 売上データ一覧</a></li>
-                <li><a href="/client/receivablelist/"><i class="glyphicon glyphicon-usd"></i> 債権データ一覧</a></li>
+                <li><a href="/client/saleslist/"><i class="glyphicon glyphicon-yen"></i> 売上情報一覧</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="/client/sales_graph/monthly/"><i class="glyphicon glyphicon-signal"></i> 月次売上表</a></li>
                 <li><a href="/client/sales_graph/salesman/"><i class="glyphicon glyphicon-signal"></i> 担当営業別売上表</a></li>
-              </ul>
-            </li>
-            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-time"></i> その他<b class="caret"></b></a>
-              <ul class="dropdown-menu right">
-                <li><a href="/client/sales_create/"><i class="glyphicon glyphicon-yen"></i> 債権＆売上データ作成</a></li>
+                <li><a href="/client/sales_graph/accounting/"><i class="glyphicon glyphicon-signal"></i> 課金方式別売上表</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href="/client/receivable/create/"><i class="glyphicon glyphicon-piggy-bank"></i> 仕訳データ作成</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="/client/data_csvup/receive/"><i class="glyphicon glyphicon-cloud-upload"></i> 入金データ取込</a></li>
+                <li><a href="/client/sales_create/"><i class="glyphicon glyphicon-save-file"></i> 売上 データ作成</a></li>
               </ul>
             </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-wrench"></i> システム設定<b class="caret"></b></a>
+            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-barcode"></i> 支払情報<b class="caret"></b></a>
+              <ul class="dropdown-menu right">
+                <li><a href="/client/shokailist/"><i class="glyphicon glyphicon-user"></i> 支払先情報一覧</a></li>
+                <li><a href="/client/shokailist/add/"><i class="glyphicon glyphicon-pencil"></i> 支払先情報登録</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="/client/shokaifee_create/"><i class="glyphicon glyphicon-usd"></i> 紹介料計算</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="/client/shokaifeelist/"><i class="glyphicon glyphicon-yen"></i> 支払紹介料一覧</a></li>
+              </ul>
+            </li>
+            <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-wrench"></i> システム管理<b class="caret"></b></a>
               <ul class="dropdown-menu right">
                 <li><a href="/client/accountlist/"><i class="glyphicon glyphicon-list-alt"></i> アカウント一覧</a></li>
                 <li><a href="/client/accountlist/add/"><i class="glyphicon glyphicon-pencil"></i> アカウント登録</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="/client/system/backup/"><i class="glyphicon glyphicon-floppy-open"></i> 手動バックアップ</a></li>
                 <li><a href="/client/system/sess_destroy/"><i class="glyphicon glyphicon-trash"></i> セッション削除</a></li>
+                <li><a href="/client/system/memcached_delete/"><i class="glyphicon glyphicon-trash"></i> MEMキャッシュ削除</a></li>
               </ul>
             </li>
             <li class="active"><a href="/client/login/logout/"><i class="glyphicon glyphicon-log-out"></i> ログアウト</a></li>
@@ -106,29 +110,18 @@
                 <li><a href="/client/customerlist/"><i class="glyphicon glyphicon-list-alt"></i> 顧客一覧</a></li>
                 <li><a href="/client/customerlist/add/"><i class="glyphicon glyphicon-pencil"></i> 顧客登録</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href="/client/data_csvup/customer/"><i class="glyphicon glyphicon-cloud-upload"></i> 顧客データCSV取込</a></li>
+                <li><a href="/client/data_csvup/customer/"><i class="glyphicon glyphicon-cloud-upload"></i> 顧客データCSV</a></li>
               </ul>
             </li>
-            <li class="active"><a href="/client/projectlist/"><i class="glyphicon glyphicon-list-alt"></i> 受注（案件）一覧</a></li>
+            <li class="active"><a href="/client/projectlist/"><i class="glyphicon glyphicon-list-alt"></i> 受注案件一覧</a></li>
             <li class="active"><a href="/client/invoicelist/"><i class="glyphicon glyphicon-list-alt"></i> 請求書一覧</a></li>
-            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-stats"></i> 売上・債権データ<b class="caret"></b></a>
+
+            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-stats"></i> 売上情報<b class="caret"></b></a>
               <ul class="dropdown-menu right">
-                <li><a href="/client/saleslist/"><i class="glyphicon glyphicon-usd"></i> 売上データ一覧</a></li>
-                <li><a href="/client/receivablelist/"><i class="glyphicon glyphicon-usd"></i> 債権データ一覧</a></li>
+                <li><a href="/client/saleslist/"><i class="glyphicon glyphicon-yen"></i> 売上データ一覧</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="/client/sales_graph/monthly/"><i class="glyphicon glyphicon-signal"></i> 月次売上表</a></li>
                 <li><a href="/client/sales_graph/salesman/"><i class="glyphicon glyphicon-signal"></i> 担当営業別売上表</a></li>
-              </ul>
-            </li>
-            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-time"></i> その他<b class="caret"></b></a>
-              <ul class="dropdown-menu right">
-                <li><a href="/client/data_create/"><i class="glyphicon glyphicon-save-file"></i> 請求書 一括データ作成</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="/client/sales_create/"><i class="glyphicon glyphicon-yen"></i> 債権＆売上データ作成</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="/client/receivable/create/"><i class="glyphicon glyphicon-piggy-bank"></i> 仕訳データ作成</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="/client/data_csvup/receive/"><i class="glyphicon glyphicon-cloud-upload"></i> 入金データ取込</a></li>
               </ul>
             </li>
           </ul>

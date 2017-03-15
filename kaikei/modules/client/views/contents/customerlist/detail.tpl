@@ -58,6 +58,9 @@
       {form_input('cm_company_kana' , set_value('cm_company_kana', $info.cm_company_kana) , 'class="form-control" placeholder="max.4文字"')}
       {if form_error('cm_company_kana')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_company_kana')}</font></label>{/if}
     </div>
+    <div class="col-md-4">
+      <font color=deeppink>※債権データ集計のキーとなります。</font>
+    </div>
   </div>
   <div class="form-group">
     <label for="cm_zip" class="col-xs-3 col-md-3 control-label">郵便番号<font color=red> *</font></label>
@@ -195,7 +198,14 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="cm_collect" class="col-sm-3 control-label">回収サイト</label>
+    <label for="cm_collect" class="col-sm-3 control-label">上場有無</label>
+    <div class="col-sm-2 btn-lg">
+      {form_dropdown('cm_pub_company', $options_cm_pub_company, set_value('cm_pub_company', $info.cm_pub_company))}
+      {if form_error('cm_pub_company')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_pub_company')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cm_collect" class="col-sm-3 control-label">回収サイト<font color=red> *</font></label>
     <div class="col-sm-2 btn-lg">
       {form_dropdown('cm_collect', $options_cm_collect, set_value('cm_collect', $info.cm_collect))}
       {if form_error('cm_collect')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cm_collect')}</font></label>{/if}

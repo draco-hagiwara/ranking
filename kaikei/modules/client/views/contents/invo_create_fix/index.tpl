@@ -8,6 +8,8 @@
 {* ヘッダー部分　END *}
 
 <H3><p class="bg-success">　　請求書データ　一括 or 個別 作成</p></H3>
+
+{$mess}
 <hr>
 
 {form_open('invo_create_fix/fix_cal/' , 'name="createForm" class="form-horizontal h-adr"')}
@@ -278,8 +280,83 @@ $('#mydate3').datepicker({
 });
 </script>
 
+<!-- </form> -->
+
+<hr>
+
+{form_open('invo_create_fix/paydate_chg/' , 'name="createForm" class="form-horizontal h-adr"')}
+
+  <div class="form-group form-group-lg">
+    <label for="iv_pay_date" class="col-sm-3 control-label">【 振込期日の一括変更 】</label>
+    <div class="col-sm-2 input-lg">
+      {form_dropdown('iv_issue_yymm', $options_date_res, set_value('iv_issue_yymm', ''))}
+      {if form_error('iv_issue_yymm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_issue_yymm')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="iv_pay_date" class="col-xs-3 col-md-3 control-label">変更前→変更後 日付指定<font color=red> *</font></label>
+    <div class="col-xs-4 col-sm-2">
+      {form_input('iv_pay_date01' , set_value('iv_pay_date01', '') , 'id="mydate40" class="form-control" placeholder="yyyy-mm-dd"')}
+      {if form_error('iv_pay_date01')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_pay_date01')}</font></label>{/if}
+    </div>
+    <div class="col-xs-2 col-sm-1 text-center">⇒ ⇒ ⇒</div>
+    <div class="col-xs-4 col-sm-2">
+      {form_input('iv_pay_date02' , set_value('iv_pay_date02', '') , 'id="mydate41" class="form-control" placeholder="yyyy-mm-dd"')}
+      {if form_error('iv_pay_date02')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_pay_date02')}</font></label>{/if}
+    </div>
+    <div class="col-sm-1 col-sm-offset-1">
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal40">変　更</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-xs-9 col-md-9 col-sm-offset-3">
+      <p class="text-danger">※ステータスが「未発行」の請求書が対象です。</p>
+    </div>
+  </div>
+
+  <br>
+  <!-- Button trigger modal -->
+  <div class="modal fade" id="myModal40" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">振込期日の一括変更</h4>
+        </div>
+        <div class="modal-body">
+          <p>変更しますか。&hellip;</p>
+        </div>
+        <div class="modal-footer">
+          <button type='submit' name='_submit' value='save_all' class="btn btn-sm btn-primary">O  K</button>
+          <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+{form_close()}
+
+<script type="text/javascript">
+$('#mydate40').datepicker({
+  format: "yyyy-mm-dd",
+  daysOfWeekHighlighted: "0",
+  todayBtn: "linked",
+  autoclose: true,
+  orientation: "bottom auto",
+  clearBtn: true
+});
+$('#mydate41').datepicker({
+  format: "yyyy-mm-dd",
+  daysOfWeekHighlighted: "0",
+  todayBtn: "linked",
+  autoclose: true,
+  orientation: "bottom auto",
+  clearBtn: true
+});
+</script>
 
 <!-- </form> -->
+
 
 <br><br>
 {* フッター部分　START *}

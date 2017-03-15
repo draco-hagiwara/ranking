@@ -127,8 +127,8 @@ function fmSubmit(formName, url, method, num) {
               {*<button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/invo_create/invoice_cm/', 'POST', '{$cm.cm_seq}', 'chg_seq');">請求書作成</button>*}
             {/if}
 
-            <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/customerlist/detail/', 'POST', '{$cm.cm_seq}', 'chg_seq');">編　集</button>
-            {*<button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/customerlist/cp/', 'POST', '{$cm.cm_seq}', 'chg_seq');">コピー</button>*}
+            <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/customerlist/detail/', 'POST', '{$cm.cm_seq}', 'chg_seq');">編　集</button><br>
+            <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/customerlist/cp/', 'POST', '{$cm.cm_seq}', 'chg_seq');">複　写</button>
           </td>
         </tr>
       </tbody>

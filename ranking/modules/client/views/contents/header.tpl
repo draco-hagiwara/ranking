@@ -27,7 +27,7 @@
       </ul>
 
     {if $login_chk==TRUE}
-      {if $mem_Type==1}{*管理者用メニュー*}
+      {if (($mem_Type==1) OR ($mem_Type==9))}{*管理者用メニュー*}
         <ul class="list-inline text-right"></ul>
         <nav class="navbar navbar-inverse">
         <div class="navbar-header">

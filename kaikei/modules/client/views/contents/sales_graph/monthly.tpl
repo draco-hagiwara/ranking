@@ -63,7 +63,7 @@ var SalesChart01 = new Chart(ctx01, {
                    //},
                    //max: 3000000,
                    min: 0,
-                   stepSize: 1000000,
+                   stepSize: 5000000,
                 }
              }]
         }

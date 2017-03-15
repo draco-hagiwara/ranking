@@ -20,10 +20,10 @@ class Login extends MY_Controller
     public function index()
     {
 
-    	$this->_set_validation();												// バリデーション設定
+        $this->_set_validation();                                               // バリデーション設定
 
-    	$this->smarty->assign('err_mess', '');
-    	$this->view('login/index.tpl');
+        $this->smarty->assign('err_mess', '');
+        $this->view('login/index.tpl');
 
     }
 
@@ -32,7 +32,7 @@ class Login extends MY_Controller
     {
 
        // バリデーション・チェック
-    	$this->_set_validation();												// バリデーション設定
+        $this->_set_validation();                                               // バリデーション設定
         if ($this->form_validation->run() == FALSE) {
             $this->smarty->assign('err_mess', '');
             $this->view('login/index.tpl');

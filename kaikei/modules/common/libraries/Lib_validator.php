@@ -15,7 +15,7 @@ class Lib_validator
      */
     public static function checkAlphanumeric($arg)
     {
-        if(CommonValidator::checkString($arg) && preg_match('/^[a-zA-Z0-9]+$/', $arg)){
+        if(Lib_validator::checkString($arg) && preg_match('/^[a-zA-Z0-9]+$/', $arg)){
             return true;
         } else {
             return false;
@@ -50,7 +50,7 @@ class Lib_validator
      */
     public static function checkDigit($arg)
     {
-        if (CommonValidator::checkString($arg) && ctype_digit((string)$arg)) {
+        if (Lib_validator::checkString($arg) && ctype_digit((string)$arg)) {
             return true;
         } else {
             return false;
@@ -66,7 +66,7 @@ class Lib_validator
      */
     public static function checkInt($arg)
     {
-        if (CommonValidator::checkString($arg) && is_numeric((string)$arg)) {
+        if (Lib_validator::checkString($arg) && is_numeric((string)$arg)) {
             $arg += 0;
             if (is_int($arg)) {
                 return true;
@@ -86,15 +86,15 @@ class Lib_validator
      */
     public static function checkDecimal($arg, $len)
     {
-    	if (CommonValidator::checkString($arg)) {
-    		if (preg_match( '/^[0-9]+(.[0-9]{1,' . $len . '})?$/', $arg )) {
-    			return true;
-    		} else {
-    			return false;
-    		}
-    	} else {
-    		return false;
-    	}
+        if (Lib_validator::checkString($arg)) {
+            if (preg_match( '/^[0-9]+(.[0-9]{1,' . $len . '})?$/', $arg )) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -107,8 +107,8 @@ class Lib_validator
      */
     public static function checkLength($arg, $min, $max = null)
     {
-        if (is_string($arg) && CommonValidator::checkDigit($min) && mb_strlen($arg) >= $min
-        && (is_null($max) || (CommonValidator::checkDigit($max) && mb_strlen($arg) <= $max))){
+        if (is_string($arg) && Lib_validator::checkDigit($min) && mb_strlen($arg) >= $min
+        && (is_null($max) || (Lib_validator::checkDigit($max) && mb_strlen($arg) <= $max))){
             return true;
         } else {
             return false;
@@ -125,8 +125,8 @@ class Lib_validator
      */
     public static function checkRange($arg, $min, $max = null)
     {
-        if (CommonValidator::checkDigit($arg) && CommonValidator::checkDigit($min) && $arg >= $min
-        && (is_null($max) || (CommonValidator::checkDigit($max) && $arg <= $max))){
+        if (Lib_validator::checkDigit($arg) && Lib_validator::checkDigit($min) && $arg >= $min
+        && (is_null($max) || (Lib_validator::checkDigit($max) && $arg <= $max))){
             return true;
         } else {
             return false;
@@ -142,7 +142,7 @@ class Lib_validator
      */
     public static function checkMailAddress($mailAddress)
     {
-        if (CommonValidator::checkString($mailAddress) && preg_match('/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/', $mailAddress)){
+        if (Lib_validator::checkString($mailAddress) && preg_match('/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/', $mailAddress)){
             return true;
         } else {
             return false;
@@ -158,7 +158,7 @@ class Lib_validator
      */
     public static function checkSingleByte($arg)
     {
-        if (CommonValidator::checkString($arg) && preg_match('/^[!-~]+$/i', $arg)) {
+        if (Lib_validator::checkString($arg) && preg_match('/^[!-~]+$/i', $arg)) {
             return true;
         } else {
             return false;
@@ -191,7 +191,7 @@ class Lib_validator
      */
     public static function checkUri($arg)
     {
-        if (CommonValidator::checkString($arg) && preg_match(';^(https?://).+|(mailto:).+@.+;', $arg)) {
+        if (Lib_validator::checkString($arg) && preg_match(';^(https?://).+|(mailto:).+@.+;', $arg)) {
             return true;
         } else {
             return false;
@@ -199,85 +199,84 @@ class Lib_validator
     }
 
 
-
     /**
      * 入力値の整形（変換）
      *
      * @access public
-     * @param    string
-     * @param string
+     * @param  string
+     * @param  string
      * @return string
      *
      *
      */
     public static function convert($str, $val)
     {
-    	if($str == '') {
-    		return '';
-    	}
+        if($str == '') {
+            return '';
+        }
 
-    	switch($val)
-    	{
-    		case 'single': // 半角文字列
-    			return mb_convert_kana($str, 'ras');
-    			break;
-    		case 'double': // 全角文字列
-    			return $val = mb_convert_kana($str, 'ASKV');
-    			break;
-    		case 'hiragana': // ひらがな
-    			return mb_convert_kana($str, 'HVc');
-    			break;
-    		case 'katakana': // 全角カタカナ
-    			return mb_convert_kana($str, 'KVC');
-    			break;
-    		case 'single_katakana': // 半角カタカナ
-    			return mb_convert_kana($str, 'kh');
-    			break;
-    		case 'phone': // 電話番号
-    			$str = mb_convert_kana($str, 'ras');
-    			return str_replace(array('ー','―','‐'), '-', $str);
-    			break;
-    		case 'postal': // 郵便番号
-    			$str = mb_convert_kana($str, 'ras');
-    			$str = str_replace(array('ー','―','‐'), '-', $str);
-    			if(strlen($str) == 7 AND preg_match("/^[0-9]+$/", $str))
-    			{
-    				$str = substr($str, 0, 3) . '-' . substr($str, 3);
-    			}
-    			return $str;
-    			break;
-    		case 'ymd': // 西暦年月日
-    			$str = mb_convert_kana($str, 'ras');
-    			$str = str_replace('/', '-', $str);
-    			if (preg_match('/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/', $str) AND strlen($str) != 10) {
-    				$tmp = explode('-', $str);
-    				return vsprintf("%4d-%02d-%02d", $tmp); // 月日の箇所をゼロ詰めに整形
-    			}
-    			break;
-    		case 'html': // HTMLタグからXSSなどの悪意のあるコードを除外
-    			$CI =& get_instance();
-    			$CI->load->helper('escape_helper'); // escape_helper.php については http://blog.aidream.jp/?p=1479 を参照ください
-    			$clean_html = purify($str);
-    			return ($clean_html == '<p></p>'.PHP_EOL) ? '' : $clean_html; // TinyMCEヘルパを使用している場合の対策
-    			break;
-    	}
+        switch($val)
+        {
+            case 'single': // 半角文字列
+                return mb_convert_kana($str, 'ras');
+                break;
+            case 'double': // 全角文字列
+                return $val = mb_convert_kana($str, 'ASKV');
+                break;
+            case 'hiragana': // ひらがな
+                return mb_convert_kana($str, 'HVc');
+                break;
+            case 'katakana': // 全角カタカナ
+                return mb_convert_kana($str, 'KVC');
+                break;
+            case 'single_katakana': // 半角カタカナ
+                return mb_convert_kana($str, 'kh');
+                break;
+            case 'phone': // 電話番号
+                $str = mb_convert_kana($str, 'ras');
+                return str_replace(array('ー','―','‐'), '-', $str);
+                break;
+            case 'postal': // 郵便番号
+                $str = mb_convert_kana($str, 'ras');
+                $str = str_replace(array('ー','―','‐'), '-', $str);
+                if(strlen($str) == 7 AND preg_match("/^[0-9]+$/", $str))
+                {
+                    $str = substr($str, 0, 3) . '-' . substr($str, 3);
+                }
+                return $str;
+                break;
+            case 'ymd': // 西暦年月日
+                $str = mb_convert_kana($str, 'ras');
+                $str = str_replace('/', '-', $str);
+                if (preg_match('/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/', $str) AND strlen($str) != 10) {
+                    $tmp = explode('-', $str);
+                    return vsprintf("%4d-%02d-%02d", $tmp); // 月日の箇所をゼロ詰めに整形
+                }
+                break;
+            case 'html': // HTMLタグからXSSなどの悪意のあるコードを除外
+                $CI =& get_instance();
+                $CI->load->helper('escape_helper'); // escape_helper.php については http://blog.aidream.jp/?p=1479 を参照ください
+                $clean_html = purify($str);
+                return ($clean_html == '<p></p>'.PHP_EOL) ? '' : $clean_html; // TinyMCEヘルパを使用している場合の対策
+                break;
+        }
     }
 
     /**
      * 半角チェック
      *
      * @access public
-     * @param    string
+     * @param  string
      * @return bool
      *
      */
     public static function single($str)
     {
-    	if ($str == '')
-    	{
-    		return TRUE;
-    	}
-    	return (strlen($str) != mb_strlen($str)) ? FALSE: TRUE;
+        if ($str == '')
+        {
+            return TRUE;
+        }
+        return (strlen($str) != mb_strlen($str)) ? FALSE: TRUE;
     }
 
     // --------------------------------------------------------------------
@@ -286,18 +285,18 @@ class Lib_validator
      * 全角チェック
      *
      * @access public
-     * @param    string
+     * @param  string
      * @return bool
      *
      */
     public static function double($str)
     {
-    	if ($str == '')
-    	{
-    		return TRUE;
-    	}
-    	$ratio = (mb_detect_encoding($str) == 'UTF-8') ? 3 : 2;
-    	return (strlen($str) != mb_strlen($str) * $ratio) ? FALSE : TRUE;
+        if ($str == '')
+        {
+            return TRUE;
+        }
+        $ratio = (mb_detect_encoding($str) == 'UTF-8') ? 3 : 2;
+        return (strlen($str) != mb_strlen($str) * $ratio) ? FALSE : TRUE;
     }
     /*
      // 上記以外の判別方法
@@ -319,18 +318,18 @@ class Lib_validator
      * ひらがな チェック
      *
      * @access public
-     * @param    string
+     * @param  string
      * @return bool
      *
      */
     public static function hiragana($str)
     {
-    	if ($str == '')
-    	{
-    		return TRUE;
-    	}
-    	$str = mb_convert_encoding($str, 'UTF-8');
-    	return ( ! preg_match("/^(?:\xE3\x81[\x81-\xBF]|\xE3\x82[\x80-\x93]|ー)+$/", $str)) ? FALSE : TRUE;
+        if ($str == '')
+        {
+            return TRUE;
+        }
+        $str = mb_convert_encoding($str, 'UTF-8');
+        return ( ! preg_match("/^(?:\xE3\x81[\x81-\xBF]|\xE3\x82[\x80-\x93]|ー)+$/", $str)) ? FALSE : TRUE;
     }
 
     // --------------------------------------------------------------------
@@ -339,18 +338,18 @@ class Lib_validator
      * 全角カタカナ チェック
      *
      * @access public
-     * @param    string
+     * @param  string
      * @return bool
      *
      */
     public static function katakana($str)
     {
-    	if ($str == '')
-    	{
-    		return TRUE;
-    	}
-    	$str = mb_convert_encoding($str, 'UTF-8');
-    	return ( ! preg_match("/^(?:\xE3\x82[\xA1-\xBF]|\xE3\x83[\x80-\xB6]|ー)+$/", $str)) ? FALSE : TRUE;
+        if ($str == '')
+        {
+            return TRUE;
+        }
+        $str = mb_convert_encoding($str, 'UTF-8');
+        return ( ! preg_match("/^(?:\xE3\x82[\xA1-\xBF]|\xE3\x83[\x80-\xB6]|ー)+$/", $str)) ? FALSE : TRUE;
     }
 
     // --------------------------------------------------------------------
@@ -359,35 +358,53 @@ class Lib_validator
      * 半角カタカナ チェック
      *
      * @access public
-     * @param    string
+     * @param  string
      * @return bool
      *
      */
     public static function single_katakana($str)
     {
-    	if ($str == '')
-    	{
-    		return TRUE;
-    	}
-    	$str = mb_convert_encoding($str, 'UTF-8');
-    	return ( ! preg_match("/^(?:\xEF\xBD[\xA1-\xBF]|\xEF\xBE[\x80-\x9F])+$/", $str)) ? FALSE : TRUE;
+        if ($str == '')
+        {
+            return TRUE;
+        }
+        $str = mb_convert_encoding($str, 'UTF-8');
+        return ( ! preg_match("/^(?:\xEF\xBD[\xA1-\xBF]|\xEF\xBE[\x80-\x9F])+$/", $str)) ? FALSE : TRUE;
+    }
+
+    /**
+     * 半角英数記号カナ チェック
+     *
+     * @access public
+     * @param  string
+     * @return bool
+     *
+     */
+    public static function single_eisukana($str)
+    {
+        if ($str == '')
+        {
+            return TRUE;
+        }
+        $str = mb_convert_encoding($str, 'UTF-8');
+        return ( ! preg_match("/^(?:\xEF\xBD[\xA1-\xBF]|\xEF\xBE[\x80-\x9F]|[ -\~]|[()])+$/", $str)) ? FALSE : TRUE;
     }
 
     /**
      * クレジットカード 名義チェック（英字大文字）
      *
      * @access public
-     * @param    string
+     * @param  string
      * @return bool
      *
      */
     public static function creditcard_name($str)
     {
-    	if ($str == '')
-    	{
-    		return TRUE;
-    	}
-    	return ( ! preg_match("/^[A-Z]+[\s|　]+[A-Z]+[\s|　]*[A-Z]+$/", $str)) ? FALSE : TRUE;
+        if ($str == '')
+        {
+            return TRUE;
+        }
+        return ( ! preg_match("/^[A-Z]+[\s|　]+[A-Z]+[\s|　]*[A-Z]+$/", $str)) ? FALSE : TRUE;
     }
 
     // --------------------------------------------------------------------
@@ -396,22 +413,22 @@ class Lib_validator
      * YYYY-MM-DD形式のチェック
      *
      * @access public
-     * @param    string
+     * @param  string
      * @return bool
      *
      */
     public static function ymd($str)
     {
-    	if ($str == '')
-    	{
-    		return TRUE;
-    	}
-    	$tmp = explode('-', $str);
-    	if (count($tmp) != 3) {
-    		return false;
-    	}
-    	$tmp = array_map('intval', $tmp);
-    	return ( ! checkdate($tmp[1], $tmp[2], $tmp[0])) ? FALSE : TRUE;
+        if ($str == '')
+        {
+            return TRUE;
+        }
+        $tmp = explode('-', $str);
+        if (count($tmp) != 3) {
+            return false;
+        }
+        $tmp = array_map('intval', $tmp);
+        return ( ! checkdate($tmp[1], $tmp[2], $tmp[0])) ? FALSE : TRUE;
     }
 
     // --------------------------------------------------------------------
@@ -420,20 +437,20 @@ class Lib_validator
      * 環境依存文字・旧漢字などJISに変換できない文字チェック
      *
      * @access public
-     * @param    string
+     * @param  string
      * @return bool
      *
      */
     public static function jis($str)
     {
-    	if ($str == '')
-    	{
-    		return TRUE;
-    	}
-    	$str = str_replace(array('～', 'ー', '－', '∥', '￠', '￡', '￢'), '', $str);
-    	$str2 = mb_convert_encoding($str, 'iso-2022-jp', $encoding);
-    	$str2 = mb_convert_encoding($str2, $encoding,'iso-2022-jp');
-    	return ($str != $str2) ? FALSE : TRUE;
+        if ($str == '')
+        {
+            return TRUE;
+        }
+        $str = str_replace(array('～', 'ー', '－', '∥', '￠', '￡', '￢'), '', $str);
+        $str2 = mb_convert_encoding($str, 'iso-2022-jp', $encoding);
+        $str2 = mb_convert_encoding($str2, $encoding,'iso-2022-jp');
+        return ($str != $str2) ? FALSE : TRUE;
     }
 
 }

@@ -51,29 +51,29 @@ class MY_Form_validation extends CI_Form_validation {
 
         switch($val)
         {
-            case 'single': // 半角文字列
+            case 'single':                  // 半角文字列
                 return mb_convert_kana($str, 'ras');
                 break;
-            case 'double': // 全角文字列
+            case 'double':                  // 全角文字列
                 return $val = mb_convert_kana($str, 'ASKV');
                 break;
-            case 'hiragana': // ひらがな
+            case 'hiragana':                // ひらがな
                 return mb_convert_kana($str, 'HVc');
                 break;
-            case 'katakana': // 全角カタカナ
+            case 'katakana':                // 全角カタカナ
                 return mb_convert_kana($str, 'KVC');
                 break;
-            case 'single_katakana': // 半角カタカナ
+            case 'single_katakana':         // 半角カタカナ
                 return mb_convert_kana($str, 'kh');
                 break;
-            case 'single_eisukana': // 半角英数字カナ
+            case 'single_eisukana':         // 半角英数字カナ
                 return mb_convert_kana($str, 'kh');
                 break;
-            case 'phone': // 電話番号
+            case 'phone':                   // 電話番号
                 $str = mb_convert_kana($str, 'ras');
                 return str_replace(array('ー','―','‐'), '-', $str);
                 break;
-            case 'postal': // 郵便番号
+            case 'postal':                  // 郵便番号
                 $str = mb_convert_kana($str, 'ras');
                 $str = str_replace(array('ー','―','‐'), '-', $str);
                 if(strlen($str) == 7 AND preg_match("/^[0-9]+$/", $str))
@@ -82,19 +82,19 @@ class MY_Form_validation extends CI_Form_validation {
                 }
                 return $str;
                 break;
-            case 'ymd': // 西暦年月日
+            case 'ymd':                     // 西暦年月日
                 $str = mb_convert_kana($str, 'ras');
                 $str = str_replace('/', '-', $str);
                 if (preg_match('/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/', $str) AND strlen($str) != 10) {
                     $tmp = explode('-', $str);
-                    return vsprintf("%4d-%02d-%02d", $tmp); // 月日の箇所をゼロ詰めに整形
+                    return vsprintf("%4d-%02d-%02d", $tmp);                     // 月日の箇所をゼロ詰めに整形
                 }
                 break;
-            case 'html': // HTMLタグからXSSなどの悪意のあるコードを除外
+            case 'html':                    // HTMLタグからXSSなどの悪意のあるコードを除外
                 $CI =& get_instance();
-                $CI->load->helper('escape_helper'); // escape_helper.php については http://blog.aidream.jp/?p=1479 を参照ください
+                $CI->load->helper('escape_helper');                             // escape_helper.php については http://blog.aidream.jp/?p=1479 を参照ください
                 $clean_html = purify($str);
-                return ($clean_html == '<p></p>'.PHP_EOL) ? '' : $clean_html; // TinyMCEヘルパを使用している場合の対策
+                return ($clean_html == '<p></p>'.PHP_EOL) ? '' : $clean_html; 	// TinyMCEヘルパを使用している場合の対策
                 break;
         }
     }
@@ -228,7 +228,7 @@ class MY_Form_validation extends CI_Form_validation {
             return TRUE;
         }
         $str = mb_convert_encoding($str, 'UTF-8');
-        return ( ! preg_match("/^(?:\xEF\xBD[\xA1-\xBF]|\xEF\xBE[\x80-\x9F]|[ -\~]|[\)])+$/", $str)) ? FALSE : TRUE;
+        return ( ! preg_match("/^(?:\xEF\xBD[\xA1-\xBF]|\xEF\xBE[\x80-\x9F]|[ -\~]|[()])+$/", $str)) ? FALSE : TRUE;
     }
 
     // --------------------------------------------------------------------

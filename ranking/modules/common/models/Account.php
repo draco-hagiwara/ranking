@@ -117,7 +117,7 @@ class Account extends CI_Model
     			  ac_name02,
     			  ac_mail,
     			  ac_lastlogin
-    			FROM mt_account WHERE ac_delflg = 0 AND ac_cl_seq = ' . $set_select['ac_cl_seq'];
+    			FROM mt_account WHERE ac_delflg = 0 AND ac_type != 9 AND ac_cl_seq = ' . $set_select['ac_cl_seq'];
 
     	// WHERE文 作成
 //     	$sql .= ' AND ( ac_name01 LIKE \'%' .     $this->db->escape_like_str($set_select['ac_name01']) . '%\'' .

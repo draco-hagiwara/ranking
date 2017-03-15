@@ -103,8 +103,8 @@ function fmSubmit(formName, url, method, num) {
         <th>請求書</th>
         <th>課 金</th>
         <th>会 社 名 (下段：キーワード)</th>
-        <th>契約期間</th>
         <th>固定金額</th>
+        <th>契約期間</th>
         <th>担当営業</th>
         <th></th>
       </tr>
@@ -148,14 +148,14 @@ function fmSubmit(formName, url, method, num) {
             [{$pj.pj_cm_seq}]{$pj.pj_cm_company}<br>> {$pj.pj_keyword}
           </td>
           <td>
-            {$pj.pj_start_date}<br> ～ {if $pj.pj_end_date<=$chk_end}<font color="red">{$pj.pj_end_date}</font>{else}{$pj.pj_end_date}{/if}
-          </td>
-          <td>
             {$pj.pj_billing|number_format} 円
           </td>
           <td>
+            {$pj.pj_start_date}<br> ～ {if $pj.pj_end_date<=$chk_end}<font color="red">{$pj.pj_end_date}</font>{else}{$pj.pj_end_date}{/if}
+          </td>
+          <td>
             {$options_pj_salesman[$pj.pj_salesman]}
-            <br>{if $pj.pj_renew_chk==1}自動延長{/if}
+            <br>{if $pj.pj_renew_chk==1}契約自延{/if}
           </td>
           <td class="text-right">
             {*<button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/projectlist/detail/', 'POST', '{$pj.pj_seq}', 'chg_seq');">個別請求書作成</button>*}

@@ -17,10 +17,10 @@
           {form_input('sa_slip_no' , set_value('sa_slip_no', {$seach_sa_slip_no}) , 'class="form-control"')}
           {if form_error('sa_slip_no')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('sa_slip_no')}</font></label>{/if}
         </td>
-        <td class="col-md-1">顧客CD</td>
+        <td class="col-md-1">キーワード</td>
         <td class="col-md-2 input-group-sm">
-          {form_input('sa_cm_seq' , set_value('sa_cm_seq', {$seach_sa_cm_seq}) , 'class="form-control"')}
-          {if form_error('sa_cm_seq')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('sa_cm_seq')}</font></label>{/if}
+          {form_input('sa_keyword' , set_value('sa_keyword', {$seach_sa_keyword}) , 'class="form-control"')}
+          {if form_error('sa_keyword')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('sa_keyword')}</font></label>{/if}
         </td>
         <td class="col-md-1">会 社 名</td>
         <td class="col-md-2 input-group-sm">
@@ -48,12 +48,16 @@
         <td class="col-md-2  btn-md">
           {form_dropdown('sa_collect', $options_sa_collect, set_value('sa_collect', {$seach_sa_collect}))}
         </td>
+        <td class="col-md-1">課金方式</td>
+        <td class="col-md-2  btn-md">
+          {form_dropdown('sa_accounting', $options_sa_accounting, set_value('sa_accounting', {$seach_sa_accounting}))}
+        </td>
+      </tr>
+      <tr>
         <td class="col-md-1">表示方法</td>
         <td class="col-md-2  btn-md">
           {form_dropdown('displine', $options_displine, set_value('displine', {$seach_displine}))}
         </td>
-      </tr>
-      <tr>
         <td class="col-md-1">並び替え</td>
         <td class="col-md-2  btn-md">
           {form_dropdown('orderid', $options_orderid, set_value('orderid', {$seach_orderid}))}
