@@ -10,7 +10,6 @@ class Login extends MY_Controller
     {
         parent::__construct();
 
-//         if ($_SESSION['c_login'] == TRUE)
         if (isset($_SESSION['c_login']) && $_SESSION['c_login'] == TRUE)
         {
         	$this->smarty->assign('login_chk', TRUE);
@@ -18,14 +17,23 @@ class Login extends MY_Controller
             $this->smarty->assign('mem_Type',  $_SESSION['c_memType']);
             $this->smarty->assign('mem_Grp',   $_SESSION['c_memGrp']);
             $this->smarty->assign('mem_Name',  $_SESSION['c_memName']);
+
+            $this->smarty->assign('mem_Kw',    $_SESSION['c_memKw']);
+            $this->smarty->assign('mem_Gp',    $_SESSION['c_memGp']);
+            $this->smarty->assign('mem_Tg',    $_SESSION['c_memTg']);
+
         	$this->view('top/index.tpl');
         } else {
-
         	$this->smarty->assign('login_chk', FALSE);
         	$this->smarty->assign('mem_Seq',   "");
         	$this->smarty->assign('mem_Type',  "");
         	$this->smarty->assign('mem_Grp',   "");
         	$this->smarty->assign('mem_Name',  "");
+
+        	$this->smarty->assign('mem_Kw',    "");
+        	$this->smarty->assign('mem_Gp',    "");
+        	$this->smarty->assign('mem_Tg',    "");
+
         	$this->smarty->assign('err_mess',  '');
         	$this->view('login/index.tpl');
         }
@@ -55,12 +63,14 @@ class Login extends MY_Controller
             $login_member = $this->config->item('LOGIN_CLIENT');
 
             // ログインID＆パスワードチェック
-            $this->load->model('comm_auth', 'auth', TRUE);
+            $this->load->library('lib_auth');
+//             $this->load->model('comm_auth', 'auth', TRUE);
 
             $loginid  = $this->input->post('cl_id');
             $password = $this->input->post('cl_pw');
 
-            $err_mess = $this->auth->check_Login($loginid, $password, $login_member);
+//             $err_mess = $this->auth->check_Login($loginid, $password, $login_member);
+            $err_mess = $this->lib_auth->check_Login($loginid, $password, $login_member);
             if (isset($err_mess)) {
                 // 入力エラー
                 $this->smarty->assign('err_mess', $err_mess);
@@ -81,8 +91,10 @@ class Login extends MY_Controller
     public function logout()
     {
         // SESSION クリア
-        $this->load->model('comm_auth', 'auth', TRUE);
-        $this->auth->logout('client');
+    	$this->load->library('lib_auth');
+//         $this->load->model('comm_auth', 'auth', TRUE);
+//         $this->auth->logout('client');
+        $this->lib_auth->logout('client');
 
         // TOPへリダイレクト
         redirect(base_url());

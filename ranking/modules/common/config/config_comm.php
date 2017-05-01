@@ -15,12 +15,39 @@ $config['LOGIN_ADMIN']    = 'admin';                      // 管理者
 // SEOユーザ種類
 $config['ACCOUNT_AC_TYPE'] =
 array(
-		""  => " -- 選択してください -- ",
-		"0" => "営業",
-		"1" => "管理者（営業）",
-		"2" => "利用者",
+		"0" => "利用者",
+		"1" => "管理者",
+		//"9" => "クライアント管理者",
 );
 
+
+
+
+/*
+ * 検索結果取得API 関連パラメタ
+ */
+$config['API_URL'] = 'http://www.api-platform.info/SERPs.php';				// URL
+$config['API_CODE'] = 'HI14tkWzAUZUj0DMwHpN53jJ7TehFg2h';					// 固定
+$config['API_SEARCH_ENGINE'] =												// 検索エンジン
+array(
+		"0" => "google",
+		"1" => "yahoo",
+);
+$config['API_DEVICE'] =														// 取得対象デバイス
+array(
+		"0" => "pc",
+		"1" => "mobile",
+);
+$config['API_PAGE'] = 														// 取得ページ数 x 10
+array(
+		"0" => 10,
+		"1" => 20,
+		"2" => 30,
+);
+
+
+$config['API_CASHE'] = 0;													// キャッシュを使用する場合の有効範囲（秒）・デフォルト=0
+$config['API_DEBAG'] = 0;													// 1=デバッグ（var_dumpで配列出力）
 
 
 
@@ -54,9 +81,23 @@ array(
 
 
 
+
+
+// キーワード情報：受注データCSVアップロード
+$config['PROJECT_CSV_UPLOAD'] =
+array(
+		"upload_path"   => '../user_data/csv_up/',                    // ドキュメントルートからの相対パス
+		"allowed_types" => 'csv',                                     // 許容するファイルのMIMEタイプを設定
+		"overwrite"     => TRUE,                                      // ファイルは上書き
+		"max_size"      => '10000',                                   // 許容する最大ファイルサイズをKB単位で設定
+);
+
+
+
+
 // Pagination 設定:1ページ当たりの表示件数
 // ※ ～/system/libraries/Pagination.php に不具合あり
-$config['PAGINATION_PER_PAGE'] = '5';
+$config['PAGINATION_PER_PAGE'] = '10';
 
 
 /* End of file config_comm.php */

@@ -35,9 +35,9 @@ class Top extends MY_Controller
 
         // 受注案件データ数
         $this->load->model('Project', 'pj', TRUE);
-        $_pj_cnt_enable  = $this->pj->get_pj_cnt(0, $_SESSION['c_memGrp'], 'seorank');
-        $_pj_cnt_pause   = $this->pj->get_pj_cnt(1, $_SESSION['c_memGrp'], 'seorank');
-        $_pj_cnt_disable = $this->pj->get_pj_cnt(2, $_SESSION['c_memGrp'], 'seorank');
+        $_pj_cnt_enable  = $this->pj->get_pj_cnt(0, $_SESSION['c_memGrp'], 'projects');
+        $_pj_cnt_pause   = $this->pj->get_pj_cnt(1, $_SESSION['c_memGrp'], 'projects');
+        $_pj_cnt_disable = $this->pj->get_pj_cnt(2, $_SESSION['c_memGrp'], 'projects');
 
         $this->smarty->assign('pj_cnt_enable',  $_pj_cnt_enable);
         $this->smarty->assign('pj_cnt_pause',   $_pj_cnt_pause);

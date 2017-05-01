@@ -9,18 +9,18 @@
 {form_open('accountlist/addchk/' , 'name="accountForm" class="form-horizontal"')}
 
   {$mess}
-  {*<div class="form-group">
-    <label for="ac_cl_seq" class="col-md-3 control-label">会社選択<font color=red> *</font></label>
-    <div class="col-md-3 btn-lg">
-      {form_dropdown('ac_cl_seq', $options_cl_company, set_value('ac_cl_seq', ''))}
-      {if form_error('ac_cl_seq')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_cl_seq')}</font></label>{/if}
-    </div>
-  </div>*}
   <div class="form-group">
     <label for="ac_type" class="col-md-3 control-label">アカウント選択<font color=red> *</font></label>
     <div class="col-md-2 btn-lg">
       {form_dropdown('ac_type', $options_ac_type, set_value('ac_type', ''))}
       {if form_error('ac_type')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_type')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="ac_status" class="col-sm-3 control-label">ステータス選択<font color=red> *</font></label>
+    <div class="col-sm-2 btn-lg">
+      {form_dropdown('ac_status', $options_ac_status, set_value('ac_status', ''))}
+      {if form_error('ac_status')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_status')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
@@ -42,20 +42,6 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="ac_tel" class="col-xs-3 col-md-3 control-label">担当者電話番号</label>
-    <div class="col-xs-4 col-md-4">
-      {form_input('ac_tel' , set_value('ac_tel', '') , 'class="form-control" placeholder="担当者電話番号を入力してください"')}
-      {if form_error('ac_tel')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_tel')}</font></label>{/if}
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="ac_mobile" class="col-xs-3 col-md-3 control-label">担当者携帯番号</label>
-    <div class="col-xs-4 col-md-4">
-      {form_input('ac_mobile' , set_value('ac_mobile', '') , 'class="form-control" placeholder="担当者携帯番号を入力してください"')}
-      {if form_error('ac_mobile')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_mobile')}</font></label>{/if}
-    </div>
-  </div>
-  <div class="form-group">
     <label for="ac_id" class="col-md-3 control-label">メールアドレス<font color=red> *</font><br>＆　ログインID</label>
     <div class="col-md-8">
       {form_input('ac_id' , set_value('ac_id', '') , 'class="col-md-4 form-control" placeholder="メールアドレスを入力してください。max.50文字"')}
@@ -68,19 +54,56 @@
     <label for="ac_pw" class="col-md-3 control-label">パスワード<font color=red> *</font></label>
     <div class="col-md-8">
       {form_password('ac_pw' , set_value('ac_pw', '') , 'class="form-control" placeholder="パスワード　(半角英数字・記号：８文字以上)。max.50文字"')}
-      <p class="redText"><small>※お客様のお名前や、生年月日、またはその他の個人情報など、推測されやすい情報は使用しないでください。 max.50文字</small></p>
+      <p class="redText"><small>※お客様のお名前や、生年月日、またはその他の個人情報など、推測されやすい情報は使用しないでください。</small></p>
       {if form_error('ac_pw')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_pw')}</font></label>{/if}
     </div>
   </div>
+
+
+
   <div class="form-group">
-    <label for="retype_password" class="col-md-3 control-label">パスワード再入力<font color=red> *</font></label>
-    <div class="col-md-8">
-      {form_password('retype_password' , set_value('retype_password', '') , 'class="form-control" placeholder="パスワード再入力　(半角英数字・記号：８文字以上)"')}
-      <p><small>確認のため、もう一度入力してください。</small></p>
-      {if form_error('retype_password')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('retype_password')}</font></label>{/if}
-      {if $err_passwd==TRUE}<span class="label label-danger">Error : </span><label><font color=red>「パスワード」欄で入力した文字と違います。再度入力してください。</font></label>{/if}
+    <label class="col-md-3 control-label">権限の付与</label>
+  </div>
+  <div class="form-group">
+    <div class="col-md-offset-3 col-md-3">■&emsp;キーワード</div>
+    <div class="col-md-offset-3 col-md-9">
+      <label class="radio-target">
+        <input type="radio" name="ac_keyword" id="radio-keyword1" value="1"> 権限あり
+      </label>
+      <label class="radio-target">&emsp;&emsp;
+        <input type="radio" name="ac_keyword" id="radio-keyword0" value="0"> 権限なし
+      </label>
+      {if form_error('ac_keyword')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_keyword')}</font></label>{/if}
     </div>
   </div>
+  <div class="form-group">
+    <div class="col-md-offset-3 col-md-3">■&emsp;グループ</div>
+    <div class="col-md-offset-3 col-md-9">
+      <label class="radio-target">
+        <input type="radio" name="ac_group" id="radio-group1" value="1"> 権限あり
+      </label>
+      <label class="radio-target">&emsp;&emsp;
+        <input type="radio" name="ac_group" id="radio-group0" value="0"> 権限なし
+      </label>
+      {if form_error('ac_group')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_group')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-md-offset-3 col-md-3">■&emsp;タグ</div>
+    <div class="col-md-offset-3 col-md-9">
+      <label class="radio-target">
+        <input type="radio" name="ac_tag" id="radio-tag1" value="1"> 権限あり
+      </label>
+      <label class="radio-target">&emsp;&emsp;
+        <input type="radio" name="ac_tag" id="radio-tag0" value="0"> 権限なし
+      </label>
+      {if form_error('ac_tag')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_tag')}</font></label>{/if}
+    </div>
+  </div>
+
+
+
+
 
   <br>
   <!-- Button trigger modal -->

@@ -70,7 +70,7 @@ class Projectlist extends MY_Controller
 
         // 顧客情報の取得
         $this->load->model('Project', 'pj', TRUE);
-        list($project_list, $project_countall) = $this->pj->get_projectlist($tmp_inputpost, $tmp_per_page, $tmp_offset, $_SESSION['c_memGrp'], 'seorank');
+        list($project_list, $project_countall) = $this->pj->get_projectlist($tmp_inputpost, $tmp_per_page, $tmp_offset, $_SESSION['c_memGrp'], 'projects');
 
         $this->smarty->assign('list', $project_list);
 
@@ -157,7 +157,7 @@ class Projectlist extends MY_Controller
 
         // 顧客情報の取得
         $this->load->model('Project', 'pj', TRUE);
-        list($project_list, $project_countall) = $this->pj->get_projectlist($tmp_inputpost, $tmp_per_page, $tmp_offset, $_SESSION['c_memGrp'], 'seorank');
+        list($project_list, $project_countall) = $this->pj->get_projectlist($tmp_inputpost, $tmp_per_page, $tmp_offset, $_SESSION['c_memGrp'], 'projects');
 
         $this->smarty->assign('list', $project_list);
 
@@ -208,10 +208,10 @@ class Projectlist extends MY_Controller
 
         $this->load->model('Project', 'pj', TRUE);
         $tmp_pjid = $input_post['chg_seq'];
-        $pj_data = $this->pj->get_pj_seq($tmp_pjid, $_SESSION['c_memGrp'], 'seorank');
+        $pj_data = $this->pj->get_pj_seq($tmp_pjid, $_SESSION['c_memGrp'], 'projects');
 
         $this->load->model('Project_detail', 'pjd', TRUE);
-        $pjd_data = $this->pjd->get_pj_seq($tmp_pjid, $_SESSION['c_memGrp'], 'seorank');
+        $pjd_data = $this->pjd->get_pj_seq($tmp_pjid, $_SESSION['c_memGrp'], 'projects');
 
         if (count($pjd_data) != 0)
         {
@@ -333,7 +333,7 @@ class Projectlist extends MY_Controller
 
                     // DB書き込み
                     $this->load->model('Project', 'pj', TRUE);
-                    $this->pj->update_project($_set_pj_data, $_SESSION['c_memGrp'], 'seorank');
+                    $this->pj->update_project($_set_pj_data, $_SESSION['c_memGrp'], 'projects');
 
                     // 顧客マスタに作成順序書き込み判定
                     $this->_update_timing($_set_pj_data);
@@ -348,7 +348,7 @@ class Projectlist extends MY_Controller
                         $this->load->model('Project_detail', 'pjd', TRUE);
 
                         // 既存データの有無チェック
-                        $get_pjd_data = $this->pjd->get_pj_seq($_set_pj_data['pj_seq'], $_SESSION['c_memGrp'], 'seorank');
+                        $get_pjd_data = $this->pjd->get_pj_seq($_set_pj_data['pj_seq'], $_SESSION['c_memGrp'], 'projects');
 
                         $cnt=0;
                         foreach($_set_rank_data01 as $key => $value)
@@ -363,9 +363,9 @@ class Projectlist extends MY_Controller
 
                             if (count($get_pjd_data) >= 1)
                             {
-                                $this->pjd->update_project_detail($set_pjd_data, $_SESSION['c_memGrp'], 'seorank');
+                                $this->pjd->update_project_detail($set_pjd_data, $_SESSION['c_memGrp'], 'projects');
                             } else {
-                                $this->pjd->insert_project_detail($set_pjd_data, $_SESSION['c_memGrp'], 'seorank');
+                                $this->pjd->insert_project_detail($set_pjd_data, $_SESSION['c_memGrp'], 'projects');
                             }
 
                             $cnt++;
@@ -519,7 +519,7 @@ class Projectlist extends MY_Controller
 
                     // DB書き込み
                     $this->load->model('Project', 'pj', TRUE);
-                    $_pj_seq = $this->pj->insert_project($_set_pj_data, $_SESSION['c_memGrp'], 'seorank');
+                    $_pj_seq = $this->pj->insert_project($_set_pj_data, $_SESSION['c_memGrp'], 'projects');
 
                     // 顧客マスタに作成順序書き込み判定
                     $this->_update_timing($_set_pj_data);
@@ -542,7 +542,7 @@ class Projectlist extends MY_Controller
                             $set_pjd_data['pjd_billing']  = $value['bill'];
                             $set_pjd_data['pjd_order_no'] = $value['no'];
 
-                            $this->pjd->insert_project_detail($set_pjd_data, $_SESSION['c_memGrp'], 'seorank');
+                            $this->pjd->insert_project_detail($set_pjd_data, $_SESSION['c_memGrp'], 'projects');
                         }
                     }
 
@@ -593,11 +593,11 @@ class Projectlist extends MY_Controller
 
         // 受注案件セット
         $this->load->model('Project', 'pj', TRUE);
-        $pj_data = $this->pj->get_pj_seq($input_post['chg_seq'], $_SESSION['c_memGrp'], 'seorank');
+        $pj_data = $this->pj->get_pj_seq($input_post['chg_seq'], $_SESSION['c_memGrp'], 'projects');
 
         // 受注案件詳細セット
         $this->load->model('Project_detail', 'pjd', TRUE);
-        $pjd_data = $this->pjd->get_pj_seq($pj_data[0]['pj_seq'], $_SESSION['c_memGrp'], 'seorank');
+        $pjd_data = $this->pjd->get_pj_seq($pj_data[0]['pj_seq'], $_SESSION['c_memGrp'], 'projects');
         if (count($pjd_data) == 0)
         {
             for($i=0; $i<=9; $i++)
@@ -728,7 +728,7 @@ class Projectlist extends MY_Controller
 
                 // DB書き込み
                 $this->load->model('Project', 'pj', TRUE);
-                $_pj_seq = $this->pj->insert_project($_set_pj_data, $_SESSION['c_memGrp'], 'seorank');
+                $_pj_seq = $this->pj->insert_project($_set_pj_data, $_SESSION['c_memGrp'], 'projects');
 
                 // 顧客マスタに作成順序書き込み判定
                 $this->_update_timing($_set_pj_data);
@@ -751,7 +751,7 @@ class Projectlist extends MY_Controller
                         $set_pjd_data['pjd_billing']  = $value['bill'];
                         $set_pjd_data['pjd_order_no'] = $value['no'];
 
-                        $this->pjd->insert_project_detail($set_pjd_data, $_SESSION['c_memGrp'], 'seorank');
+                        $this->pjd->insert_project_detail($set_pjd_data, $_SESSION['c_memGrp'], 'projects');
                     }
                 }
 
@@ -822,7 +822,7 @@ class Projectlist extends MY_Controller
                 $value['pj_end_date'] = $date->modify($_tmp_month)->format('Y-m-t');
 
                 // 契約終了日の更新
-                $this->pj->update_project($value, $_SESSION['c_memGrp'], 'seorank');
+                $this->pj->update_project($value, $_SESSION['c_memGrp'], 'projects');
             }
         }
 
@@ -901,7 +901,7 @@ class Projectlist extends MY_Controller
         $opt_cl_seq = $this->config->item('PROJECT_CL_SEQ');
 
         $this->load->model('Account', 'ac', TRUE);
-        $salesman_list = $this->ac->get_salesman($opt_cl_seq, 'seorank');       // 「ラベンダー」固定 : ac_cl_seq = 2
+        $salesman_list = $this->ac->get_salesman($opt_cl_seq, 'projects');       // 「ラベンダー」固定 : ac_cl_seq = 2
 
         $opt_pj_salesman[''] = " -- 選択してください -- ";
         foreach ($salesman_list as $key => $val)
@@ -928,7 +928,7 @@ class Projectlist extends MY_Controller
         $opt_cl_seq = $this->config->item('PROJECT_CL_SEQ');
 
         $this->load->model('Account', 'ac', TRUE);
-        $salesman_list = $this->ac->get_salesman($opt_cl_seq, 'seorank');       // 「ラベンダー」固定 : ac_cl_seq = 2
+        $salesman_list = $this->ac->get_salesman($opt_cl_seq, 'projects');       // 「ラベンダー」固定 : ac_cl_seq = 2
 
         foreach ($salesman_list as $key => $val)
         {
@@ -972,14 +972,14 @@ class Projectlist extends MY_Controller
 
                 // 既存の受注案件のチェック
                 $_iv_type = 2;                                                                  // 成功報酬
-                $get_pj_list = $this->pj->get_pj_cm_seq($_input_post['pj_cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'seorank', TRUE);
+                $get_pj_list = $this->pj->get_pj_cm_seq($_input_post['pj_cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'projects', TRUE);
                 if (count($get_pj_list) != 0)
                 {
                     $cm_data[0]['cm_invo_timing'] = $cm_timing['result'];
                 }
 
                 $_iv_type = 3;                                                                  // 固定 + 成功報酬
-                $get_pj_list = $this->pj->get_pj_cm_seq($_input_post['pj_cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'seorank', TRUE);
+                $get_pj_list = $this->pj->get_pj_cm_seq($_input_post['pj_cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'projects', TRUE);
                 if (count($get_pj_list) != 0)
                 {
                     $cm_data[0]['cm_invo_timing'] = $cm_timing['result'];

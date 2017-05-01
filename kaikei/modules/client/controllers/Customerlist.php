@@ -209,14 +209,14 @@ class Customerlist extends MY_Controller
 
                 // 既存の受注案件のチェック
                 $_iv_type = 2;                                                                      // 2：成功報酬
-                $get_pj_list = $this->pj->get_pj_cm_seq($input_post['cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'seorank', TRUE);
+                $get_pj_list = $this->pj->get_pj_cm_seq($input_post['cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'projects', TRUE);
                 if (count($get_pj_list) != 0)
                 {
                     $input_post['cm_invo_timing'] = 1;
                 }
 
                 $_iv_type = 3;                                                                      // 3：固定 + 成功報酬
-                $get_pj_list = $this->pj->get_pj_cm_seq($input_post['cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'seorank', TRUE);
+                $get_pj_list = $this->pj->get_pj_cm_seq($input_post['cm_seq'], $_iv_type, $_SESSION['c_memGrp'], 'projects', TRUE);
                 if (count($get_pj_list) != 0)
                 {
                     $input_post['cm_invo_timing'] = 1;
@@ -232,7 +232,7 @@ class Customerlist extends MY_Controller
             {
 
                 // 受注案件情報データの有無チェック
-                $get_pj_list = $this->pj->get_pj_cm_status($input_post['cm_seq'], $_SESSION['c_memGrp'], 'seorank');
+                $get_pj_list = $this->pj->get_pj_cm_status($input_post['cm_seq'], $_SESSION['c_memGrp'], 'projects');
 
                 if (count($get_pj_list))
                 {
@@ -250,7 +250,7 @@ class Customerlist extends MY_Controller
                         }
                         $set_pj_data["pj_seq"]    = $value['pj_seq'];
 
-                        $this->pj->update_project($set_pj_data, $_SESSION['c_memGrp'], 'seorank');
+                        $this->pj->update_project($set_pj_data, $_SESSION['c_memGrp'], 'projects');
 
                     }
                 }
@@ -656,7 +656,7 @@ class Customerlist extends MY_Controller
         $opt_cl_seq = $this->config->item('PROJECT_CL_SEQ');
 
         $this->load->model('Account', 'ac', TRUE);
-        $salesman_list = $this->ac->get_salesman($opt_cl_seq, 'seorank');       // 「ラベンダー」固定 : ac_cl_seq = 2
+        $salesman_list = $this->ac->get_salesman($opt_cl_seq, 'projects');       // 「ラベンダー」固定 : ac_cl_seq = 2
 
         foreach ($salesman_list as $key => $val)
         {

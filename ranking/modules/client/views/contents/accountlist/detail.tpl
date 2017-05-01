@@ -11,14 +11,14 @@
   {$mess}
   {if $smarty.session.c_memType==1}
   <div class="form-group">
-    <label for="ac_type" class="col-sm-3 control-label">アカウント種類選択<font color=red>【必須】</font></label>
+    <label for="ac_type" class="col-sm-3 control-label">アカウント種類選択<font color=red> *</font></label>
     <div class="col-sm-2 btn-lg">
       {form_dropdown('ac_type', $options_ac_type, set_value('ac_type', $info.ac_type))}
       {if form_error('ac_type')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_type')}</font></label>{/if}
     </div>
   </div>
   <div class="form-group">
-    <label for="ac_status" class="col-sm-3 control-label">ステータス選択<font color=red>【必須】</font></label>
+    <label for="ac_status" class="col-sm-3 control-label">ステータス選択<font color=red> *</font></label>
     <div class="col-sm-2 btn-lg">
       {form_dropdown('ac_status', $options_ac_status, set_value('ac_status', $info.ac_status))}
       {if form_error('ac_status')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_status')}</font></label>{/if}
@@ -28,6 +28,7 @@
     {form_hidden('ac_type', $info.ac_type)}
     {form_hidden('ac_status', $info.ac_status)}
   {/if}
+
   <div class="form-group">
     <label for="ac_department" class="col-sm-3 control-label">所属部署</label>
     <div class="col-sm-8">
@@ -36,7 +37,7 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="ac_name" class="col-sm-3 control-label">担当者<font color=red>【必須】</font></label>
+    <label for="ac_name" class="col-sm-3 control-label">担当者<font color=red> *</font></label>
     <div class="col-sm-4">
       {form_input('ac_name01' , set_value('ac_name01', $info.ac_name01) , 'class="form-control" placeholder="担当者姓を入力してください。max.50文字"')}
       {if form_error('ac_name01')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_name01')}</font></label>{/if}
@@ -47,59 +48,85 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="ac_id" class="col-sm-3 control-label">ログインID<font color=red>【必須】</font></label>
+    <label for="ac_id" class="col-sm-3 control-label">ログインID</label>
     <div class="col-sm-8">
       {$info.ac_id}
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="ac_mail" class="col-sm-3 control-label">メールアドレス<font color=red>【必須】</font></label>
-    <div class="col-sm-8">
-      {form_input('ac_mail' , set_value('ac_mail', $info.ac_mail) , 'class="col-sm-4 form-control" placeholder="メールアドレスを入力してください。max.100文字"')}
-      {if form_error('ac_mail')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_mail')}</font></label>{/if}
-      {if $err_email==TRUE}<span class="label label-danger">Error : </span><label><font color=red>「メールアドレス」欄で入力したアドレスは既に他で使用されています。再度他のアドレスを入力してください。</font></label>{/if}
     </div>
   </div>
 
   {if $smarty.session.c_memSeq==$info.ac_seq}
   <div class="form-group">
-    <label for="ac_pw" class="col-sm-3 control-label">パスワード<font color=red>【必須】</font></label>
+    <label for="ac_pw" class="col-sm-3 control-label">パスワード</label>
     <div class="col-sm-8">
       {form_password('ac_pw' , set_value('ac_pw', '') , 'class="form-control" placeholder="パスワード　(半角英数字・記号：８文字以上)。max.50文字"')}
       <p class="redText"><small>※お客様のお名前や、生年月日、またはその他の個人情報など、推測されやすい情報は使用しないでください</small></p>
       {if form_error('ac_pw')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_pw')}</font></label>{/if}
     </div>
   </div>
-  <div class="form-group">
-    <label for="retype_password" class="col-sm-3 control-label">パスワード再入力<font color=red>【必須】</font></label>
-    <div class="col-sm-8">
-      {form_password('retype_password' , set_value('retype_password', '') , 'class="form-control" placeholder="パスワード再入力　(半角英数字・記号：８文字以上)"')}
-      <p><small>確認のため、もう一度入力してください。</small></p>
-      {if form_error('retype_password')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('retype_password')}</font></label>{/if}
-      {if $err_passwd==TRUE}<span class="label label-danger">Error : </span><label><font color=red>「パスワード」欄で入力した文字と違います。再度入力してください。</font></label>{/if}
-    </div>
-  </div>
   {/if}
-
-  <div class="form-group">
-    <label for="ac_tel" class="col-sm-3 control-label">担当者電話番号</label>
-    <div class="col-sm-3">
-      {form_input('ac_tel' , set_value('ac_tel', $info.ac_tel) , 'class="form-control" placeholder="担当者電話番号を入力してください"')}
-      {if form_error('ac_tel')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_tel')}</font></label>{/if}
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="ac_mobile" class="col-sm-3 control-label">担当者携帯番号</label>
-    <div class="col-sm-3">
-      {form_input('ac_mobile' , set_value('ac_mobile', $info.ac_mobile) , 'class="form-control" placeholder="担当者携帯番号を入力してください"')}
-      {if form_error('ac_mobile')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_mobile')}</font></label>{/if}
-    </div>
-  </div>
 
   {form_hidden('ac_seq', $info.ac_seq)}
   {form_hidden('ac_id', $info.ac_id)}
 
+
+
+  {if $smarty.session.c_memType==1}
+  <div class="form-group">
+    <label class="col-md-3 control-label">権限の付与</label>
+  </div>
+  <div class="form-group">
+    <div class="col-md-offset-3 col-md-3">■&emsp;キーワード</div>
+    <div class="col-md-offset-3 col-md-9">
+      <label class="radio-target1">
+        <input type="radio" name="ac_keyword" id="radio-keyword1" value="1" {if $info.ac_keyword==1}checked{/if}> 権限あり
+      </label>
+      <label class="radio-target2">&emsp;&emsp;
+        <input type="radio" name="ac_keyword" id="radio-keyword0" value="0" {if $info.ac_keyword==0}checked{/if}> 権限なし
+      </label>
+      {if form_error('ac_keyword')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_keyword')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-md-offset-3 col-md-3">■&emsp;グループ</div>
+    <div class="col-md-offset-3 col-md-9">
+      <label class="radio-target2">
+        <input type="radio" name="ac_group" id="radio-group1" value="1" {if $info.ac_group==1}checked{/if}> 権限あり
+      </label>
+      <label class="radio-target2">&emsp;&emsp;
+        <input type="radio" name="ac_group" id="radio-group0" value="0" {if $info.ac_group==0}checked{/if}> 権限なし
+      </label>
+      {if form_error('ac_group')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_group')}</font></label>{/if}
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-md-offset-3 col-md-3">■&emsp;タグ</div>
+    <div class="col-md-offset-3 col-md-9">
+      <label class="radio-target">
+        <input type="radio" name="ac_tag" id="radio-_tag1" value="1" {if $info.ac_tag==1}checked{/if}> 権限あり
+      </label>
+      <label class="radio-target">&emsp;&emsp;
+        <input type="radio" name="ac_tag" id="radio-_tag0" value="0" {if $info.ac_tag==0}checked{/if}> 権限なし
+      </label>
+      {if form_error('ac_tag')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('ac_tag')}</font></label>{/if}
+    </div>
+  </div>
+  {else}
+  <div class="form-group">
+    <label class="col-md-3 control-label">権限の付与</label>
+  </div>
+  <div class="form-group">
+    <div class="col-md-offset-3 col-md-3">■&emsp;キーワード：{if $info.ac_keyword==1}権限あり{else}権限なし{/if}</div>
+  </div>
+  <div class="form-group">
+    <div class="col-md-offset-3 col-md-3">■&emsp;グループ&emsp;：{if $info.ac_group==1}権限あり{else}権限なし{/if}</div>
+  </div>
+  <div class="form-group">
+    <div class="col-md-offset-3 col-md-3">■&emsp;タ&emsp;&emsp;グ&emsp;：{if $info.ac_tag==1}権限あり{else}権限なし{/if}</div>
+  </div>
+  {/if}
+
   <br><br>
+
   <!-- Button trigger modal -->
   <div class="row">
   <div class="col-sm-4 col-sm-offset-3">

@@ -146,7 +146,7 @@ class Invo_create extends MY_Controller
 
         // 受注案件情報を取得
         $_iv_type = 0;                                                      // 課金方式：：固定=0/成果=1/固+成=2
-        $get_pj_list = $this->pj->get_pj_cm_seq($input_post['chg_seq'], $_iv_type, $_SESSION['c_memGrp'], 'seorank', TRUE);
+        $get_pj_list = $this->pj->get_pj_cm_seq($input_post['chg_seq'], $_iv_type, $_SESSION['c_memGrp'], 'projects', TRUE);
 
         $cnt = 0;
         if (count($get_pj_list) >= 1)
@@ -428,7 +428,7 @@ class Invo_create extends MY_Controller
         // 担当営業名を取得
         if (ctype_digit($input_post['iv_salesman']))
         {
-            $get_salesman = $this->ac->get_pj_salesman($input_post['iv_salesman'], 'seorank');
+            $get_salesman = $this->ac->get_pj_salesman($input_post['iv_salesman'], 'projects');
             $set_iv_data['iv_salesman']    = $get_salesman[0]['ac_name01'] . '　' . $get_salesman[0]['ac_name02'];
             $set_iv_data['iv_salesman_id'] = $input_post['iv_salesman'];
         }

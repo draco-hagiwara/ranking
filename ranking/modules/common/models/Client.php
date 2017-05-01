@@ -281,7 +281,30 @@ class Client extends CI_Model
     	return $result;
     }
 
+    /**
+     * ログインIDによる更新
+     *
+     * @param    array()
+     * @return   bool
+     */
+    public function update_client_id($setData)
+    {
 
+    	$where = array(
+    			'cl_id' => $setData['cl_id']
+    	);
+
+    	$result = $this->db->update('mt_client', $setData, $where);
+    	$_last_sql = $this->db->last_query();
+
+    	// ログ書き込み
+    	$set_data['lg_type']      = 'Client.php';
+    	$set_data['lg_func']      = 'update_client_id';
+    	$set_data['lg_detail']    = 'cl_id = ' . $setData['cl_id'] . ' <= ' . $_last_sql;
+    	$this->insert_log($set_data);
+
+    	return $result;
+    }
 
 
 

@@ -52,7 +52,8 @@ function fmSubmit(formName, url, method, num) {
         </tr>
       </thead>
 
-      {foreach from=$list item=ac}
+    {foreach from=$list item=ac}
+      {if ($smarty.session.c_memType==1)||($smarty.session.c_memSeq==$ac.ac_seq)}
       <tbody>
         <tr>
           <td>
@@ -87,9 +88,10 @@ function fmSubmit(formName, url, method, num) {
           </td>
         </tr>
       </tbody>
-      {foreachelse}
-        検索結果はありませんでした。
-      {/foreach}
+      {/if}
+    {foreachelse}
+      検索結果はありませんでした。
+    {/foreach}
 
     </table>
   </div>

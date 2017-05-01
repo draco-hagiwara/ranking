@@ -842,14 +842,18 @@ class Lib_pdf_invoice extends TCPDF {
                 }
 
                 $_sales_yymm = str_split($_iv_data["iv_sales_yymm"], 4);
-                if ($value['ivd_iv_accounting'] != 12)
+
+                /*
+                 * 「○○月度」の表示を止める。「キーワード」or「備考」欄に必要事項を記入してください。
+                 * 受注案件の検索キーワードに入力する際、最後の文字として「#(半角)」を記入する
+                 */
+                if (mb_substr($value['ivd_item'], -1) == "#")
                 {
-                    $iv_data[$mcate_cnt]['subtitle'] = $_subtitle . ' 明細（' . $_sales_yymm[0] . '年' . $_sales_yymm[1] . '月度）';
-                    $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = $_subtitle . ' 明細（' . $_sales_yymm[0] . '年' . $_sales_yymm[1] . '月度）';
+                	$iv_data[$mcate_cnt]['subtitle'] = $_subtitle;
+                	$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = $_subtitle;
                 } else {
-                    // 「○○月度」の表示を止める。「キーワード」or「備考」欄に必要事項を記入してください。
-                    $iv_data[$mcate_cnt]['subtitle'] = $_subtitle;
-                    $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = $_subtitle;
+                	$iv_data[$mcate_cnt]['subtitle'] = $_subtitle . ' 明細（' . $_sales_yymm[0] . '年' . $_sales_yymm[1] . '月度）';
+                	$ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = $_subtitle . ' 明細（' . $_sales_yymm[0] . '年' . $_sales_yymm[1] . '月度）';
                 }
 
                 $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][9] = "LF";
@@ -879,7 +883,7 @@ class Lib_pdf_invoice extends TCPDF {
             {
                 case 0:
 
-                    $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '・対象KW：' . $value['ivd_item'];
+                    $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '・対象KW：' . rtrim($value['ivd_item'], "#");
                     $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][1] = $value['ivd_qty'];
                     $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][2] = $value['ivd_price'];
                     $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][3] = $value['ivd_total'];
@@ -901,7 +905,7 @@ class Lib_pdf_invoice extends TCPDF {
 
                 case 1:
 
-                    $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '・対象KW：' . $value['ivd_item'];
+                    $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '・対象KW：' . rtrim($value['ivd_item'], "#");
                     $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][1] = $value['ivd_qty'];
                     $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][2] = $value['ivd_price'];
                     $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][3] = $value['ivd_total'];
@@ -918,7 +922,7 @@ class Lib_pdf_invoice extends TCPDF {
 
                     if ($value['ivd_pj_seq'] != $_tmp_pjseq)
                     {
-                        $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '・対象KW：' . $value['ivd_item'];
+                        $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '・対象KW：' . rtrim($value['ivd_item'], "#");
                         if ($_tmp_res_flg == FALSE)
                         {
                             $_tmp_res_flg = TRUE;
@@ -971,7 +975,7 @@ class Lib_pdf_invoice extends TCPDF {
 
                 default:
 
-                    $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '・' . $value['ivd_item'];
+                    $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][0] = '・' . rtrim($value['ivd_item'], "#");
                     $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][1] = $value['ivd_qty'];
                     $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][2] = $value['ivd_price'];
                     $ivd_data[$lcate_cnt][$mcate_cnt][$scate_cnt][3] = $value['ivd_total'];

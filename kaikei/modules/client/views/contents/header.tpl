@@ -110,22 +110,51 @@
                 <li><a href="/client/customerlist/"><i class="glyphicon glyphicon-list-alt"></i> 顧客一覧</a></li>
                 <li><a href="/client/customerlist/add/"><i class="glyphicon glyphicon-pencil"></i> 顧客登録</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href="/client/data_csvup/customer/"><i class="glyphicon glyphicon-cloud-upload"></i> 顧客データCSV</a></li>
+                <li><a href="/client/data_csvup/customer/"><i class="glyphicon glyphicon-duplicate"></i> 顧客データCSV</a></li>
               </ul>
             </li>
-            <li class="active"><a href="/client/projectlist/"><i class="glyphicon glyphicon-list-alt"></i> 受注案件一覧</a></li>
-            <li class="active"><a href="/client/invoicelist/"><i class="glyphicon glyphicon-list-alt"></i> 請求書一覧</a></li>
-
+            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-list-alt"></i> 受注案件<b class="caret"></b></a>
+              <ul class="dropdown-menu right">
+                <li><a href="/client/projectlist/"><i class="glyphicon glyphicon-list-alt"></i> 受注案件一覧</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="/client/projectlist/project_renew/"><i class="glyphicon glyphicon-refresh"></i> 契約延長処理</a></li>
+              </ul>
+            </li>
+            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-list-alt"></i> 請求書<b class="caret"></b></a>
+              <ul class="dropdown-menu right">
+                <li><a href="/client/invoicelist/"><i class="glyphicon glyphicon-list-alt"></i> 請求書一覧</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="/client/invo_create_fix/"><i class="glyphicon glyphicon-save-file"></i> 請求書 データ作成</a></li>
+              </ul>
+            </li>
             <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-stats"></i> 売上情報<b class="caret"></b></a>
               <ul class="dropdown-menu right">
-                <li><a href="/client/saleslist/"><i class="glyphicon glyphicon-yen"></i> 売上データ一覧</a></li>
+                <li><a href="/client/saleslist/"><i class="glyphicon glyphicon-yen"></i> 売上情報一覧</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="/client/sales_graph/monthly/"><i class="glyphicon glyphicon-signal"></i> 月次売上表</a></li>
                 <li><a href="/client/sales_graph/salesman/"><i class="glyphicon glyphicon-signal"></i> 担当営業別売上表</a></li>
+                <li><a href="/client/sales_graph/accounting/"><i class="glyphicon glyphicon-signal"></i> 課金方式別売上表</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="/client/sales_create/"><i class="glyphicon glyphicon-save-file"></i> 売上 データ作成</a></li>
+              </ul>
+            </li>
+            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-barcode"></i> 支払情報<b class="caret"></b></a>
+              <ul class="dropdown-menu right">
+                <li><a href="/client/shokailist/"><i class="glyphicon glyphicon-user"></i> 支払先情報一覧</a></li>
+                <li><a href="/client/shokailist/add/"><i class="glyphicon glyphicon-pencil"></i> 支払先情報登録</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="/client/shokaifee_create/"><i class="glyphicon glyphicon-usd"></i> 紹介料計算</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="/client/shokaifeelist/"><i class="glyphicon glyphicon-yen"></i> 支払紹介料一覧</a></li>
               </ul>
             </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
+            <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-wrench"></i> システム管理<b class="caret"></b></a>
+              <ul class="dropdown-menu right">
+                <li><a href="/client/accountlist/"><i class="glyphicon glyphicon-list-alt"></i> アカウント一覧</a></li>
+              </ul>
+            </li>
             <li class="active"><a href="/client/login/logout/"><i class="glyphicon glyphicon-log-out"></i> ログアウト</a></li>
           </ul>
         </div>
@@ -139,11 +168,8 @@
       </ul>
 
       <nav class="navbar navbar-inverse">
-        <div class="navbar-header">toggle="collapse" data-target="#patern05">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <a href="/admin/login/" class="navbar-brand">INVOICE</a>
+        <div class="navbar-header">
+          <a href="#" class="navbar-brand">INVOICE</a>
         </div>
       </nav>
 

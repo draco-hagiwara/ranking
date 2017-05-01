@@ -126,7 +126,7 @@ class Shokaifee_create extends MY_Controller
                             $set_skd[$i]['skd_iv_seq']         = $val_sales['sa_iv_seq'];
 
                             // 売上情報から各案件の紹介料情報を取得する
-                            $shokai_info = $this->sk->get_pj_shokai($val_sales['sa_pj_seq'], $_SESSION['c_memGrp'], 'seorank');
+                            $shokai_info = $this->sk->get_pj_shokai($val_sales['sa_pj_seq'], $_SESSION['c_memGrp'], 'projects');
 
                             // 紹介料を計算 :: 固定金額 +（ 料率 × 売上高 ）
                             $_issue_tax['zeiritsu'] = $this->config->item('INVOICE_TAX');

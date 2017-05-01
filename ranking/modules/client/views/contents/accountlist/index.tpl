@@ -42,22 +42,20 @@ function fmSubmit(formName, url, method, num) {
     <table class="table table-striped table-hover">
       <thead>
         <tr>
-          <th>ID</th>
           <th>状態</th>
           <th>Type</th>
           <th>名前</th>
-          <th>メールアドレス</th>
+          <th>ログインID</th>
+          <th>作成日時</th>
           <th>最終ログイン日時</th>
           <th></th>
         </tr>
       </thead>
 
-      {foreach from=$list item=ac}
+    {foreach from=$list item=ac}
+      {if ($smarty.session.c_memType==1)||($smarty.session.c_memSeq==$ac.ac_seq)}
       <tbody>
         <tr>
-          <td>
-            {$ac.ac_seq}
-          </td>
           <td>
             {if $ac.ac_status == "0"}<font color="#ffffff" style="background-color:royalblue">[ 有　効 ]</font>
             {elseif $ac.ac_status == "1"}<font color="#ffffff" style="background-color:gray">[ 無　効 ]</font>
@@ -75,7 +73,10 @@ function fmSubmit(formName, url, method, num) {
             {$ac.ac_name01|escape}　{$ac.ac_name02|escape}
           </td>
           <td>
-            {$ac.ac_mail}
+            {$ac.ac_id}
+          </td>
+          <td>
+            {$ac.ac_create_date}
           </td>
           <td>
             {$ac.ac_lastlogin}
@@ -87,9 +88,10 @@ function fmSubmit(formName, url, method, num) {
           </td>
         </tr>
       </tbody>
-      {foreachelse}
-        検索結果はありませんでした。
-      {/foreach}
+      {/if}
+    {foreachelse}
+      検索結果はありませんでした。
+    {/foreach}
 
     </table>
   </div>

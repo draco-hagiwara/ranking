@@ -23,7 +23,7 @@ class Lib_project
         $project_date['end'] = $date->modify('last day of this months')->format('Y-m-d');
 
         $CI->load->model('Project', 'pj', TRUE);
-        $get_data = $CI->pj->get_renew_data($project_date, $_SESSION['c_memGrp'], 'seorank');
+        $get_data = $CI->pj->get_renew_data($project_date, $_SESSION['c_memGrp'], 'projects');
 
         return $get_data;
 

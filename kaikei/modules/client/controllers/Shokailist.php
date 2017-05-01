@@ -458,7 +458,7 @@ class Shokailist extends MY_Controller
         $opt_cl_seq = $this->config->item('PROJECT_CL_SEQ');
 
         $this->load->model('Account', 'ac', TRUE);
-        $salesman_list = $this->ac->get_salesman($opt_cl_seq, 'seorank');       // 「ラベンダー」固定 : ac_cl_seq = 2
+        $salesman_list = $this->ac->get_salesman($opt_cl_seq, 'projects');       // 「ラベンダー」固定 : ac_cl_seq = 2
 
         foreach ($salesman_list as $key => $val)
         {

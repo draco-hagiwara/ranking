@@ -30,7 +30,10 @@
       <p class="redText"><small>※入力フォーマット（ yyyy/dd/mm　または　yyyy-dd-mm ）</small></p>
     </div>
     <div class="col-sm-1">
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal10">一　括</button>
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal11">個　別</button>
+    </div>
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#myModal10">一　括</button>
     </div>
   </div>
   <div class="form-group">
@@ -41,9 +44,6 @@
     </div>
     <div class="col-md-4">
       <p class="redText"><small>※該当顧客のみ支払計算を作成します。<br>※「個別」ボタンを押下してください。</small></p>
-    </div>
-    <div class="col-sm-1">
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal11">個　別</button>
     </div>
   </div>
   <div class="form-group">

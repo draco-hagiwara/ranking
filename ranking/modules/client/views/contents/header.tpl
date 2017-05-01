@@ -31,44 +31,45 @@
         <ul class="list-inline text-right"></ul>
         <nav class="navbar navbar-inverse">
         <div class="navbar-header">
-            <a href="#" class="navbar-brand">SEO</a>
+            <a href="#" class="navbar-brand">RANKING</a>
         </div>
         <div id="patern05" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="/client/top/"><i class="glyphicon glyphicon-home"></i> TOP</a></li>
-            <li class="active"><a href="/client/accountlist/"><i class="glyphicon glyphicon-list-alt"></i> SEO案件一覧</a></li>
-            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> 顧客<b class="caret"></b></a>
+            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-search"></i> キーワード<b class="caret"></b></a>
               <ul class="dropdown-menu right">
-                <li><a href="/client/customerlist/"><i class="glyphicon glyphicon-list-alt"></i> 顧客一覧</a></li>
-                <li><a href="/client/customerlist/add/"><i class="glyphicon glyphicon-pencil"></i> 顧客登録</a></li>
+                <li><a href="/client/keywordlist/"><i class="glyphicon glyphicon-list-alt"></i> キーワード一覧</a></li>
+                {if $mem_Kw==1}<li><a href="/client/keywordlist/add/"><i class="glyphicon glyphicon-pencil"></i> キーワード登録 & 更新</a></li>{/if}
+                <li role="separator" class="divider"></li>
+                <li><a href="/client/data_csv/project/"><i class="glyphicon glyphicon-duplicate"></i> 受注データCSV</a></li>
               </ul>
             </li>
-            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> アカウント<b class="caret"></b></a>
+            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-tag"></i> タグ管理<b class="caret"></b></a>
               <ul class="dropdown-menu right">
-                <li><a href="/client/accountlist/"><i class="glyphicon glyphicon-list-alt"></i> アカウント一覧</a></li>
-                <li><a href="/client/accountlist/add/"><i class="glyphicon glyphicon-pencil"></i> アカウント登録</a></li>
+                <li><a href="/client/taglist/"><i class="glyphicon glyphicon-list-alt"></i> タグ一覧</a></li>
+                {if $mem_Tg==1}<li><a href="/client/taglist/add/"><i class="glyphicon glyphicon-pencil"></i> タグ登録＆更新</a></li>{/if}
+                {if $mem_Tg==1}<li><a href="/client/taglist/tag_test/"><i class="glyphicon glyphicon-pencil"></i> タグtest</a></li>{/if}
               </ul>
             </li>
-            <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-stats"></i> グラフ関連<b class="caret"></b></a>
+            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> グループ管理<b class="caret"></b></a>
               <ul class="dropdown-menu right">
-                <li><a href="/client/graph/"><i class="glyphicon glyphicon-stats"></i> グラフ表示</a></li>
-                <li><a href="/client/graph/graph_print"><i class="glyphicon glyphicon-stats"></i> グラフ印刷</a></li>
-                <li><a href="/client/graph/pdf_test"><i class="glyphicon glyphicon-stats"></i> PDFテスト</a></li>
+                <li><a href="/client/grouplist/"><i class="glyphicon glyphicon-list-alt"></i> グループ一覧</a></li>
+                {if $mem_Gp==1}<li><a href="/client/grouplist/add/"><i class="glyphicon glyphicon-pencil"></i> グループ登録＆更新</a></li>{/if}
               </ul>
             </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            {*<li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-wrench"></i> システム設定<b class="caret"></b></a>
+            <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-wrench"></i> システム管理<b class="caret"></b></a>
               <ul class="dropdown-menu right">
-                <li><a href="/client/system/mailtpl/"><i class="glyphicon glyphicon-envelope"></i> メールテンプレ管理</a></li>
-                {if $smarty.session.a_memSeq==1}
-                  <li><a href="/client/system/categroup_new/"><i class="glyphicon glyphicon-th-list"></i> カテゴリ並替</a></li>
-                  <li><a href="/client/system/categroup_search/"><i class="glyphicon glyphicon-th-list"></i> カテゴリ編集</a></li>
-                  <li><a href="/client/system/backup/"><i class="glyphicon glyphicon-floppy-save"></i> 手動バックアップ</a></li>
-                  <li><a href="/client/system/sess_destroy/"><i class="glyphicon glyphicon-remove-circle"></i> セッション削除</a></li>
-                {/if}
+                <li><a href="/client/accountlist/"><i class="glyphicon glyphicon-list-alt"></i> アカウント一覧</a></li>
+                <li><a href="/client/accountlist/add/"><i class="glyphicon glyphicon-user"></i> アカウント登録</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="/client/rank_create/"><i class="glyphicon glyphicon-list-alt"></i> 検索データ取得</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="/client/system/backup/"><i class="glyphicon glyphicon-floppy-open"></i> 手動バックアップ</a></li>
+                <li><a href="/client/system/sess_destroy/"><i class="glyphicon glyphicon-trash"></i> セッション削除</a></li>
               </ul>
-            </li>*}
+            </li>
             <li class="active"><a href="/client/login/logout/"><i class="glyphicon glyphicon-log-out"></i> ログアウト</a></li>
           </ul>
         </div>
@@ -77,18 +78,39 @@
         <ul class="list-inline text-right"></ul>
         <nav class="navbar navbar-inverse">
         <div class="navbar-header">
-            <a href="#" class="navbar-brand">Fnote</a>
+            <a href="#" class="navbar-brand">RANKING</a>
         </div>
         <div id="patern05" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="/client/top/">TOP</a></li>
-            <li class="active"><a href="/client/accountlist/"><i class="glyphicon glyphicon-list-alt"></i> SEOランキング一覧</a></li>
-            <li class="active"><a href="/client/accountlist/"><i class="glyphicon glyphicon-list-alt"></i> SEO登録</a></li>
-            <li class="active"><a href="/client/accountlist/detail/"><i class="glyphicon glyphicon-pencil"></i> アカウント編集</a></li>
-            <li><a href="/client/graph/"><i class="glyphicon glyphicon-pencil"></i> グラフ表示</a></li>
+            <li class="active"><a href="/client/top/"><i class="glyphicon glyphicon-home"></i> TOP</a></li>
+            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-search"></i> キーワード<b class="caret"></b></a>
+              <ul class="dropdown-menu right">
+                <li><a href="/client/keywordlist/"><i class="glyphicon glyphicon-list-alt"></i> キーワード一覧</a></li>
+                {if $mem_Kw==1}<li><a href="/client/keywordlist/add/"><i class="glyphicon glyphicon-pencil"></i> キーワード登録 & 更新</a></li>{/if}
+                <li role="separator" class="divider"></li>
+                <li><a href="/client/data_csv/project/"><i class="glyphicon glyphicon-duplicate"></i> 受注データCSV</a></li>
+              </ul>
+            </li>
+            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-tag"></i> タグ管理<b class="caret"></b></a>
+              <ul class="dropdown-menu right">
+                <li><a href="/client/taglist/"><i class="glyphicon glyphicon-list-alt"></i> タグ一覧</a></li>
+                {if $mem_Tg==1}<li><a href="/client/taglist/add/"><i class="glyphicon glyphicon-pencil"></i> タグ登録＆更新</a></li>{/if}
+              </ul>
+            </li>
+            <li class="active"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> グループ管理<b class="caret"></b></a>
+              <ul class="dropdown-menu right">
+                <li><a href="/client/grouplist/"><i class="glyphicon glyphicon-list-alt"></i> グループ一覧</a></li>
+                {if $mem_Gp==1}<li><a href="/client/grouplist/add/"><i class="glyphicon glyphicon-pencil"></i> グループ登録＆更新</a></li>{/if}
+              </ul>
+            </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="/client/login/logout/">ログアウト</a></li>
+            <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-wrench"></i> システム管理<b class="caret"></b></a>
+              <ul class="dropdown-menu right">
+                <li><a href="/client/accountlist/"><i class="glyphicon glyphicon-list-alt"></i> アカウント一覧</a></li>
+              </ul>
+            </li>
+            <li class="active"><a href="/client/login/logout/"><i class="glyphicon glyphicon-log-out"></i> ログアウト</a></li>
           </ul>
         </div>
         </nav>
@@ -101,11 +123,8 @@
       </ul>
 
       <nav class="navbar navbar-inverse">
-        <div class="navbar-header">toggle="collapse" data-target="#patern05">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <a href="/admin/login/" class="navbar-brand">SEO ランキング</a>
+        <div class="navbar-header">
+          <a href="#" class="navbar-brand">RANKING</a>
         </div>
       </nav>
 

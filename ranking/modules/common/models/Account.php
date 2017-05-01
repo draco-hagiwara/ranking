@@ -47,8 +47,7 @@ class Account extends CI_Model
     public function check_loginid($id)
     {
 
-    	$sql = 'SELECT ac_id FROM `mt_account` '
-    			. 'WHERE `ac_id` = ? ';
+    	$sql = 'SELECT ac_id FROM `mt_account` WHERE `ac_id` = ? ';
 
     	$values = array(
     					$id,
@@ -113,10 +112,11 @@ class Account extends CI_Model
     			  ac_seq,
     			  ac_status,
     			  ac_type,
+    			  ac_id,
     			  ac_name01,
     			  ac_name02,
-    			  ac_mail,
-    			  ac_lastlogin
+    			  ac_lastlogin,
+    			  ac_create_date
     			FROM mt_account WHERE ac_delflg = 0 AND ac_type != 9 AND ac_cl_seq = ' . $set_select['ac_cl_seq'];
 
     	// WHERE文 作成
@@ -165,8 +165,8 @@ class Account extends CI_Model
     public function insert_account($setdata)
     {
 
-    	// ID ⇒ MAIL に挿入
-    	$setdata["ac_mail"] = $setdata["ac_id"];
+//     	// ID ⇒ MAIL に挿入
+//     	$setdata["ac_mail"] = $setdata["ac_id"];
 
     	// パスワード作成
     	$_hash_pw = password_hash($setdata["ac_pw"], PASSWORD_DEFAULT);

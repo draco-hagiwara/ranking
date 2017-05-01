@@ -256,7 +256,7 @@ class Sales_graph extends MY_Controller
         $opt_cl_seq = $this->config->item('PROJECT_CL_SEQ');
 
         // 対象営業担当者(ac_seq)を抽出
-        $salesman_list = $this->ac->get_salesman($opt_cl_seq, 'seorank');       // 「ラベンダー」固定 : ac_cl_seq = 2
+        $salesman_list = $this->ac->get_salesman($opt_cl_seq, 'projects');       // 「ラベンダー」固定 : ac_cl_seq = 2
 
         // 担当営業毎に売上データの取得
         foreach ($salesman_list as $key => $val)

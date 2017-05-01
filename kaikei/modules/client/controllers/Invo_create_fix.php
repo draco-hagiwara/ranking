@@ -80,10 +80,10 @@ class Invo_create_fix extends MY_Controller
 
                 if ($input_post['_submit'] == "save_oly")
                 {
-                    $get_pj_list = $this->pj->get_ivlist_fix($value['cm_seq'], $_SESSION['c_memGrp'], 'seorank', TRUE);
+                    $get_pj_list = $this->pj->get_ivlist_fix($value['cm_seq'], $_SESSION['c_memGrp'], 'projects', TRUE);
                     $_invo_class = "C";
                 } else {
-                    $get_pj_list = $this->pj->get_ivlist_fix($value['cm_seq'], $_SESSION['c_memGrp'], 'seorank');
+                    $get_pj_list = $this->pj->get_ivlist_fix($value['cm_seq'], $_SESSION['c_memGrp'], 'projects');
                     $_invo_class = "B";
                 }
 
@@ -198,7 +198,7 @@ class Invo_create_fix extends MY_Controller
                     $get_iv_data[0]['iv_sales_date']  = NULL;                                                   // 売上日
 
                     // 担当営業名を取得
-                    $get_salesman = $this->ac->get_pj_salesman($value['cm_salesman'], 'seorank');
+                    $get_salesman = $this->ac->get_pj_salesman($value['cm_salesman'], 'projects');
                     $set_data_iv['iv_salesman']      = $get_salesman[0]['ac_name01'] . '　' . $get_salesman[0]['ac_name02'];
                     $set_data_iv['iv_salesman_id']   = $value['cm_salesman'];
 

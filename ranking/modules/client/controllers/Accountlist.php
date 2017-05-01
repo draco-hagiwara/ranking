@@ -7,24 +7,27 @@ class Accountlist extends MY_Controller
     {
         parent::__construct();
 
-        if ($_SESSION['c_login'] == TRUE)
-        {
-            $this->smarty->assign('login_chk', TRUE);
-            $this->smarty->assign('mem_Type',  $_SESSION['c_memType']);
-            $this->smarty->assign('mem_Seq',   $_SESSION['c_memSeq']);
-            $this->smarty->assign('mem_Grp',   $_SESSION['c_memGrp']);
-            $this->smarty->assign('mem_Name',  $_SESSION['c_memName']);
-        } else {
-            $this->smarty->assign('login_chk', FALSE);
-            $this->smarty->assign('mem_Type',  "");
-            $this->smarty->assign('mem_Seq',   "");
-            $this->smarty->assign('mem_Grp',   "");
+        $this->load->library('lib_auth');
+        $this->lib_auth->check_session();
 
-            redirect('/login/');
-        }
+//         if ($_SESSION['c_login'] == TRUE)
+//         {
+//             $this->smarty->assign('login_chk', TRUE);
+//             $this->smarty->assign('mem_Type',  $_SESSION['c_memType']);
+//             $this->smarty->assign('mem_Seq',   $_SESSION['c_memSeq']);
+//             $this->smarty->assign('mem_Grp',   $_SESSION['c_memGrp']);
+//             $this->smarty->assign('mem_Name',  $_SESSION['c_memName']);
+//         } else {
+//             $this->smarty->assign('login_chk', FALSE);
+//             $this->smarty->assign('mem_Type',  "");
+//             $this->smarty->assign('mem_Seq',   "");
+//             $this->smarty->assign('mem_Grp',   "");
+
+//             redirect('/login/');
+//         }
 
         $this->smarty->assign('err_email',  FALSE);
-        $this->smarty->assign('err_passwd', FALSE);
+//         $this->smarty->assign('err_passwd', FALSE);
         $this->smarty->assign('mess',       FALSE);
 
     }
@@ -34,8 +37,10 @@ class Accountlist extends MY_Controller
     {
 
     	// セッションデータをクリア
-    	$this->load->model('comm_auth', 'comm_auth', TRUE);
-    	$this->comm_auth->delete_session('client');
+    	$this->load->library('lib_auth');
+    	$this->lib_auth->delete_session('client');
+//     	$this->load->model('comm_auth', 'comm_auth', TRUE);
+//     	$this->comm_auth->delete_session('client');
 
         // バリデーション・チェック
         $this->_set_validation();												// バリデーション設定
@@ -160,11 +165,10 @@ class Accountlist extends MY_Controller
     	$this->_item_set();
 
     	// バリデーション設定
-    	$this->_set_validation02();
+    	$this->_set_validation();
 
     	// 更新対象アカウントのデータ取得
     	$input_post = $this->input->post();
-    	$this->load->model('Account', 'ac', TRUE);
 
     	if ($_SESSION['c_memType'] == 0)
     	{
@@ -173,6 +177,7 @@ class Accountlist extends MY_Controller
     		$tmp_acid = $input_post['ac_uniq'];
     	}
 
+    	$this->load->model('Account', 'ac', TRUE);
     	$ac_data = $this->ac->get_ac_seq($tmp_acid, TRUE);
 
     	$this->smarty->assign('info', $ac_data[0]);
@@ -199,54 +204,32 @@ class Accountlist extends MY_Controller
     		$this->_set_validation03();
     	}
 
-    	if ($this->form_validation->run() == FALSE)
+    	if ($this->form_validation->run() == TRUE)
     	{
-    	} else {
 
 	    	$this->load->model('Account', 'ac', TRUE);
 
-	    	// メールアドレスの重複チェック
-// 	    	if ($_SESSION['c_memType'] != 2)
-// 	    	{
-// 	    		$_seq = $_SESSION['c_memSeq'];
-// 	    	} else {
-// 	    		$_seq = $input_post['ac_seq'];
-// 	    	}
-
-// 	    	if ($this->ac->check_mailaddr($_seq, $input_post['ac_mail'])) {
-// 	    		$this->smarty->assign('err_email',  TRUE);
-// 	    		$this->smarty->assign('err_passwd', FALSE);
-
-//     			$this->smarty->assign('info', $input_post);
-// 	    		$this->view('accountlist/detail.tpl');
-// 	    		return;
-// 	    	}
+	    	// 不要パラメータ削除
+	    	if ((isset($input_post['ac_pw'])) && ($input_post['ac_pw'] == ""))
+	    	{
+	    		$pw = FALSE;
+	    		unset($input_post["ac_pw"]) ;
+	    	} elseif (!isset($input_post['ac_pw'])) {
+	    		$pw = FALSE;
+	    	} else {
+	    		$pw = TRUE;
+	    	}
+	    	unset($input_post["submit"]) ;
 
 	    	if ($_SESSION['c_memSeq'] == $input_post['ac_seq'])
 	    	{
-		    	// パスワード再入力チェック
-		    	if ($input_post['ac_pw'] !== $input_post['retype_password']) {
-		    		$this->smarty->assign('err_email',  FALSE);
-		    		$this->smarty->assign('err_passwd', TRUE);
-
-	    			$this->smarty->assign('info', $input_post);
-		    		$this->view('accountlist/detail.tpl');
-		    		return;
-		    	}
-
-		    	// 不要パラメータ削除
-		    	unset($input_post["retype_password"]) ;
-	    		unset($input_post["submit"]) ;
 
 		    	// DB書き込み
-		    	$this->ac->update_account($input_post, TRUE);
+		    	$this->ac->update_account($input_post, $pw);
 
 		    	$this->smarty->assign('mess',  "更新が完了しました。");
 
 	    	} else {
-
-	    		// 不要パラメータ削除
-	    		unset($input_post["submit"]) ;
 
 	    		if ($input_post['ac_status'] == 9)
 	    		{
@@ -254,13 +237,12 @@ class Accountlist extends MY_Controller
 	    		}
 
 	    		// DB書き込み (PW更新なし)
-	    		$this->ac->update_account($input_post);
+	    		$this->ac->update_account($input_post, $pw);
 
 	    		$this->smarty->assign('mess',  "更新が完了しました。");
 	    	}
-    	}
 
-//     	redirect('/accountlist/');
+    	}
 
      	$this->smarty->assign('info', $input_post);
      	$this->view('accountlist/detail.tpl');
@@ -272,11 +254,10 @@ class Accountlist extends MY_Controller
     {
 
     	// バリデーション設定
-    	$this->_set_validation04();
+    	$this->_set_validation();
 
     	// 初期値セット
     	$this->_item_set();
-    	//$this->_company_set();
 
     	$this->view('accountlist/add.tpl');
 
@@ -293,46 +274,33 @@ class Accountlist extends MY_Controller
     	if ($this->form_validation->run() == TRUE)
     	{
 
-
-    		// メールアドレス＆ログインIDの重複チェック
     		$this->load->model('Account', 'ac', TRUE);
 
+    		// メールアドレス＆ログインIDの重複チェック
     		if ($this->ac->check_loginid($input_post['ac_id']))
     		{
 
     			$this->smarty->assign('err_clid',   TRUE);
-    			$this->smarty->assign('err_passwd', FALSE);
 
     		} else {
 
-    			// パスワード再入力チェック
-    			if ($input_post['ac_pw'] !== $input_post['retype_password'])
-    			{
+   				$this->smarty->assign('err_clid',   FALSE);
 
-    				$this->smarty->assign('err_clid',   FALSE);
-    				$this->smarty->assign('err_passwd', TRUE);
+    			// 不要パラメータ削除
+    			unset($input_post["_submit"]) ;
 
-    			} else {
+    			// DB書き込み
+    			$input_post["ac_cl_seq"] = $_SESSION['c_memGrp'];
+    			$this->ac->insert_account($input_post);
 
-    				// 不要パラメータ削除
-    				unset($input_post["retype_password"]) ;
-    				unset($input_post["_submit"]) ;
+    			$this->smarty->assign('mess',  "更新が完了しました。");
+    			redirect('/accountlist/');
 
-    				// DB書き込み
-    				$input_post["ac_cl_seq"] = $_SESSION['c_memGrp'];
-    				$this->ac->insert_account($input_post);
-
-    				$this->smarty->assign('mess',  "更新が完了しました。");
-
-    			}
     		}
     	}
 
-//     	redirect('/accountlist/');
-
     	// 初期値セット
     	$this->_item_set();
-    	//$this->_company_set();
 
     	$this->view('accountlist/add.tpl');
 
@@ -378,183 +346,80 @@ class Accountlist extends MY_Controller
 
     }
 
-//     // 会社（クライアント）セット
-//     private function _company_set()
-//     {
-
-//     	$this->load->model('Client', 'cl', TRUE);
-//     	$cl_data = $this->cl->get_cl_company();
-
-//     	if (count($cl_data) > 0)
-//     	{
-//     		foreach ($cl_data as $value) {
-//     			$opt_cl_company[$value['cl_seq']] = $value['cl_company'];
-//     		}
-
-//     	}
-
-//      	$this->smarty->assign('options_cl_company',   $opt_cl_company);
-
-//     }
-
     // フォーム・バリデーションチェック
     private function _set_validation()
     {
 
     	$rule_set = array(
-//     			array(
-//     					'field'   => 'ac_name',
-//     					'label'   => '名前',
-//     					'rules'   => 'trim|max_length[20]'
-//     			),
-//     			array(
-//     					'field'   => 'ac_mail',
-//     					'label'   => 'メールアドレス',
-//     					'rules'   => 'trim|max_length[100]'
-//     			),
     	);
 
     	$this->load->library('form_validation', $rule_set);                     // バリデーションクラス読み込み
 
     }
 
-    // フォーム・バリデーションチェック : フルチェック
-    private function _set_validation02()
-    {
-    	$rule_set = array(
-    			array(
-    					'field'   => 'ac_type',
-    					'label'   => '管理種類選択',
-    					'rules'   => 'trim|required|max_length[2]'
-    			),
-    			array(
-    					'field'   => 'ac_status',
-    					'label'   => 'ステータス選択',
-    					'rules'   => 'trim|required|max_length[2]'
-    			),
-    			array(
-    					'field'   => 'ac_department',
-    					'label'   => '所属部署',
-    					'rules'   => 'trim|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'ac_name01',
-    					'label'   => '担当者姓',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'ac_name02',
-    					'label'   => '担当者名',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'ac_id',
-    					'label'   => 'ログインID',
-    					'rules'   => 'trim|required|max_length[50]|valid_email'
-    			),
-    			array(
-    					'field'   => 'ac_mail',
-    					'label'   => 'メールアドレス',
-    					'rules'   => 'trim|required|max_length[50]|valid_email'
-    			),
-    			array(
-    					'field'   => 'ac_tel',
-    					'label'   => '担当者電話番号',
-    					'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
-    			),
-    			array(
-    					'field'   => 'ac_mobile',
-    					'label'   => '担当者携帯番号',
-    					'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
-    			),
-//     			array(
-//     					'field'   => 'ac_pw',
-//     					'label'   => 'パスワード',
-//     					'rules'   => 'trim|required|regex_match[/^[\x21-\x7e]+$/]|min_length[8]|max_length[50]|matches[retype_password]'
-//     			),
-//     			array(
-//     					'field'   => 'retype_password',
-//     					'label'   => 'パスワード再入力',
-//     					'rules'   => 'trim|required|regex_match[/^[\x21-\x7e]+$/]|min_length[8]|max_length[50]|matches[ac_pw]'
-//     			)
-    	);
+     // フォーム・バリデーションチェック : 管理者による更新チェック
+     private function _set_validation02()
+     {
+     	$rule_set = array(
+		     	array(
+		     			'field'   => 'ac_type',
+		     			'label'   => '管理種類選択',
+		     			'rules'   => 'trim|required|is_numeric|max_length[2]'
+		     	),
+		     	array(
+		     			'field'   => 'ac_status',
+		     			'label'   => 'ステータス選択',
+		     			'rules'   => 'trim|required|is_numeric|max_length[2]'
+		     	),
+		     	array(
+		     			'field'   => 'ac_department',
+		     			'label'   => '所属部署',
+		     			'rules'   => 'trim|max_length[50]'
+		     	),
+		     	array(
+		     			'field'   => 'ac_name01',
+		     			'label'   => '担当者姓',
+		     			'rules'   => 'trim|required|max_length[50]'
+		     	),
+		     	array(
+		     			'field'   => 'ac_name02',
+		     			'label'   => '担当者名',
+		     			'rules'   => 'trim|required|max_length[50]'
+		     	),
+		     	array(
+		     			'field'   => 'ac_id',
+		     			'label'   => 'ログインID',
+		     			'rules'   => 'trim|required|max_length[50]|valid_email'
+		     	),
+		     	array(
+		     			'field'   => 'ac_pw',
+		     			'label'   => 'パスワード',
+		     			'rules'   => 'trim|regex_match[/^[\x21-\x7e]+$/]|min_length[8]|max_length[50]'
+		     	),
+		     	array(
+		     			'field'   => 'ac_keyword',
+		     			'label'   => 'キーワード',
+		     			'rules'   => 'trim|required|is_numeric|max_length[1]'
+		     	),
+		     	array(
+		     			'field'   => 'ac_group',
+		     			'label'   => 'グループ',
+		     			'rules'   => 'trim|required|is_numeric|max_length[1]'
+		     	),
+		     	array(
+		     			'field'   => 'ac_tag',
+		     			'label'   => 'タグ',
+		     			'rules'   => 'trim|required|is_numeric|max_length[1]'
+		     	),
+     	);
 
-    	$this->load->library('form_validation', $rule_set);                     // バリデーションクラス読み込み
-    }
-
-    // フォーム・バリデーションチェック : 管理者によるチェック
-    private function _set_validation04()
-    {
-    	$rule_set = array(
-//     			array(
-//     					'field'   => 'ac_cl_seq',
-//     					'label'   => '会社選択',
-//     					'rules'   => 'trim|required|max_length[2]'
-//     			),
-    			array(
-    					'field'   => 'ac_type',
-    					'label'   => '管理種類選択',
-    					'rules'   => 'trim|required|max_length[2]'
-    			),
-    			array(
-    					'field'   => 'ac_department',
-    					'label'   => '所属部署',
-    					'rules'   => 'trim|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'ac_name01',
-    					'label'   => '担当者姓',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'ac_name02',
-    					'label'   => '担当者名',
-    					'rules'   => 'trim|required|max_length[50]'
-    			),
-    			array(
-    					'field'   => 'ac_tel',
-    					'label'   => '担当者電話番号',
-    					'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
-    			),
-    			array(
-    					'field'   => 'ac_mobile',
-    					'label'   => '担当者携帯番号',
-    					'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
-    			),
-    			array(
-    					'field'   => 'ac_id',
-    					'label'   => 'ログインID',
-    					'rules'   => 'trim|required|max_length[50]|valid_email'
-    			),
-    			array(
-    					'field'   => 'ac_pw',
-    					'label'   => 'パスワード',
-    					'rules'   => 'trim|required|regex_match[/^[\x21-\x7e]+$/]|min_length[8]|max_length[50]|matches[retype_password]'
-    			),
-    			array(
-    					'field'   => 'retype_password',
-    					'label'   => 'パスワード再入力',
-    					'rules'   => 'trim|required|regex_match[/^[\x21-\x7e]+$/]|min_length[8]|max_length[50]|matches[ac_pw]'
-    			)
-    	);
-
-    	$this->load->library('form_validation', $rule_set);                     // バリデーションクラス読み込み
-    }
+     	$this->load->library('form_validation', $rule_set);                     // バリデーションクラス読み込み
+     }
 
     // フォーム・バリデーションチェック : 本人チェック
     private function _set_validation03()
     {
     	$rule_set = array(
-//     			array(
-//     					'field'   => 'ac_type',
-//     					'label'   => '管理種類選択',
-//     					'rules'   => 'trim|required|max_length[2]'
-//     			),
-//     			array(
-//     					'field'   => 'ac_status',
-//     					'label'   => 'ステータス選択',
-//     					'rules'   => 'trim|required|max_length[2]'
-//     			),
     			array(
     					'field'   => 'ac_department',
     					'label'   => '所属部署',
@@ -576,31 +441,70 @@ class Accountlist extends MY_Controller
     					'rules'   => 'trim|required|max_length[100]|valid_email'
     			),
     			array(
-    					'field'   => 'ac_mail',
-    					'label'   => 'メールアドレス',
-    					'rules'   => 'trim|required|max_length[100]|valid_email'
+    					'field'   => 'ac_pw',
+    					'label'   => 'パスワード',
+    					'rules'   => 'trim|regex_match[/^[\x21-\x7e]+$/]|min_length[8]|max_length[50]'
+    			),
+    	);
+
+    	$this->load->library('form_validation', $rule_set);                     // バリデーションクラス読み込み
+    }
+
+    // フォーム・バリデーションチェック : 管理者による新規登録チェック
+    private function _set_validation04()
+    {
+    	$rule_set = array(
+    			array(
+    					'field'   => 'ac_type',
+    					'label'   => '管理種類選択',
+    					'rules'   => 'trim|required|is_numeric|max_length[2]'
     			),
     			array(
-    					'field'   => 'ac_tel',
-    					'label'   => '担当者電話番号',
-    					'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
+    					'field'   => 'ac_status',
+    					'label'   => 'ステータス選択',
+    					'rules'   => 'trim|required|is_numeric|max_length[2]'
     			),
     			array(
-    					'field'   => 'ac_mobile',
-    					'label'   => '担当者携帯番号',
-    					'rules'   => 'trim|regex_match[/^[0-9\-]+$/]|max_length[15]'
+    					'field'   => 'ac_department',
+    					'label'   => '所属部署',
+    					'rules'   => 'trim|max_length[50]'
+    			),
+    			array(
+    					'field'   => 'ac_name01',
+    					'label'   => '担当者姓',
+    					'rules'   => 'trim|required|max_length[50]'
+    			),
+    			array(
+    					'field'   => 'ac_name02',
+    					'label'   => '担当者名',
+    					'rules'   => 'trim|required|max_length[50]'
+    			),
+    			array(
+    					'field'   => 'ac_id',
+    					'label'   => 'ログインID',
+    					'rules'   => 'trim|required|max_length[50]|valid_email'
     			),
     			array(
     					'field'   => 'ac_pw',
     					'label'   => 'パスワード',
-    					'rules'   => 'trim|required|regex_match[/^[\x21-\x7e]+$/]|min_length[8]|max_length[50]|matches[retype_password]'
+    					'rules'   => 'trim|required|regex_match[/^[\x21-\x7e]+$/]|min_length[8]|max_length[50]'
     			),
-    	    	array(
-    					'field'   => 'retype_password',
-    	    			'label'   => 'パスワード再入力',
-    	    			'rules'   => 'trim|required|regex_match[/^[\x21-\x7e]+$/]|min_length[8]|max_length[50]|matches[ac_pw]'
-    	    	)
-    	);
+		    	array(
+		    			'field'   => 'ac_keyword',
+		    			'label'   => 'キーワード',
+		    			'rules'   => 'trim|required|is_numeric|max_length[1]'
+		    	),
+		    	array(
+		    			'field'   => 'ac_group',
+		    			'label'   => 'グループ',
+		    			'rules'   => 'trim|required|is_numeric|max_length[1]'
+		    	),
+		    	array(
+		    			'field'   => 'ac_tag',
+		    			'label'   => 'タグ',
+		    			'rules'   => 'trim|required|is_numeric|max_length[1]'
+		    	),
+    	 );
 
     	$this->load->library('form_validation', $rule_set);                     // バリデーションクラス読み込み
     }

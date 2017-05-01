@@ -205,7 +205,7 @@ class Invo_create_agency extends MY_Controller
                     $get_iv_data[0]['iv_sales_date']  = NULL;                                                   // 売上日
 
                     // 担当営業名を取得
-                    $get_salesman = $this->ac->get_pj_salesman($value['cm_salesman'], 'seorank');
+                    $get_salesman = $this->ac->get_pj_salesman($value['cm_salesman'], 'projects');
                     $set_data_iv['iv_salesman']      = $get_salesman[0]['ac_name01'] . '　' . $get_salesman[0]['ac_name02'];
                     $set_data_iv['iv_salesman_id']   = $value['cm_salesman'];
 

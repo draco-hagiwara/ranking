@@ -20,6 +20,12 @@
       {form_dropdown('iv_issue_yymm', $options_date_fix, set_value('iv_issue_yymm', ''))}
       {if form_error('iv_issue_yymm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_issue_yymm')}</font></label>{/if}
     </div>
+    <div class="col-sm-offset-4 col-sm-1">
+      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal11">個　別</button>
+    </div>
+    <div class="col-sm-offset-1 col-sm-1">
+      <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#myModal10">一　括</button>
+    </div>
   </div>
   <div class="form-group">
     <label for="iv_issue_date01" class="col-xs-3 col-md-3 control-label">発行日指定<font color=red> *</font></label>
@@ -29,9 +35,6 @@
     </div>
     <div class="col-md-4">
       <p class="redText"><small>※入力フォーマット（ yyyy/dd/mm　または　yyyy-dd-mm ）</small></p>
-    </div>
-    <div class="col-sm-1">
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal10">一　括</button>
     </div>
   </div>
   <div class="form-group">
@@ -43,14 +46,11 @@
     <div class="col-md-4">
       <p class="redText"><small>※該当顧客のみ請求書データを作成します。<br>※「個別」ボタンを押下してください。</small></p>
     </div>
-    <div class="col-sm-1">
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal11">個　別</button>
-    </div>
   </div>
   <div class="form-group">
     <div class="col-xs-9 col-md-9 col-sm-offset-3">
-      <p class="text-danger">※毎月データを作成した後に、顧客情報や案件情報を変更しても反映されませんので注意してください。</p>
-      <p class="text-danger">※複数回使用する場合は、既存の請求書データは上書きされるので注意してください。</p>
+      <p class="text-danger">※「一括」作成を複数回使用する場合は、既存の請求書データが上書きされるので注意してください。</p>
+      <p class="text-danger">※データを作成した後に、顧客情報や案件情報を変更しても反映されませんので注意してください。</p>
     </div>
   </div>
 
@@ -114,6 +114,12 @@ $('#mydate1').datepicker({
       {form_dropdown('iv_issue_yymm', $options_date_res, set_value('iv_issue_yymm', ''))}
       {if form_error('iv_issue_yymm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_issue_yymm')}</font></label>{/if}
     </div>
+    <div class="col-sm-offset-4 col-sm-1">
+      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal21">個　別</button>
+    </div>
+    <div class="col-sm-offset-1 col-sm-1">
+      <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#myModal20">一　括</button>
+    </div>
   </div>
   <div class="form-group">
     <label for="iv_issue_date01" class="col-xs-3 col-md-3 control-label">発行日指定<font color=red> *</font></label>
@@ -124,9 +130,6 @@ $('#mydate1').datepicker({
     <div class="col-md-4">
       <p class="redText"><small>※入力フォーマット（ yyyy/dd/mm　または　yyyy-dd-mm ）</small></p>
     </div>
-    <div class="col-sm-1">
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal20">一　括</button>
-    </div>
   </div>
   <div class="form-group">
     <label for="iv_cm_seq02" class="col-xs-3 col-md-3 control-label">顧客番号</label>
@@ -136,9 +139,6 @@ $('#mydate1').datepicker({
     </div>
     <div class="col-md-4">
       <p class="redText"><small>※該当顧客のみ請求書データを作成します。<br>※「個別」ボタンを押下してください。</small></p>
-    </div>
-    <div class="col-sm-1">
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal21">個　別</button>
     </div>
   </div>
 
@@ -202,6 +202,12 @@ $('#mydate2').datepicker({
       {form_dropdown('iv_issue_yymm', $options_date_res, set_value('iv_issue_yymm', ''))}
       {if form_error('iv_issue_yymm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_issue_yymm')}</font></label>{/if}
     </div>
+    <div class="col-sm-offset-4 col-sm-1">
+      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal31">個　別</button>
+    </div>
+    <div class="col-sm-offset-1 col-sm-1">
+      <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#myModal30">一　括</button>
+    </div>
   </div>
   <div class="form-group">
     <label for="iv_issue_date01" class="col-xs-3 col-md-3 control-label">発行日指定<font color=red> *</font></label>
@@ -212,9 +218,6 @@ $('#mydate2').datepicker({
     <div class="col-md-4">
       <p class="redText"><small>※入力フォーマット（ yyyy/dd/mm　または　yyyy-dd-mm ）</small></p>
     </div>
-    <div class="col-sm-1">
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal30">一　括</button>
-    </div>
   </div>
   <div class="form-group">
     <label for="iv_cm_seq03" class="col-xs-3 col-md-3 control-label">顧客番号</label>
@@ -224,9 +227,6 @@ $('#mydate2').datepicker({
     </div>
     <div class="col-md-4">
       <p class="redText"><small>※該当顧客のみ請求書データを作成します。<br>※「個別」ボタンを押下してください。</small></p>
-    </div>
-    <div class="col-sm-1">
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal31">個　別</button>
     </div>
   </div>
 
@@ -289,7 +289,7 @@ $('#mydate3').datepicker({
   <div class="form-group form-group-lg">
     <label for="iv_pay_date" class="col-sm-3 control-label">【 振込期日の一括変更 】</label>
     <div class="col-sm-2 input-lg">
-      {form_dropdown('iv_issue_yymm', $options_date_res, set_value('iv_issue_yymm', ''))}
+      {form_dropdown('iv_issue_yymm', $options_date_fix, set_value('iv_issue_yymm', ''))}
       {if form_error('iv_issue_yymm')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_issue_yymm')}</font></label>{/if}
     </div>
   </div>
@@ -305,7 +305,7 @@ $('#mydate3').datepicker({
       {if form_error('iv_pay_date02')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('iv_pay_date02')}</font></label>{/if}
     </div>
     <div class="col-sm-1 col-sm-offset-1">
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal40">変　更</button>
+      <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#myModal40">変　更</button>
     </div>
   </div>
   <div class="form-group">

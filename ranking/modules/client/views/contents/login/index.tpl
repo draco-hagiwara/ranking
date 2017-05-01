@@ -5,7 +5,7 @@
 {* ヘッダー部分　END *}
 
 <div class="jumbotron">
-  <h3>ログイン画面　　<span class="label label-info">事業者</span></h3>
+  <h3><span class="label label-info">順位チェックツール</span>　　DEV：ログイン画面</h3>
 </div>
 
 {form_open('/login/check/' , 'name="LoginForm" class="form-horizontal"')}

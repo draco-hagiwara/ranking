@@ -36,8 +36,10 @@ class Clientlist extends MY_Controller
     {
 
     	// セッションデータをクリア
-    	$this->load->model('comm_auth', 'comm_auth', TRUE);
-    	$this->comm_auth->delete_session('admin');
+    	$this->load->library('lib_auth');
+    	$this->lib_auth->delete_session('client');
+//     	$this->load->model('comm_auth', 'comm_auth', TRUE);
+//     	$this->comm_auth->delete_session('client');
 
         // バリデーション・チェック
         $this->_set_validation();												// バリデーション設定
@@ -63,9 +65,9 @@ class Clientlist extends MY_Controller
 
 			// セッションをフラッシュデータとして保存
 			$data = array(
-							'a_cl_company' => "",
-							'a_cl_status'  => "",
-							'a_orderid'    => "",
+							'c_cl_company' => "",
+							'c_cl_status'  => "",
+							'c_orderid'    => "",
 			);
 			$this->session->set_userdata($data);
         }
@@ -102,9 +104,9 @@ class Clientlist extends MY_Controller
         {
             // セッションをフラッシュデータとして保存
             $data = array(
-                    		'a_cl_company' => $this->input->post('cl_company'),
-                    		'a_cl_status'  => $this->input->post('cl_status'),
-                    		'a_orderid'    => $this->input->post('orderid'),
+                    		'c_cl_company' => $this->input->post('cl_company'),
+                    		'c_cl_status'  => $this->input->post('cl_status'),
+                    		'c_orderid'    => $this->input->post('orderid'),
             );
             $this->session->set_userdata($data);
 
@@ -113,9 +115,9 @@ class Clientlist extends MY_Controller
 
         } else {
             // セッションからフラッシュデータ読み込み
-            $tmp_inputpost['cl_company'] = $_SESSION['a_cl_company'];
-            $tmp_inputpost['cl_status']  = $_SESSION['a_cl_status'];
-            $tmp_inputpost['orderid']    = $_SESSION['a_orderid'];
+            $tmp_inputpost['cl_company'] = $_SESSION['c_cl_company'];
+            $tmp_inputpost['cl_status']  = $_SESSION['c_cl_status'];
+            $tmp_inputpost['orderid']    = $_SESSION['c_orderid'];
         }
 
         // バリデーション・チェック
@@ -312,7 +314,7 @@ class Clientlist extends MY_Controller
     				if ($this->db->trans_status() === FALSE)
     				{
     					$this->smarty->assign('mess',  "トランザクションエラーが発生しました。");
-    					log_message('error', 'ADMIN::[Clientlist->addchk()]クライアント新規登録処理 トランザクションエラー');
+    					log_message('error', 'client::[Clientlist->addchk()]クライアント新規登録処理 トランザクションエラー');
     				} else {
     					$this->smarty->assign('mess',  "更新が完了しました。");
     				}
