@@ -42,7 +42,20 @@ class Taglist extends MY_Controller
     	if (isset($segments[3]))
     	{
     		$tmp_offset = $segments[3];
+    		if (!is_numeric($tmp_offset))
+    		{
+    			//throw new Exception("例外発生！");
+    			show_error('指定されたIDは不正です。');
+    		}
+
     		$tmp_inputpost = $this->input->post();
+
+    		// セッションをフラッシュデータとして保存
+    		$data = array(
+    				'c_offset'     => $tmp_offset,
+    				'c_back_set'   => "taglist",
+    		);
+    		$this->session->set_userdata($data);
     	} else {
     		$tmp_offset = 0;
     		$tmp_inputpost = array(
@@ -54,6 +67,8 @@ class Taglist extends MY_Controller
     		$data = array(
     				'c_gt_name' => "",
     				'c_orderid' => "",
+		    		'c_offset'   => $tmp_offset,
+		    		'c_back_set' => "taglist",
     		);
     		$this->session->set_userdata($data);
     	}
@@ -66,9 +81,9 @@ class Taglist extends MY_Controller
     	list($gt_list, $gt_countall) = $this->gt->get_gtlist($_set_gt_data, $tmp_per_page, $tmp_offset);
 
     	// タグ情報を整形
-    	$this->load->library('lib_keyword');
-    	$this->lib_keyword->create_mold_tag($gt_list);
-//     	$this->smarty->assign('list', $gt_list);
+//     	$this->load->library('lib_keyword');
+//     	$this->lib_keyword->create_mold_tag($gt_list);
+    	$this->smarty->assign('list', $gt_list);
 
     	// Pagination 設定
     	$set_pagination = $this->_get_Pagination($gt_countall, $tmp_per_page);
@@ -85,7 +100,6 @@ class Taglist extends MY_Controller
     	$this->view('taglist/index.tpl');
 
     }
-
 
 
 
@@ -112,6 +126,12 @@ class Taglist extends MY_Controller
     	if (isset($segments[3]))
     	{
     		$tmp_offset = $segments[3];
+    		if (!is_numeric($tmp_offset))
+    		{
+    			//throw new Exception("例外発生！");
+    			show_error('指定されたIDは不正です。');
+    		}
+
     		$tmp_inputpost = $this->input->post();
     	} else {
     		$tmp_offset = 0;
@@ -169,7 +189,7 @@ class Taglist extends MY_Controller
     		// セッションをフラッシュデータとして保存
     		$data = array(
     				'c_gt_name' => $this->input->post('gt_name'),
-    				'c_orderid'    => $this->input->post('orderid'),
+    				'c_orderid' => $this->input->post('orderid'),
     		);
     		$this->session->set_userdata($data);
 
@@ -178,8 +198,8 @@ class Taglist extends MY_Controller
 
     	} else {
     		// セッションからフラッシュデータ読み込み
-    		$tmp_inputpost['gt_name']   = $_SESSION['c_gt_name'];
-    		$tmp_inputpost['orderid']      = $_SESSION['c_orderid'];
+    		$tmp_inputpost['gt_name'] = $_SESSION['c_gt_name'];
+    		$tmp_inputpost['orderid'] = $_SESSION['c_orderid'];
     	}
 
     	// バリデーション・チェック
@@ -190,9 +210,21 @@ class Taglist extends MY_Controller
     	if (isset($segments[3]))
     	{
     		$tmp_offset = $segments[3];
+    		if (!is_numeric($tmp_offset))
+    		{
+    			//throw new Exception("例外発生！");
+    			show_error('指定されたIDは不正です。');
+    		}
+
     	} else {
     		$tmp_offset = 0;
     	}
+
+    	// セッションをフラッシュデータとして保存
+    	$data = array(
+    			'c_offset'     => $tmp_offset,
+    	);
+    	$this->session->set_userdata($data);
 
     	// 1ページ当たりの表示件数
     	$this->config->load('config_comm');
@@ -204,11 +236,11 @@ class Taglist extends MY_Controller
     	$_set_gt_data['gt_type']   = 1;
     	$_set_gt_data['gt_cl_seq'] = $_SESSION['c_memGrp'];
     	list($gt_list, $gt_countall) = $this->gt->get_gtlist($_set_gt_data, $tmp_per_page, $tmp_offset);
+    	$this->smarty->assign('list', $gt_list);
 
     	// タグ情報を整形
     	$this->load->library('lib_keyword');
     	$this->lib_keyword->create_mold_tag($gt_list);
-    	//     	$this->smarty->assign('list', $gt_list);
 
     	// Pagination 設定
     	$set_pagination = $this->_get_Pagination($gt_countall, $tmp_per_page);
@@ -230,11 +262,9 @@ class Taglist extends MY_Controller
     public function detail()
     {
 
-    	// セッションデータをクリア
-    	$this->load->library('lib_auth');
-    	$this->lib_auth->delete_session('client');
-//     	$this->load->model('comm_auth', 'comm_auth', TRUE);
-//     	$this->comm_auth->delete_session('client');
+//     	// セッションデータをクリア
+//     	$this->load->library('lib_auth');
+//     	$this->lib_auth->delete_session('client');
 
     	// バリデーション・チェック
     	$this->_set_validation();												// バリデーション設定
@@ -247,34 +277,51 @@ class Taglist extends MY_Controller
     	$segments = $this->uri->segment_array();
     	if (isset($segments[3]))
     	{
-    		$tmp_offset = 0;
-//     		$tmp_tg_seq = $segments[3];
+    		$tmp_offset = $segments[3];
+    		if (!is_numeric($tmp_offset))
+    		{
+    			//throw new Exception("例外発生！");
+    			show_error('指定されたIDは不正です。');
+    		}
 
-    		// セッションをフラッシュデータとして保存
-    		// セッションをフラッシュデータとして保存
-    		$data = array(
-    				'c_kw_keyword' => "",
-    				'c_kw_domain'  => '',
-    				'c_orderid'    => "",
-    				'c_kw_seq'     => $segments[3],
-    		);
-    		$this->session->set_userdata($data);
-
+    		$tmp_inputpost = $this->input->post();
     	} else {
     		$tmp_offset = 0;
+    		$tmp_inputpost = $this->input->post();
+
+    		if (!isset($tmp_inputpost['chg_seq']))
+    		{
+    			show_404();
+    		}
+
+    		$tmp_inputpost = array(
+	    				'gt_name'   => '',
+	    				'orderid'   => '',
+	    				'gt_seq'    => $this->input->post('chg_seq'),
+    		);
+
+    		// セッションをフラッシュデータとして保存
+    		$data = array(
+	    				'c_gt_name'    => "",
+	    				'c_orderid'    => "",
+	    				'c_gt_seq'     => $this->input->post('chg_seq'),
+			    		'c_kw_keyword' => "",
+			    		'c_kw_domain'  => "",
+			    		'c_kw_status'  => "",
+    		);
+    		$this->session->set_userdata($data);
     	}
 
     	// タグ情報の取得
     	$this->load->model('Group_tag', 'gt', TRUE);
-    	$get_gt_data = $this->gt->get_gt_seq($_SESSION['c_kw_seq']);
-//     	$get_gt_data = $this->gt->get_gt_seq($tmp_tg_seq);
+    	$get_gt_data = $this->gt->get_gt_seq($_SESSION['c_gt_seq']);
 
     	// 該当タグが設定してあるキーワード情報を取得
     	$_set_kw_data['kw_cl_seq']  = $_SESSION['c_memGrp'];
-    	$_set_kw_data['kw_group']   = $get_gt_data[0]['gt_name'];
+    	$_set_kw_data['kw_tag']     = $get_gt_data[0]['gt_name'];
     	$_set_kw_data['kw_keyword'] = NULL;
     	$_set_kw_data['kw_domain']  = NULL;
-    	$_set_kw_data['kw_status']  = NULL;
+    	$_set_kw_data['kw_status']  = 1;
     	$_set_kw_data['orderid']    = NULL;
 
     	$this->load->model('Keyword', 'kw', TRUE);
@@ -285,20 +332,11 @@ class Taglist extends MY_Controller
     	// 順位データ情報を取得 (31日分) ＆ グラフ表示
     	$this->load->library('lib_ranking_data');
     	$this->lib_ranking_data->create_ranking_graph($kw_list, $cnt_date=31);
-//     	$this->load->model('Ranking', 'rk', TRUE);
 
-//     	$cnt_date = 31;
     	$date = new DateTime();
     	$_start_date = $date->format('Y-m-d');
-    	$_set_cnt_date = "- " . $cnt_date+1 . " days";
+    	$_set_cnt_date = "- " . ($cnt_date - 1) . " days";
     	$_end_date   = $date->modify($_set_cnt_date)->format('Y-m-d');
-
-//     	$this->load->library('lib_ranking_data');
-//     	foreach ($kw_list as $key => $value)
-//     	{
-//     		$this->lib_ranking_data->get_ranking_graph($value['kw_seq'], $cnt_date);
-// //     		$this->_get_ranking_graph($value['kw_seq'], $cnt_date);
-//     	}
 
     	// Pagination 設定
     	$set_pagination = $this->_get_Pagination01($kw_countall, $tmp_per_page);
@@ -316,6 +354,18 @@ class Taglist extends MY_Controller
     	$this->smarty->assign('seach_orderid', $_set_kw_data['orderid']);
     	$this->smarty->assign('start_date',    $_start_date);
     	$this->smarty->assign('end_date',      $_end_date);
+
+    	// 「戻る」のページャ先をセット
+    	if (isset($_SESSION['c_offset']))
+    	{
+    		$page_cnt = $_SESSION['c_offset'];
+    	} else {
+    		$page_cnt = 0;
+    	}
+    	$this->smarty->assign('seach_page_no', $page_cnt);
+
+    	// 「戻る」の画面先をセット
+    	$this->smarty->assign('back_page', $_SESSION['c_back_set']);
 
     	$this->view('taglist/detail.tpl');
 
@@ -363,11 +413,11 @@ class Taglist extends MY_Controller
 
     	// タグ情報の取得
     	$this->load->model('Group_tag', 'gt', TRUE);
-    	$get_gt_data = $this->gt->get_gt_seq($_SESSION['c_kw_seq']);
+    	$get_gt_data = $this->gt->get_gt_seq($_SESSION['c_gt_seq']);
 
     	// 該当タグが設定してあるキーワード情報を取得
     	$_set_kw_data['kw_cl_seq']  = $_SESSION['c_memGrp'];
-    	$_set_kw_data['kw_group']   = $get_gt_data[0]['gt_name'];
+    	$_set_kw_data['kw_tag']     = $get_gt_data[0]['gt_name'];
     	$_set_kw_data['kw_keyword'] = $tmp_inputpost['kw_keyword'];
     	$_set_kw_data['kw_domain']  = $tmp_inputpost['kw_domain'];
     	$_set_kw_data['kw_status']  = NULL;
@@ -386,7 +436,7 @@ class Taglist extends MY_Controller
 //     	$cnt_date = 31;																// 表示期間。後にconfigで定義。
     	$date = new DateTime();
     	$_start_date = $date->format('Y-m-d');
-    	$_set_cnt_date = "- " . $cnt_date+1 . " days";
+    	$_set_cnt_date = "- " . ($cnt_date - 1) . " days";
     	$_end_date   = $date->modify($_set_cnt_date)->format('Y-m-d');
 
 //     	$this->load->library('lib_ranking_data');
@@ -456,14 +506,23 @@ class Taglist extends MY_Controller
     		$set_gt_data['gt_name']   = trim($_tagname);
 //     		$set_gt_data['gt_name']   = $input_post['new_name'];
 
-    		$set_gt_data['gt_memo']   = $input_post['new_memo'];
-    		$set_gt_data['gt_cl_seq'] = $_SESSION['c_memGrp'];
-    		$set_gt_data['gt_type']   = 1;
+    		// 重複チェック
+    		$get_gt_name = $this->gt->get_gt_name($set_gt_data['gt_name'], $_SESSION['c_memGrp'], 1);
+    		if (empty($get_gt_name))
+    		{
 
-    		// INSERT
-    		$this->gt->insert_group_tag($set_gt_data);
+	    		$set_gt_data['gt_memo']   = $input_post['new_memo'];
+	    		$set_gt_data['gt_cl_seq'] = $_SESSION['c_memGrp'];
+	    		$set_gt_data['gt_type']   = 1;
 
-    		$this->smarty->assign('mess02', "<font color=blue>グループ名が追加されました。</font>");
+	    		// INSERT
+	    		$this->gt->insert_group_tag($set_gt_data);
+
+	    		$this->smarty->assign('mess02', "<font color=blue>タグ名が追加されました。</font>");
+
+    		} else {
+    			$this->smarty->assign('mess02', "<font color=red>ERROR::同一タグ名が既に存在します。</font>");
+    		}
 
     	}
 
@@ -518,6 +577,13 @@ class Taglist extends MY_Controller
 
     	$input_post = $this->input->post();
 
+
+
+//     	print_r($input_post);
+//     	print("<br><br>");
+//     	exit;
+
+
     	// バリデーション設定
     	$this->_set_validation01();
     	if ($this->form_validation->run() == TRUE)
@@ -532,19 +598,41 @@ class Taglist extends MY_Controller
     			$_tagname = str_replace("　", " ", $input_post['gt_name']);;
     			$set_gt_data['gt_name']     = trim($_tagname);
 
-    			// UPDATE
-    			$set_gt_data['gt_cl_seq']   = $_SESSION['c_memGrp'];
-    			$set_gt_data['old_gt_name'] = $input_post['old_gt_name'];
-    			$set_gt_data['gt_memo']     = $input_post['gt_memo'];
-    			$this->gt->update_gt_name($set_gt_data, $type=1);
+    			// 重複チェック
+    			$get_gt_name = $this->gt->get_gt_name($set_gt_data['gt_name'], $_SESSION['c_memGrp'], 1);
+    			if (empty($get_gt_name) || ($set_gt_data['gt_name'] == $input_post['old_gt_name']))
+    			{
 
-    			// キーワード情報一括書き換え
-    			$set_kw_data['kw_cl_seq']   = $_SESSION['c_memGrp'];
-    			$set_kw_data['gt_name']     = $set_gt_data['gt_name'];
-    			$set_kw_data['old_gt_name'] = $input_post['old_gt_name'];
-    			$this->kw->update_kw_all($set_kw_data);
+    				// UPDATE
+    				$set_gt_data['gt_cl_seq']   = $_SESSION['c_memGrp'];
+    				$set_gt_data['old_gt_name'] = $input_post['old_gt_name'];
+    				$set_gt_data['gt_memo']     = $input_post['gt_memo'];
+    				$this->gt->update_gt_name($set_gt_data, $type=1);
 
-    			$this->smarty->assign('mess01', "<font color=blue>グループ名が更新されました。</font>");
+    				// タグ情報一括書き換え
+    				$set_kw_data['kw_cl_seq']   = $_SESSION['c_memGrp'];
+    				$set_kw_data['kw_tag']      = $input_post['old_gt_name'];
+    				$get_tag_data = $this->kw->get_kw_tag($set_kw_data);
+
+    				if (!empty($get_tag_data))
+    				{
+    					foreach ($get_tag_data as $key => $value)
+    					{
+    						$_org_word = "[" . $input_post['old_gt_name'] . "]";
+    						$_chg_word = "[" . $input_post['gt_name'] . "]";
+    						$get_tag_data[$key]['kw_tag'] = str_replace($_org_word, $_chg_word, $value['kw_tag']);
+
+    						$this->kw->update_keyword($get_tag_data[$key]);
+    					}
+    				}
+
+    				$this->smarty->assign('mess01', "<font color=blue>タグ名が更新されました。</font>");
+
+    			} else {
+
+    				$this->smarty->assign('mess01', "<font color=red>ERROR::同一タグ名が既に存在します。</font>");
+
+    			}
 
     		} elseif ($input_post['submit'] == '_delete') {
 
@@ -553,13 +641,25 @@ class Taglist extends MY_Controller
     			$set_gt_data['old_gt_name'] = $input_post['old_gt_name'];
     			$this->gt->delete_group_tag($set_gt_data, $type=1);
 
-    			// キーワード情報一括書き換え
+    			// タグ情報一括書き換え
     			$set_kw_data['kw_cl_seq']   = $_SESSION['c_memGrp'];
-    			$set_kw_data['gt_name']     = "選択なし";
-    			$set_kw_data['old_gt_name'] = $input_post['old_gt_name'];
-    			$this->kw->update_kw_all($set_kw_data);
+    			$set_kw_data['kw_tag']      = $input_post['old_gt_name'];
+    			$get_tag_data = $this->kw->get_kw_tag($set_kw_data);
 
-    			$this->smarty->assign('mess01', "<font color=blue>グループ名が削除されました。</font>");
+    			if (!empty($get_tag_data))
+    			{
+    				// タグ名の場合は置き換え
+    				foreach ($get_tag_data as $key => $value)
+    				{
+    					$_org_word = "[" . $input_post['old_gt_name'] . "]";
+    					$_chg_word = "";
+    					$get_tag_data[$key]['kw_tag'] = str_replace($_org_word, $_chg_word, $value['kw_tag']);
+
+    					$this->kw->update_keyword($get_tag_data[$key]);
+    				}
+    			}
+
+    			$this->smarty->assign('mess01', "<font color=blue>タグ名が削除されました。</font>");
 
     		}else {
 

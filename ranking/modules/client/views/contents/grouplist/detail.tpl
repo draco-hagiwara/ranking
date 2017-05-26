@@ -4,28 +4,7 @@
 <body>
 {* ヘッダー部分　END *}
 
-<script type="text/javascript">
-<!--
-function fmSubmit(formName, url, method, num) {
-  var f1 = document.forms[formName];
-
-  console.log(num);
-
-  /* エレメント作成&データ設定&要素追加 */
-  var e1 = document.createElement('input');
-  e1.setAttribute('type', 'hidden');
-  e1.setAttribute('name', 'chg_clseq');
-  e1.setAttribute('value', num);
-  f1.appendChild(e1);
-
-  /* サブミットするフォームを取得 */
-  f1.method = method;                                   // method(GET or POST)を設定する
-  f1.action = url;                                      // action(遷移先URL)を設定する
-  f1.submit();                                          // submit する
-  return true;
-}
-// -->
-</script>
+  <script src="{base_url()}../../js/my/fmsubmit.js"></script>
 
 <div id="contents" class="container">
 
@@ -70,22 +49,46 @@ function fmSubmit(formName, url, method, num) {
     {$set_pagination}
 </ul>
 
-<p>グループ名：{$gt_name}<br>表示期間：{$end_date} ～ {$start_date}</p>
+<p>グループ名：{$gt_name}<br>表示期間：{$end_date} ～ {$start_date} (31日間)</p>
 {form_open('/grouplist/detail_search/' , 'name="detailForm" class="form-horizontal"')}
 
   {foreach from=$list item=kw}
-    ID:{$kw.kw_seq}
-     , 【{$kw.kw_keyword}】
-     , {$kw.kw_url}
-     , {if $kw.kw_matchtype==0}完全一致{elseif $kw.kw_matchtype==1}前方一致{elseif $kw.kw_matchtype==2}ドメイン一致{elseif $kw.kw_matchtype==3}ルートドメイン一致{else}error{/if}
-     , {if $kw.kw_searchengine==0}Google{elseif $kw.kw_searchengine==1}Yahoo!{else}error{/if}
-     , {if $kw.kw_device==0}PC{elseif $kw.kw_device==1}Mobile{else}error{/if}
-     , 【{$kw.kw_location_name}】
+
+    <div class="row">
+      <div class="col-md-1">
+        {if $kw.kw_status == "1"}<span class="label label-primary">有効</span>
+        {elseif $kw.kw_status == "0"}<span class="label label-default">無効</span>
+        {else}エラー
+        {/if}
+     </div>
+     <div class="col-md-11 text-right">
+        <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/keyworddetail/detail/', 'POST', '{$kw.kw_seq}', 'chg_seq');">詳　細</button>
+        {if $smarty.session.c_memKw==1}
+          <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/keywordlist/chg/', 'POST', '{$kw.kw_seq}', 'chg_seq');">編　集</button>
+        {/if}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        ID:{$kw.kw_seq}
+        , 【{$kw.kw_keyword}】
+        , {if $kw.kw_matchtype==0}完全一致{elseif $kw.kw_matchtype==1}前方一致{elseif $kw.kw_matchtype==2}ドメイン一致{elseif $kw.kw_matchtype==3}ルートドメイン一致{else}error{/if}
+        , {if $kw.kw_searchengine==0}<font color="#0000ff">Google</font>{elseif $kw.kw_searchengine==1}<font color="#dc143c">Yahoo!</font>{else}error{/if}
+        , {if $kw.kw_device==0}PC{elseif $kw.kw_device==1}Mobile{else}error{/if}
+        , 【{$kw.kw_location_name}】
+
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 textOverflow">
+        {$kw.kw_url}
+      </div>
+    </div>
 
     <table class="table table-striped table-hover table-condensed">
       <thead>
         <tr>
-          <th class="text-center">date</th>
+          <th class="text-center">日付</th>
           {foreach from=$tbl_x_data{$kw.kw_seq} item=head}
             <th class="text-center">{$head}</th>
           {/foreach}
@@ -97,10 +100,12 @@ function fmSubmit(formName, url, method, num) {
           <td>
             rank
           </td>
+          {$comp_y_data=0}
           {foreach from=$tbl_y_data{$kw.kw_seq} item=y_data}
             <td class="text-right">
-              {$y_data}
+              {if $y_data<$comp_y_data}<font color="#ff0000">{$y_data}</font>{else}{$y_data}{/if}
             </td>
+            {$comp_y_data=$y_data}
           {/foreach}
         </tr>
       </tbody>

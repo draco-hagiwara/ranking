@@ -91,7 +91,7 @@ class Lib_keyword
 	 * @param  int
 	 * @return char
 	 */
-	public static function update_grooup_info($set_data, $gt_type)
+	public static function update_group_info($set_data, $gt_type)
 	{
 
 		$CI =& get_instance();
@@ -99,7 +99,7 @@ class Lib_keyword
 		$CI->load->model('Group_tag', 'gt', TRUE);
 
 		// このグループが設定されているルートドメイン数
-		$rootdomain_cnt = $CI->kw->get_rootdomain_cnt($set_data, $gt_type);
+		$rootdomain_cnt = $CI->kw->get_grouptag_cnt($set_data, $gt_type);
 
 		// このグループが設定されているキーワード数
 		$keyword_cnt = $CI->kw->get_keyword_cnt($set_data, $gt_type);
@@ -123,7 +123,7 @@ class Lib_keyword
 	 * @param  int
 	 * @return char
 	 */
-	public static function update_grooup_info_all($cl_seq, $gt_type)
+	public static function update_group_info_all($cl_seq, $gt_type)
 	{
 
 		$CI =& get_instance();
@@ -140,7 +140,7 @@ class Lib_keyword
 			$set_data['kw_tag']   = $value['gt_name'];
 
 			// このグループが設定されているルートドメイン数
-			$rootdomain_cnt = $CI->kw->get_rootdomain_cnt($set_data, $gt_type);
+			$rootdomain_cnt = $CI->kw->get_grouptag_cnt($set_data, $gt_type);
 
 			// このグループが設定されているキーワード数
 			$keyword_cnt = $CI->kw->get_keyword_cnt($set_data, $gt_type);
@@ -183,7 +183,7 @@ class Lib_keyword
 			$set_data['kw_tag']   = $value['gt_name'];
 
 			// このグループが設定されているルートドメイン数
-			$rootdomain_cnt = $CI->kw->get_rootdomain_cnt($set_data, $gt_type);
+			$rootdomain_cnt = $CI->kw->get_grouptag_cnt($set_data, $gt_type);
 
 			// このグループが設定されているキーワード数
 			$keyword_cnt = $CI->kw->get_keyword_cnt($set_data, $gt_type);
@@ -286,55 +286,129 @@ class Lib_keyword
 		// グループorタグ情報取得
 		$grouptag_list = $CI->gt->get_gt_clseq($cl_seq, $gt_type);
 
+		// 画面から選択入力タグのリスト作成
 		$opt_grouptag = "";
-		if ($gt_type == 0)
+		if ($gt_name != NULL)
 		{
 
+
+// 			print_r($grouptag_list);
+// 			print("<br><br>");
+// 			print_r($gt_name);
+// 			print("<br><br>");
+
+
+			$_arr_tagname = str_replace("[", "" ,str_replace("]", "", explode("][", $gt_name)));
+
+
+
+// 			print_r($_arr_tagname);
+// 			print("<br><br>");
+
+			// 入力リスト作成
+			foreach ($_arr_tagname as $key => $value)
+			{
+				$opt_grouptag .= '<option selected="selected" value="' . $value . '">' . $value . '</option>';
+			}
+
+			// 既存リスト作成
 			foreach ($grouptag_list as $key => $value)
 			{
-				if ($gt_name == $value['gt_name'])
+				if (!in_array($value['gt_name'], $_arr_tagname))
 				{
-					$opt_grouptag .= '<option selected="selected" value="' . $value['gt_name'] . '">' . $value['gt_name'] . '</option>';
-				} else {
 					$opt_grouptag .= '<option value="' . $value['gt_name'] . '">' . $value['gt_name'] . '</option>';
 				}
 			}
 
-			$CI->smarty->assign('options_group', $opt_grouptag);
+
+
+
+// 			// 既存リスト作成
+// 			foreach ($grouptag_list as $key => $value)
+// 			{
+
+// 				if (in_array($value['gt_name'], $_arr_tagname))
+// 				{
+// 					$opt_grouptag .= '<option selected="selected" value="' . $value['gt_name'] . '">' . $value['gt_name'] . '</option>';
+// 				} else {
+// 					$opt_grouptag .= '<option value="' . $value['gt_name'] . '">' . $value['gt_name'] . '</option>';
+// 				}
+
+// 			}
+
 
 		} else {
 
-			// 画面から選択入力タグのリスト作成
-			if ($gt_name != NULL)
+			//$opt_grouptag .= '<option value></option>';
+
+			// 既存リスト作成
+			foreach ($grouptag_list as $key => $value)
 			{
-				$_arr_tagname = str_replace("[", "" ,str_replace("]", "", explode("][", $gt_name)));
-
-				// 既存タグのリスト作成
-				foreach ($grouptag_list as $key => $value)
-				{
-
-					if (in_array($value['gt_name'], $_arr_tagname))
-					{
-						$opt_grouptag .= '<option selected="selected" value="' . $value['gt_name'] . '">' . $value['gt_name'] . '</option>';
-					} else {
-						$opt_grouptag .= '<option value="' . $value['gt_name'] . '">' . $value['gt_name'] . '</option>';
-					}
-
-				}
-			} else {
-
-				// 既存タグのリスト作成
-				foreach ($grouptag_list as $key => $value)
-				{
-					$opt_grouptag .= '<option value="' . $value['gt_name'] . '">' . $value['gt_name'] . '</option>';
-				}
-
+				$opt_grouptag .= '<option value="' . $value['gt_name'] . '">' . $value['gt_name'] . '</option>';
 			}
-
-			$CI->smarty->assign('options_tag', $opt_grouptag);
-			return;
-
 		}
+
+		// グループとタグに振り分け
+		if ($gt_type == 0)
+		{
+			$CI->smarty->assign('options_group', $opt_grouptag);
+		} else {
+			$CI->smarty->assign('options_tag', $opt_grouptag);
+		}
+
+
+// 		$opt_grouptag = "";
+// 		if ($gt_type == 0)
+// 		{
+
+// 			$opt_grouptag .= '<option value="">　</option>';					// ダミー(空白)データ
+// 			foreach ($grouptag_list as $key => $value)
+// 			{
+// 				if ($gt_name == $value['gt_name'])
+// 				{
+// 					$opt_grouptag .= '<option selected="selected" value="' . $value['gt_name'] . '">' . $value['gt_name'] . '</option>';
+// 				} else {
+// 					$opt_grouptag .= '<option value="' . $value['gt_name'] . '">' . $value['gt_name'] . '</option>';
+// 				}
+// 			}
+
+// 			$CI->smarty->assign('options_group', $opt_grouptag);
+
+// 		} else {
+
+// 			// 画面から選択入力タグのリスト作成
+// 			if ($gt_name != NULL)
+// 			{
+// 				$_arr_tagname = str_replace("[", "" ,str_replace("]", "", explode("][", $gt_name)));
+
+// 				// 既存タグのリスト作成
+// 				foreach ($grouptag_list as $key => $value)
+// 				{
+
+// 					if (in_array($value['gt_name'], $_arr_tagname))
+// 					{
+// 						$opt_grouptag .= '<option selected="selected" value="' . $value['gt_name'] . '">' . $value['gt_name'] . '</option>';
+// 					} else {
+// 						$opt_grouptag .= '<option value="' . $value['gt_name'] . '">' . $value['gt_name'] . '</option>';
+// 					}
+
+// 				}
+// 			} else {
+
+// 				// 既存タグのリスト作成
+// 				foreach ($grouptag_list as $key => $value)
+// 				{
+// 					$opt_grouptag .= '<option value="' . $value['gt_name'] . '">' . $value['gt_name'] . '</option>';
+// 				}
+
+// 			}
+
+// 			$CI->smarty->assign('options_tag', $opt_grouptag);
+// 			return;
+
+// 		}
+
+
 	}
 
 
@@ -353,12 +427,13 @@ class Lib_keyword
 // 		$CI->load->model('Keyword', 'kw', TRUE);
 
 
+// 		$CI->load->library('lib_keyword');
 
 
-		print_r($input_post);
-		print("<br><br>");
-		print_r($set_data_kw);
-		print("<br><br>");
+// 		print_r($input_post);
+// 		print("<br><br>");
+// 		print_r($set_data_kw);
+// 		print("<br><br>");
 // 		exit;
 
 
@@ -390,8 +465,13 @@ class Lib_keyword
 					{
 						$set_data_kw['kw_device'] = $input_post['chkdevice'][0];
 
+						// 追加＆更新
 						// check → UPDATE → INSERT
 						$res = $CI->kw->up_insert_keyword($set_data_kw, $input_post['kw_memo']);
+
+						// 旧キーワードデータ(kw_ole_seq)のチェック
+						$CI->lib_keyword->_old_kw_check($set_data_kw);
+
 					}
 
 					// 対象デバイス(Mobile)をチェック
@@ -401,6 +481,10 @@ class Lib_keyword
 
 						// check → UPDATE → INSERT
 						$res =$CI->kw->up_insert_keyword($set_data_kw, $input_post['kw_memo']);
+
+						// 旧キーワードデータ(kw_ole_seq)のチェック
+						$CI->lib_keyword->_old_kw_check($set_data_kw);
+
 					}
 				}
 
@@ -416,6 +500,10 @@ class Lib_keyword
 
 						// check → UPDATE → INSERT
 						$res =$CI->kw->up_insert_keyword($set_data_kw, $input_post['kw_memo']);
+
+						// 旧キーワードデータ(kw_ole_seq)のチェック
+						$CI->lib_keyword->_old_kw_check($set_data_kw);
+
 					}
 
 					// 対象デバイス(Mobile)をチェック
@@ -425,9 +513,52 @@ class Lib_keyword
 
 						// check → UPDATE → INSERT
 						$res =$CI->kw->up_insert_keyword($set_data_kw, $input_post['kw_memo']);
+
+						// 旧キーワードデータ(kw_ole_seq)のチェック
+						$CI->lib_keyword->_old_kw_check($set_data_kw);
+
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * キーワード作成
+	 *
+	 * @param  array()
+	 * @return char
+	 */
+	public static function _old_kw_check($set_data_kw)
+	{
+
+		$CI =& get_instance();
+
+		$get_kw_check = $CI->kw->check_keyword($set_data_kw, $old_seq=NULL, $status=1);
+
+
+
+
+// 		print("OLD_KW_CHK :: ");
+// 		print_r($get_kw_check);
+// 		print("<br><br>");
+// 		exit;
+
+
+
+
+		if (count($get_kw_check) >= 2)
+		{
+			// status を書き換え
+			$get_kw_check[0]['kw_status'] = 0;
+			$CI->kw->update_keyword($get_kw_check[0]);
+
+			// 順位データの引継ぎする？
+			$set_rk_data['rk_kw_seq'] = $get_kw_check[1]['kw_seq'];
+
+			$CI->load->model('Ranking', 'rk', TRUE);
+			$CI->rk->update_ranking_kwseq($set_rk_data, $get_kw_check[0]['kw_seq']);
+
 		}
 	}
 

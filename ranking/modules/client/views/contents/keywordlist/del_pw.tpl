@@ -6,7 +6,9 @@
 {* ヘッダー部分　END *}
 
   {* del-pw *}
-  {include file="../../../../../public/js/my/kwdetail_del_pw.php"}
+  {include file="../../../../../public/js/my/kwlist_del_pw.php"}
+
+
 
 <div class="jumbotron">
   <h3>　キーワード削除</h3>

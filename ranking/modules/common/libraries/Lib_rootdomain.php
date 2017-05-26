@@ -6,6 +6,87 @@
 class Lib_rootdomain
 {
 
+	/**
+	 * ルートドメイン数のカウント＆更新
+	 *
+	 * @param  array()
+	 * @param  int
+	 * @return char
+	 */
+	public static function get_rootdomain_chg($cl_seq, $rootdomain)
+	{
+
+		$CI =& get_instance();
+
+		$CI->load->model('Keyword',    'kw', TRUE);
+		$CI->load->model('Rootdomain', 'rd', TRUE);
+// 		$CI->load->library('lib_rootdomain');
+
+		$set_data_kw['kw_cl_seq']      = $cl_seq;
+		$set_data_kw['kw_rootdomain']  = $rootdomain;
+
+		$get_rd_cnt = $CI->kw->get_rootdomain_cnt($set_data_kw);
+
+		// ルートドメイン管理データの作成
+		$set_data_rd['rd_cl_seq']      = $cl_seq;
+		$set_data_rd['rd_rootdomain']  = $rootdomain;
+		$set_data_rd['rd_keyword_cnt'] = $get_rd_cnt;
+
+		$get_rd_data = $CI->rd->check_rootdomain($set_data_rd);
+		if (empty($get_rd_data))
+		{
+			// INSERT
+			$CI->rd->insert_rootdomain($set_data_rd);
+		} else {
+			$set_data_rd['rd_seq'] = $get_rd_data[0]['rd_seq'];
+
+			// UPDATE
+			$CI->rd->update_rootdomain($set_data_rd);
+		}
+
+	}
+
+	/**
+	 * ルートドメインの削除＆有無チェック
+	 *
+	 * @param  array()
+	 * @param  int
+	 * @return char
+	 */
+	public static function get_rootdomain_del($cl_seq, $rootdomain)
+	{
+
+		$CI =& get_instance();
+
+		$CI->load->model('Keyword',    'kw', TRUE);
+		$CI->load->model('Rootdomain', 'rd', TRUE);
+		$CI->load->library('lib_rootdomain');
+
+		$set_data_kw['kw_cl_seq']      = $cl_seq;
+		$set_data_kw['kw_rootdomain']  = $rootdomain;
+
+		$get_rd_cnt = $CI->kw->get_rootdomain_cnt($set_data_kw);
+
+
+// 		print($get_rd_cnt);
+// 		exit;
+
+
+		if ($get_rd_cnt === 0)
+		{
+
+			// DELETE
+			$CI->rd->delete_rootdomain(NULL, $cl_seq, $rootdomain);
+
+		} else {
+
+			// ルートドメイン数のカウント＆更新
+			$CI->lib_rootdomain->get_rootdomain_chg($cl_seq, $rootdomain);
+
+		}
+
+	}
+
 	/*
 
 	与えられたドメイン名かURLから、ルートドメインとTLD（ccSLD含む）を抽出する。

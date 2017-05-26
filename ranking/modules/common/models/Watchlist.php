@@ -16,12 +16,18 @@ class Watchlist extends CI_Model
      * @param    int
      * @return   array()
      */
-    public function get_watchlist_data($ac_seq, $cl_seq, $kw_seq)
+    public function get_watchlist_data($ac_seq, $cl_seq, $kw_seq=NULL, $rd_seq=NULL)
     {
 
     	$set_where["wt_ac_seq"] = $ac_seq;
     	$set_where["wt_cl_seq"] = $cl_seq;
-    	$set_where["wt_kw_seq"] = $kw_seq;
+
+    	if (empty($rd_seq))
+    	{
+    		$set_where["wt_kw_seq"] = $kw_seq;
+    	} else {
+    		$set_where["wt_rd_seq"] = $rd_seq;
+    	}
 
     	$query = $this->db->get_where('tb_watchlist', $set_where);
 
@@ -94,7 +100,13 @@ class Watchlist extends CI_Model
 
     	$set_where["wt_ac_seq"] = $setdata["wt_ac_seq"];
     	$set_where["wt_cl_seq"] = $setdata["wt_cl_seq"];
-    	$set_where["wt_kw_seq"] = $setdata["wt_kw_seq"];
+
+    	if (isset($setdata["wt_kw_seq"]))
+    	{
+    		$set_where["wt_kw_seq"] = $setdata["wt_kw_seq"];
+    	} else {
+    		$set_where["wt_rd_seq"] = $setdata["wt_rd_seq"];
+    	}
 
     	$result = $this->db->delete('tb_watchlist', $set_where);
     	$_last_sql = $this->db->last_query();
@@ -114,11 +126,17 @@ class Watchlist extends CI_Model
      * @param    array()
      * @return   int
      */
-    public function delete_wt_list($kw_seq, $cl_seq)
+    public function delete_wt_list($kw_seq=NULL, $cl_seq, $rd_seq=NULL)
     {
 
     	$set_where["wt_cl_seq"] = $cl_seq;
-    	$set_where["wt_kw_seq"] = $kw_seq;
+
+    	if (empty($rd_seq))
+    	{
+    		$set_where["wt_kw_seq"] = $kw_seq;
+    	} else {
+    		$set_where["wt_rd_seq"] = $rd_seq;
+    	}
 
     	$result = $this->db->delete('tb_watchlist', $set_where);
     	$_last_sql = $this->db->last_query();

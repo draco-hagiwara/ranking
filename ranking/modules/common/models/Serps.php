@@ -55,7 +55,7 @@ class Serps extends CI_Model
     			     se_result_id = \'' . $result_id . '\'
     			     AND se_domain = \'' . $domain . '\'
     			     AND se_url like \'%' . $serach_domain . '\'
-    			     ORDER BY se_seq ASC
+    			     ORDER BY se_seq ASC LIMIT 1
 	     		';
 
     	// クエリー実行
@@ -96,7 +96,7 @@ class Serps extends CI_Model
     			     se_result_id = \'' . $result_id . '\'
     			     AND se_domain = \'' . $domain . '\'
     			     AND se_url like \'%' . $serach_domain . '%\'
-    			     ORDER BY se_seq ASC
+    			     ORDER BY se_seq ASC LIMIT 1
 	     		';
 
 
@@ -138,7 +138,7 @@ class Serps extends CI_Model
     			WHERE
     			     se_result_id = \'' . $result_id . '\'
     			     AND se_domain = \'' . urldecode($domain) . '\'
-    			     ORDER BY se_seq ASC
+    			     ORDER BY se_seq ASC LIMIT 1
 	     		';
 
     	// クエリー実行
@@ -174,7 +174,7 @@ class Serps extends CI_Model
     			WHERE
     			     se_result_id = \'' . $result_id . '\'
     			     AND (se_domain = \'' . urldecode($rootdomain) . '\' OR se_domain like \'%' . urldecode($rootdomain) . '\')
-    			     ORDER BY se_seq ASC
+    			     ORDER BY se_seq ASC LIMIT 1
 	     		';
 
 

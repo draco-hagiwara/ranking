@@ -29,16 +29,86 @@
       {if form_error('kw_keyword[]')}<span class="label label-danger"><br>Error : </span><label><font color=red>{form_error('kw_keyword[]')}</font></label>{/if}
     </div>
     <div class="col-md-offset-2 col-md-9">
-      <small>※複数指定が可能。キーワード入力後、確定にはENTERキーを押下してください。</small>
+      <small>※複数指定が可能。キーワード入力後、確定するにはENTERキーを押下してください。</small>
     </div>
   </div>
   <div class="form-group">
     <div class="col-md-offset-2 col-md-9">■ 対象URL<font color=red> *</font>：</div>
     <div class="col-md-offset-2 col-md-9">
       {form_input('kw_url' , set_value('kw_url', '') , 'class="form-control" placeholder="対象URLを入力してください。max.510文字。http://～"')}
+      {*form_input('kw_url' , set_value('kw_url', '') , 'id="id_url" class="form-control" placeholder="対象URLを入力してください。max.510文字。http://～"')*}
+      {*form_input('kw_url' , set_value('kw_url', '') , 'id="id_urlBox" class="form-control" placeholder="対象URLを入力してください。max.510文字。http://～"')*}
       {if form_error('kw_url')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('kw_url')}</font></label>{/if}
     </div>
   </div>
+
+
+
+
+
+<script>
+$(function() {
+  // 入力されたURLの存在有無をチェック
+  $('#id_url').blur(function(e) {
+    console.log($('#id_url').val());
+
+    var in_url = $("#id_url").val();
+    console.log(in_url);
+
+    $.ajax({
+      url: in_url,
+      type:'GET',
+      dataType: 'jsonp',
+    }).done(function(data) {
+      alert("ok");
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+      $("#XMLHttpRequest").html("XMLHttpRequest : " + jqXHR.status);
+      $("#textStatus").html("textStatus : " + textStatus);
+      $("#errorThrown").html("errorThrown : " + errorThrown);
+    })
+    .always(function() {
+      alert("finishi");
+    })
+
+  });
+});
+</script>
+
+<script>
+$(function() {
+  // 入力されたURLの存在有無をチェック
+  $('#id_urlBox').blur(function(e) {
+    console.log($('#id_urlBox').val());
+
+    var in_url = $("#id_urlBox").val();
+    //var in_url = "Origin: " + $("#id_urlBox").val();
+    console.log(in_url);
+
+    $.ajax({
+      url: in_url,
+      type: 'GET',
+      //type: 'PATCH',
+      //dataType: 'json',
+      //headers: { 'X-Greeting': 'hello, world' },
+      success: function(data){
+        console.log(data);
+        alert('成功');
+      },
+      error: function(){
+    	  alert('URLが存在しません');
+      }
+    });
+  });
+});
+</script>
+
+
+
+
+
+
+
   <div class="form-group">
     <div class="col-md-offset-2 col-md-9">■ URLマッチタイプ<font color=red> *</font>：</div>
     <div class="col-md-offset-2 col-md-9">
@@ -97,6 +167,26 @@
       {form_dropdown('kw_trytimes', $options_kw_trytimes, set_value('kw_trytimes', ''))}
     </div>
   </div>
+
+  <div class="form-group">
+    <label for="kw_group" class="col-xs-2 col-md-2 control-label">グループ設定</label>
+    <div class="col-md-9">
+      <select multiple="multiple" name="kw_group[]" id="select2group" style="width: 500px;">
+        {$options_group}
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="kw_tag" class="col-xs-2 col-md-2 control-label">タグ設定</label>
+    <div class="col-md-9">
+      <select multiple="multiple" name="kw_tag[]" id="select2tag" style="width: 500px;">
+        {$options_tag}
+      </select>
+    </div>
+  </div>
+
+{*
   <div class="form-group">
     <label for="kw_group" class="col-xs-2 col-md-2 control-label">グループ設定</label>
     <div class="col-md-9">
@@ -116,6 +206,8 @@
       <small>※複数指定が可能。</small>
     </div>
   </div>
+*}
+
   <div class="form-group">
     <label for="kw_memo" class="col-xs-2 col-md-2 control-label">メ&emsp;&emsp;モ</label>
     <div class="col-md-9">
@@ -158,28 +250,7 @@
 <!-- </form> -->
 
 
-<script type="text/javascript">
-$(function() {
-  $("#select2keyword").select2({
-	tags: true,
-  });
-});
-
-$(function() {
-  $("#select2location").select2();
-});
-
-$(function() {
-  $("#select2group").select2();
-});
-
-$(function() {
-  $("#select2tag").select2({
-	tags: true,
-  });
-});
-</script>
-
+<script src="{base_url()}../../js/my/kwlist_select2.js"></script>
 
 <br>
 {* フッター部分　START *}

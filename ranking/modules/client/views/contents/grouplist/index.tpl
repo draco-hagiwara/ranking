@@ -4,28 +4,7 @@
 <body>
 {* ヘッダー部分　END *}
 
-<script type="text/javascript">
-<!--
-function fmSubmit(formName, url, method, num) {
-  var f1 = document.forms[formName];
-
-  console.log(num);
-
-  /* エレメント作成&データ設定&要素追加 */
-  var e1 = document.createElement('input');
-  e1.setAttribute('type', 'hidden');
-  e1.setAttribute('name', 'chg_gtseq');
-  e1.setAttribute('value', num);
-  f1.appendChild(e1);
-
-  /* サブミットするフォームを取得 */
-  f1.method = method;                                   // method(GET or POST)を設定する
-  f1.action = url;                                      // action(遷移先URL)を設定する
-  f1.submit();                                          // submit する
-  return true;
-}
-// -->
-</script>
+  <script src="{base_url()}../../js/my/fmsubmit.js"></script>
 
 <div id="contents" class="container">
 

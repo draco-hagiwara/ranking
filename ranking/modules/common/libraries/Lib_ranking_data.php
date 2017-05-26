@@ -31,8 +31,6 @@ class Lib_ranking_data
 		$_cashe   = $CI->config->item('API_CASHE');
 		$_debug   = $CI->config->item('API_DEBAG');
 
-
-
 		$_api_url = $_url . '?code=' .          $_code
 						  . '&keyword=' .       urlencode($_keyword)
 						  . '&search_engine=' . $_engine[$list['kw_searchengine']]
@@ -44,16 +42,8 @@ class Lib_ranking_data
 						  . '&debag=' .         $_debug
 		;
 
-
-
-// 		print($_api_url);
-// 		print("<br><br>");
-
-
 		return $_api_url;
-
 	}
-
 
 	/**
 	 * 検索結果のデータを取得する
@@ -79,7 +69,7 @@ class Lib_ranking_data
 
 			$get_data = json_decode($json, true);
 
-			if ($get_data["api_status"] == 'error')
+			if ($get_data["api_status"] === 'error')
 			{
 				// 取得失敗
 				$err_mess = "get-data-error";
@@ -132,10 +122,7 @@ class Lib_ranking_data
 			return array($err_mess, "");
 		}
 
-
 		return array($err_mess, "");
-
-
 	}
 
 
@@ -170,7 +157,7 @@ class Lib_ranking_data
 		foreach ($get_kw_data as $key => $value)
 		{
 
-			if ($_get_cnt == 1)
+			if ($_get_cnt === 1)
 			{
 
 				// 初回実行時は無条件で順位取得（INSERT）する。
@@ -180,7 +167,8 @@ class Lib_ranking_data
 				// 二回目以降は、順位が取得されていないデータを再取得する。
 
 				$get_rk_position = $CI->rk->get_ranking_kw($value['kw_seq'], $_start_date);
-				if ((count($get_rk_position) > 0) && ($get_rk_position[0]['rk_position']) < 9999)
+				//if ((count($get_rk_position) > 0) && ($get_rk_position[0]['rk_position']) < 9999)
+				if ((!empty($get_rk_position)) && ($get_rk_position[0]['rk_position']) < 9999)
 				{
 					continue;
 				}
@@ -220,7 +208,7 @@ class Lib_ranking_data
 				$_set_search_data['se_maxposition']   = $value['kw_maxposition'];
 				$_set_search_data['se_getcnt']        = $_get_cnt;
 
-				if ($err_mess == 'success')
+				if ($err_mess === 'success')
 				{
 
 					// 検索データを書き込み
@@ -252,7 +240,7 @@ class Lib_ranking_data
 						// INSERT
 						$CI->sp->insert_seach_data($_set_search_data);
 
-						$no++;
+						++$no;
 
 					}
 				} else {
@@ -268,16 +256,16 @@ class Lib_ranking_data
 
 				}
 
-				$_search_cnt++;
-
+				++$_search_cnt;
 			}
 
 			// 順位データセット
 			$set_ranking_data = array();
-			$set_ranking_data['rk_cl_seq']   = $value['kw_cl_seq'];
-			$set_ranking_data['rk_kw_seq']   = $value['kw_seq'];
-			$set_ranking_data['rk_getdate']  = $_start_date;
-			if ($err_mess == 'success')
+			$set_ranking_data['rk_cl_seq']     = $value['kw_cl_seq'];
+			$set_ranking_data['rk_kw_seq']     = $value['kw_seq'];
+			$set_ranking_data['rk_kw_old_seq'] = $value['kw_old_seq'];
+			$set_ranking_data['rk_getdate']    = $_start_date;
+			if ($err_mess === 'success')
 			{
 				$set_ranking_data['rk_position'] = 9999;							// 順位データなし。 9999 < 90009
 			} else {
@@ -286,16 +274,18 @@ class Lib_ranking_data
 
 			// 順位データの取得
 			$get_rank = $CI->lib_ranking_data->get_ranking($_set_search_data, $value);
-			if (count($get_rank) > 0)
+			//if (count($get_rank) > 0)
+			if (!empty($get_rank))
 			{
 
 				$set_ranking_data['rk_se_seq']        = $get_rank[0]['se_seq'];
 				$set_ranking_data['rk_result_id']     = $get_rank[0]['se_result_id'];
 				$set_ranking_data['rk_position']      = $get_rank[0]['se_position'];
+				$set_ranking_data['rk_position_org']  = $get_rank[0]['se_position'];
 				$set_ranking_data['rk_ranking_url']   = $get_rank[0]['se_url'];
 				$set_ranking_data['rk_ranking_title'] = $get_rank[0]['se_title'];
 
-				if ($_get_cnt == 1)
+				if ($_get_cnt === 1)
 				{
 					// INSERT
 					$CI->rk->insert_ranking($set_ranking_data);
@@ -304,7 +294,8 @@ class Lib_ranking_data
 
 					// 順位比較のため既存データの読み込み
 					$get_rank_kw = $CI->rk->get_ranking_kw($value['kw_seq'], $_start_date);
-					if (count($get_rank_kw) > 0)
+					//if (count($get_rank_kw) > 0)
+					if (!empty($get_rank_kw))
 					{
 
 						// 既存順位より上位の場合書き換える
@@ -312,7 +303,8 @@ class Lib_ranking_data
 						{
 							// UPDATE
 							$set_ranking_data['rk_seq'] = $get_rank_kw[0]['rk_seq'];
-							$CI->rk->update_ranking($set_ranking_data, $get_rank_kw[0]['rk_seq']);
+							$CI->rk->update_ranking($set_ranking_data);
+// 							$CI->rk->update_ranking($set_ranking_data, $get_rank_kw[0]['rk_seq']);
 						}
 
 					} else {
@@ -324,7 +316,7 @@ class Lib_ranking_data
 
 			} else {
 
-				if ($_get_cnt == 1)
+				if ($_get_cnt === 1)
 				{
 					// INSERT
 					$CI->rk->insert_ranking($set_ranking_data);
@@ -332,7 +324,8 @@ class Lib_ranking_data
 
 					// 順位比較のため既存データの読み込み
 					$get_rank_kw = $CI->rk->get_ranking_kw($value['kw_seq'], $_start_date);
-					if (count($get_rank_kw) == 0)
+					//if (count($get_rank_kw) === 0)
+					if (empty($get_rank_kw))
 					{
 						// INSERT
 						$CI->rk->insert_ranking($set_ranking_data);
@@ -341,7 +334,7 @@ class Lib_ranking_data
 			}
 
 			$_item_b = $_item_a;
-			$_rank_cnt++;
+			++$_rank_cnt;
 		}
 
 		return array($_get_cnt, $_search_cnt, $_rank_cnt);
@@ -485,6 +478,50 @@ class Lib_ranking_data
 
 	}
 
+	/**
+	 * 引継ぎURLを含めて最高順位に書き換え対応
+	 *
+	 * @param  int
+	 * @param  date
+	 * @return char
+	 */
+	public static function top_ranking()
+	{
+
+		$CI =& get_instance();
+		// 		$CI->load->model('Ranking', 'rk', TRUE);
+		// 		$CI->load->library('lib_ranking_data');
+
+		// 		$cnt_date = 31;
+		// 		$date = new DateTime();
+		// 		$_start_date = $date->format('Y-m-d');
+		// 		$_set_cnt_date = "- " . $cnt_date+1 . " days";
+		// 		$_end_date   = $date->modify($_set_cnt_date)->format('Y-m-d');
+
+
+
+		$date = new DateTime();
+		$today_date = $date->format('Y-m-d');
+
+		$get_ranking_data = $CI->rk->get_kw_old_seq($today_date, NULL);
+
+
+
+		// 対象順位データから最高順位に書き換え
+		foreach ($get_ranking_data as $key => $value)
+		{
+
+			$get_top_data = $CI->rk->get_top_rankingdata($value['rk_kw_seq'], $today_date);
+
+			$set_ranking_data['rk_seq']          = $value['rk_seq'];
+			$set_ranking_data['rk_se_seq_re']    = $get_top_data[0]['rk_se_seq'];
+			$set_ranking_data['rk_result_id_re'] = $get_top_data[0]['rk_result_id'];
+			$set_ranking_data['rk_position']     = $get_top_data[0]['rk_position'];
+			$CI->rk->update_ranking($set_ranking_data);
+
+		}
+
+	}
 
 	/**
 	 * URLからドメインを抜き出す
@@ -580,51 +617,162 @@ class Lib_ranking_data
 
 		// 順位データ情報を取得 (31日分)
 		$date = new DateTime();
-		$_start_date = $date->format('Y-m-d');
-		$_set_cnt_date = "- " . $cnt_date . " days";
-		$_end_date   = $date->modify($_set_cnt_date)->format('Y-m-d');
+		$_start_date   = $date->format('Y-m-d');
+		$_set_cnt_date = "- " . ($cnt_date - 1) . " days";
+		$_end_date     = $date->modify($_set_cnt_date)->format('Y-m-d');
+
+
+
+// 		print($_set_cnt_date);
+// 		print("<br>");
+// 		print($_start_date);
+// 		print("<br>");
+// 		print($_end_date);
+// 		print("<br><br>");
+
+
+
 
 		$get_rk_data = $CI->rk->get_kw_seq($kw_seq, $_start_date, $_end_date);
 
-		$_cnt_rk = 0;														// 順位データの配列カウンター
+
+
+// 				print_r($get_rk_data);
+// 				print("<br><br>");
+
+
+
+		$_getdate = $_end_date;
+		$_cnt_rk  = 0;														// 順位データの配列カウンター
 		$_x_data[$kw_seq] = "x";											// X軸データ（日付）用配列。"x"は接頭語として後で外す。
 		$_y_data[$kw_seq] = "y";											// Y軸データ（順位）用配列。"y"は接頭語として後で外す。
+		$_y_min_data[$kw_seq] = "y";										// TOP:ミニグラフ用データ
 		for ($cnt = $cnt_date; $cnt > 0; $cnt--)
 		{
 
-			$_getdate = $date->modify('+1 days')->format('Y-m-d');
+			//$_getdate = $date->modify('+1 days')->format('Y-m-d');
 			$_x_data[$kw_seq] .= ',' . $date->format('d');
 
-			if ((isset($get_rk_data[$_cnt_rk])) && ($get_rk_data[$_cnt_rk]['rk_getdate'] == $_getdate))
+
+
+
+// 			print($_getdate);
+// 			print("<br>");
+// 			print_r($get_rk_data[$_cnt_rk]['rk_getdate']);
+// 			print("<br>");
+// 			print_r($_x_data[$kw_seq]);
+// 			print("<br><br>");
+
+
+
+
+
+			//if ((isset($get_rk_data[$_cnt_rk])) && ($get_rk_data[$_cnt_rk]['rk_getdate'] == $_getdate))
+			if ((!empty($get_rk_data[$_cnt_rk])) && ($get_rk_data[$_cnt_rk]['rk_getdate'] == $_getdate))
 			{
 
 				// 順位が300位以内
 				if ($get_rk_data[$_cnt_rk]['rk_position'] <= 300)
 				{
-					$_y_data[$kw_seq] .=  ',' . $get_rk_data[$_cnt_rk]['rk_position'];
+					$_y_data[$kw_seq]     .=  ',' . $get_rk_data[$_cnt_rk]['rk_position'];
+					$_y_min_data[$kw_seq] .=  ',' . (301 - $get_rk_data[$_cnt_rk]['rk_position']);	// Y軸の反転ができないのでとりあえず！
 				} else {
-					$_y_data[$kw_seq] .=  ',' . "";
+					$_y_data[$kw_seq]     .=  ',' . "";
+					$_y_min_data[$kw_seq] .=  ',0';
+					//$_y_min_data[$kw_seq] .=  ',';
+					//$_y_min_data[$kw_seq] .=  ',null';
 				}
 
-				$_cnt_rk++;
+				++$_cnt_rk;
 
 			} else {
 				$_y_data[$kw_seq] .=  ',';
 			}
+
+			$_getdate = $date->modify('+1 days')->format('Y-m-d');
+
 		}
 
 		// グラフ用データ
 		$_x_data[$kw_seq] = str_replace("x,", "", $_x_data[$kw_seq]);
 		$_y_data[$kw_seq] = str_replace("y,", "", $_y_data[$kw_seq]);
+		$_y_min_data[$kw_seq] = str_replace("y,", "", $_y_min_data[$kw_seq]);
+
 		$CI->smarty->assign('x_data' . $kw_seq, $_x_data[$kw_seq]);
 		$CI->smarty->assign('y_data' . $kw_seq, $_y_data[$kw_seq]);
+		$CI->smarty->assign('y_min_data' . $kw_seq, $_y_min_data[$kw_seq]);
 
+		// テーブル用データ
 		$_tbl_x_data[$kw_seq] = explode(",", $_x_data[$kw_seq]);
 		$_tbl_y_data[$kw_seq] = explode(",", $_y_data[$kw_seq]);
 
-		// テーブル用データ
-		$CI->smarty->assign('tbl_x_data' . $kw_seq, $_tbl_x_data[$kw_seq]);
-		$CI->smarty->assign('tbl_y_data' . $kw_seq, $_tbl_y_data[$kw_seq]);
+
+
+
+// 		print($cnt_date);
+// 		print("<br>");
+// 		print_r($_tbl_x_data[$kw_seq]);
+// 		print("<br><br>");
+
+// 		print_r(array_splice($_tbl_y_data[$kw_seq], 0, 31));
+// 		print("<br><br>");
+// 		print_r($_tbl_y_data[$kw_seq]);
+// 		print("<br><br>");
+// 		print_r(array_splice($_tbl_y_data[$kw_seq], 0, 31));
+// 		print("<br><br>");
+// 		print_r($_tbl_y_data[$kw_seq]);
+// 		print("<br><br>");
+// 		print_r(array_splice($_tbl_y_data[$kw_seq], 0, 31));
+// 		print("<br><br>");
+// 		print_r($_tbl_y_data[$kw_seq]);
+// 		print("<br><br>");
+
+
+
+
+
+
+		switch( $cnt_date )
+		{
+			case 93:
+				$CI->smarty->assign('tbl_x_data1' . $kw_seq, array_splice($_tbl_x_data[$kw_seq], 0, 31));
+				$CI->smarty->assign('tbl_y_data1' . $kw_seq, array_splice($_tbl_y_data[$kw_seq], 0, 31));
+
+				$CI->smarty->assign('tbl_x_data2' . $kw_seq, array_splice($_tbl_x_data[$kw_seq], 0, 31));
+				$CI->smarty->assign('tbl_y_data2' . $kw_seq, array_splice($_tbl_y_data[$kw_seq], 0, 31));
+
+				$CI->smarty->assign('tbl_x_data3' . $kw_seq, array_splice($_tbl_x_data[$kw_seq], 0, 31));
+				$CI->smarty->assign('tbl_y_data3' . $kw_seq, array_splice($_tbl_y_data[$kw_seq], 0, 31));
+
+				break;
+
+			case 186:
+				$CI->smarty->assign('tbl_x_data1' . $kw_seq, array_splice($_tbl_x_data[$kw_seq], 0, 31));
+				$CI->smarty->assign('tbl_y_data1' . $kw_seq, array_splice($_tbl_y_data[$kw_seq], 0, 31));
+
+				$CI->smarty->assign('tbl_x_data2' . $kw_seq, array_splice($_tbl_x_data[$kw_seq], 0, 31));
+				$CI->smarty->assign('tbl_y_data2' . $kw_seq, array_splice($_tbl_y_data[$kw_seq], 0, 31));
+
+				$CI->smarty->assign('tbl_x_data3' . $kw_seq, array_splice($_tbl_x_data[$kw_seq], 0, 31));
+				$CI->smarty->assign('tbl_y_data3' . $kw_seq, array_splice($_tbl_y_data[$kw_seq], 0, 31));
+
+				$CI->smarty->assign('tbl_x_data4' . $kw_seq, array_splice($_tbl_x_data[$kw_seq], 0, 31));
+				$CI->smarty->assign('tbl_y_data4' . $kw_seq, array_splice($_tbl_y_data[$kw_seq], 0, 31));
+
+				$CI->smarty->assign('tbl_x_data5' . $kw_seq, array_splice($_tbl_x_data[$kw_seq], 0, 31));
+				$CI->smarty->assign('tbl_y_data5' . $kw_seq, array_splice($_tbl_y_data[$kw_seq], 0, 31));
+
+				$CI->smarty->assign('tbl_x_data6' . $kw_seq, array_splice($_tbl_x_data[$kw_seq], 0, 31));
+				$CI->smarty->assign('tbl_y_data6' . $kw_seq, array_splice($_tbl_y_data[$kw_seq], 0, 31));
+
+				break;
+			case 7:
+				// 現行テーブルは用意はしていない。
+
+			default:
+				$CI->smarty->assign('tbl_x_data' . $kw_seq, $_tbl_x_data[$kw_seq]);
+				$CI->smarty->assign('tbl_y_data' . $kw_seq, $_tbl_y_data[$kw_seq]);
+		}
 
 		return array($_x_data, $_y_data);
 
@@ -646,23 +794,45 @@ class Lib_ranking_data
 
 		// 順位データ情報を取得 (31日分)
 		$date = new DateTime();
-		$_start_date = $date->format('Y-m-d');
-		$_set_cnt_date = "- " . $cnt_date . " days";
-		$_end_date   = $date->modify($_set_cnt_date)->format('Y-m-d');
+		$_start_date   = $date->format('Y-m-d');
+		$_set_cnt_date = "- " . ($cnt_date - 1) . " days";
+// 		$_set_cnt_date = "- " . $cnt_date . " days";
+		$_end_date     = $date->modify($_set_cnt_date)->format('Y-m-d');
 
 		$get_rk_data = $CI->rk->get_kw_seq($kw_seq, $_start_date, $_end_date);
 
+
+// 		print($_start_date);
+// 		print(" >> ");
+// 		print($_end_date);
+// 		print("<br><br>");
+
+// 		print_r($get_rk_data);
+// 		print("<br><br>");
+
+
+
 		$i = 0;
 		$_cnt_rk = 0;														// 順位データの配列カウンター
-		$_tbl_x_data = array();												// X軸データ（日付）用配列。"x"は接頭語として後で外す。
-		$_tbl_y_data = array();												// Y軸データ（順位）用配列。"y"は接頭語として後で外す。
+		$_tbl_x_data = array();
+		$_tbl_y_data = array();
 		$_graph_data = array();
+		$_getdate = $_end_date;
 		for ($cnt = $cnt_date; $cnt > 0; $cnt--)
 		{
 
-			$_getdate = $date->modify('+1 days')->format('Y-m-d');
+// 			$_getdate = $date->modify('+1 days')->format('Y-m-d');
 			$_data_d  = $date->format('d');
 			$_tbl_x_data[$i] = $_data_d;
+
+
+
+// 			print_r($get_rk_data[$_cnt_rk]['rk_getdate']);
+// 			print(" :: ");
+// 			print($_getdate);
+// 			print("<br><br>");
+
+
 
 			if ((isset($get_rk_data[$_cnt_rk])) && ($get_rk_data[$_cnt_rk]['rk_getdate'] == $_getdate))
 			{
@@ -678,15 +848,23 @@ class Lib_ranking_data
 					$_graph_data[$i] = array("date" => $_getdate, "rank" => 301);
 				}
 
-				$_cnt_rk++;
+				++$_cnt_rk;
 
 			} else {
 				$_tbl_y_data[$i] = "";
 				$_graph_data[$i] = array("date" => $_getdate, "rank" => 301);
 			}
 
-			$i++;
+			$_getdate = $date->modify('+1 days')->format('Y-m-d');
+			++$i;
 		}
+
+
+
+// 		print_r($_graph_data);
+// 		print("<br><br>");
+
+
 
 		// グラフ用データ
 		$graph_data_json = json_encode($_graph_data);
@@ -695,6 +873,10 @@ class Lib_ranking_data
 		// テーブル用データ
 		$CI->smarty->assign('tbl_x_data', $_tbl_x_data);
 		$CI->smarty->assign('tbl_y_data', $_tbl_y_data);
+
+		$CI->smarty->assign('start_date', $_start_date);
+		$CI->smarty->assign('end_date',   $_end_date);
+		$CI->smarty->assign('nisuu',      $cnt_date);
 
 	}
 

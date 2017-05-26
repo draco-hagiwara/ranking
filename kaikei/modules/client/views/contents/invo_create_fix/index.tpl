@@ -54,25 +54,7 @@
     </div>
   </div>
 
-  <br>
   <!-- Button trigger modal -->
-  <div class="modal fade" id="myModal10" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">固定関連請求データ作成（一括）</h4>
-        </div>
-        <div class="modal-body">
-          <p>作成しますか。&hellip;</p>
-        </div>
-        <div class="modal-footer">
-          <button type='submit' name='_submit' value='save_all' class="btn btn-sm btn-primary">O  K</button>
-          <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
-        </div>
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
   <div class="modal fade" id="myModal11" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -85,6 +67,23 @@
         </div>
         <div class="modal-footer">
           <button type='submit' name='_submit' value='save_oly' class="btn btn-sm btn-primary">O  K</button>
+          <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <div class="modal fade" id="myModal10" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">固定関連請求データ作成（一括）</h4>
+        </div>
+        <div class="modal-body">
+          <p>作成しますか。&hellip;</p>
+        </div>
+        <div class="modal-footer">
+          <button type='submit' name='_submit' value='save_all' class="btn btn-sm btn-primary">O  K</button>
           <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
         </div>
       </div><!-- /.modal-content -->
@@ -142,25 +141,7 @@ $('#mydate1').datepicker({
     </div>
   </div>
 
-  <br>
   <!-- Button trigger modal -->
-  <div class="modal fade" id="myModal20" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">成果関連請求データ作成（一括）</h4>
-        </div>
-        <div class="modal-body">
-          <p>作成しますか。&hellip;</p>
-        </div>
-        <div class="modal-footer">
-          <button type='submit' name='_submit' value='save_all' class="btn btn-sm btn-primary">O  K</button>
-          <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
-        </div>
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
   <div class="modal fade" id="myModal21" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -173,6 +154,23 @@ $('#mydate1').datepicker({
         </div>
         <div class="modal-footer">
           <button type='submit' name='_submit' value='save_oly' class="btn btn-sm btn-primary">O  K</button>
+          <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <div class="modal fade" id="myModal20" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">成果関連請求データ作成（一括）</h4>
+        </div>
+        <div class="modal-body">
+          <p>作成しますか。&hellip;</p>
+        </div>
+        <div class="modal-footer">
+          <button type='submit' name='_submit' value='save_all' class="btn btn-sm btn-primary">O  K</button>
           <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
         </div>
       </div><!-- /.modal-content -->
@@ -230,25 +228,7 @@ $('#mydate2').datepicker({
     </div>
   </div>
 
-  <br>
   <!-- Button trigger modal -->
-  <div class="modal fade" id="myModal30" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">代理店関連請求データ作成（一括）</h4>
-        </div>
-        <div class="modal-body">
-          <p>作成しますか。&hellip;</p>
-        </div>
-        <div class="modal-footer">
-          <button type='submit' name='_submit' value='save_all' class="btn btn-sm btn-primary">O  K</button>
-          <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
-        </div>
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
   <div class="modal fade" id="myModal31" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -261,6 +241,23 @@ $('#mydate2').datepicker({
         </div>
         <div class="modal-footer">
           <button type='submit' name='_submit' value='save_oly' class="btn btn-sm btn-primary">O  K</button>
+          <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <div class="modal fade" id="myModal30" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">代理店関連請求データ作成（一括）</h4>
+        </div>
+        <div class="modal-body">
+          <p>作成しますか。&hellip;</p>
+        </div>
+        <div class="modal-footer">
+          <button type='submit' name='_submit' value='save_all' class="btn btn-sm btn-primary">O  K</button>
           <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
         </div>
       </div><!-- /.modal-content -->

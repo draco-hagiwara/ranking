@@ -19,7 +19,7 @@ class Account extends CI_Model
 
     	if ($status == TRUE)
     	{
-    		// 			$set_where["ac_status"] = 1;						// ステータス=有効
+    		//$set_where["ac_status"] = 1;						// ステータス=有効
     	} else {
     		$set_where["ac_status"] = 0;						// ステータス=登録中
     	}
@@ -33,10 +33,30 @@ class Account extends CI_Model
 
     }
 
+    /**
+     * クライアントSEQからアカウントリストを取得する
+     *
+     * @param    int
+     * @return   bool
+     */
+    public function get_ac_clseq($seq_no, $status = FALSE)
+    {
 
+    	if ($status == TRUE)
+    	{
+    		//$set_where["ac_status"] = 1;						// ステータス=有効
+    	} else {
+    		$set_where["ac_status"] = 0;						// ステータス=登録中
+    	}
+    	$set_where["ac_cl_seq"] = $seq_no;
 
+    	$query = $this->db->get_where('mt_account', $set_where);
 
+    	$get_data = $query->result('array');
 
+    	return $get_data;
+
+    }
 
     /**
      * 重複データのチェック：メールアドレス

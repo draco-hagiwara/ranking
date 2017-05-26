@@ -4,28 +4,7 @@
 <body>
 {* ヘッダー部分　END *}
 
-<script type="text/javascript">
-<!--
-function fmSubmit(formName, url, method, num) {
-  var f1 = document.forms[formName];
-
-  console.log(num);
-
-  /* エレメント作成&データ設定&要素追加 */
-  var e1 = document.createElement('input');
-  e1.setAttribute('type', 'hidden');
-  e1.setAttribute('name', 'chg_uniq');
-  e1.setAttribute('value', num);
-  f1.appendChild(e1);
-
-  /* サブミットするフォームを取得 */
-  f1.method = method;                                   // method(GET or POST)を設定する
-  f1.action = url;                                      // action(遷移先URL)を設定する
-  f1.submit();                                          // submit する
-  return true;
-}
-// -->
-</script>
+<script src="{base_url()}../../js/my/fmsubmit.js"></script>
 
 <div id="contents" class="container">
 
@@ -57,15 +36,15 @@ function fmSubmit(formName, url, method, num) {
       <tbody>
         <tr>
           <td>
-            {if $ac.ac_status == "0"}<font color="#ffffff" style="background-color:royalblue">[ 有　効 ]</font>
-            {elseif $ac.ac_status == "1"}<font color="#ffffff" style="background-color:gray">[ 無　効 ]</font>
-            {elseif $ac.ac_status == "9"}<font color="#ffffff" style="background-color:gray">[ 削　除 ]</font>
+            {if $ac.ac_status == "0"}<span class="label label-primary">有&emsp;効</span>
+            {elseif $ac.ac_status == "1"}<span class="label label-default">無&emsp;効</span>
+            {elseif $ac.ac_status == "9"}<span class="label label-default">削&emsp;除</span>
             {else}}エラー
             {/if}
           </td>
           <td>
-            {if $ac.ac_type == "0"}<font color="#ffffff" style="background-color:limegreen">[ 一般ユーザ ]</font>
-            {elseif $ac.ac_type == "1"}<font color="#ffffff" style="background-color:deeppink">[ 管　理　者 ]</font>
+            {if $ac.ac_type == "0"}<span class="label label-success">一般ユーザ</span>
+            {elseif $ac.ac_type == "1"}<span class="label label-danger">管&emsp;理&emsp;者</span>
             {else}}エラー
             {/if}
           </td>
@@ -83,7 +62,7 @@ function fmSubmit(formName, url, method, num) {
           </td>
           <td>
             {if $ac.ac_type != 2 || $ac.ac_seq == $smarty.session.a_memSeq || $smarty.session.a_memSeq == 1}
-              <button type="submit" class="btn btn-success btn-xs" name="ac_uniq" value="{$ac.ac_seq}">編集</button>
+              <button type="submit" class="btn btn-success btn-xs" name="ac_uniq" value="{$ac.ac_seq}">編&emsp;集</button>
             {/if}
           </td>
         </tr>

@@ -17,11 +17,9 @@ https://github.com/etimbo/jquery-print-preview-plugin
 
 {* ヘッダー部分　END *}
 
-  <script src="{base_url()}../../js/my/fmsubmit.js"></script>
-
 <H4><p class="bg-success">&emsp;&emsp;キーワード管理&emsp;詳細</p></H4>
 
-{*form_open('keyworddetail/detailchk/' , 'name="detailForm" class="form-horizontal"')*}
+{form_open('keywordlist/detailchk/' , 'name="detailForm" class="form-horizontal repeater"')}
 
   {$mess}
 
@@ -71,31 +69,27 @@ https://github.com/etimbo/jquery-print-preview-plugin
   </div>
 
   <div class="form-group">
-    <label for="kw_group" class="col-md-2 control-label text-right">グループ設定</label>
+    <label for="kw_group" class="col-xs-2 col-md-2 control-label">グループ設定</label>
+    <div class="col-sm-2">
+      {$info.kw_group}
+    </div>
   </div>
   <div class="form-group">
-    <div class="col-md-offset-2 col-md-9">{$info.kw_group}</div>
+    <label for="kw_tag" class="col-xs-2 col-md-2 control-label">タグ設定</label>
+    <div class="col-md-9">
+      {$info.kw_tag}
+    </div>
   </div>
 
   <div class="form-group">
-    <label for="kw_tag" class="col-md-2 control-label text-right">タ&emsp;グ&emsp;設定</label>
-  </div>
-  <div class="form-group">
-    <div class="col-md-offset-2 col-md-9">{$info.kw_tag}</div>
-  </div>
-
-  <div class="form-group">
-    <label for="kw_memo" class="col-md-2 control-label text-right">メ&emsp;&emsp;&emsp;&emsp;モ</label>
-  </div>
-  <div class="form-group">
-    <div class="col-md-10">
+    <label for="kw_memo" class="col-xs-2 col-md-2 control-label">メ&emsp;&emsp;モ</label>
+    <div class="col-md-9">
       {foreach from=$info_me item=me}
       <tbody>
         <tr>
           <td>
-            <br>-- {$me.me_create_date} --&emsp;
-            <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/keyworddetail/detailchk/', 'POST', '{$me.me_seq}', 'del_seq');">削除</button>
-            <br>{$me.me_memo}<br>
+            <br>{$me.me_create_date}
+            <br>{$me.me_memo}
           </td>
         </tr>
       </tbody>
@@ -104,17 +98,11 @@ https://github.com/etimbo/jquery-print-preview-plugin
   </div>
 
 
-
   <div class="form-horizontal col-sm-12">
     <div>
-      <br><br>
       <canvas id="RankingChart01" height="150" width="300" ></canvas>
     </div>
   </div>
-
-
-{* Graph *}
-{include file="../../../../../public/js/my/kwdetail_detail_graph.php"}
 
 
  <p></p>
@@ -146,46 +134,31 @@ https://github.com/etimbo/jquery-print-preview-plugin
     </table>
 </div>
 
-
-{form_open("{$back_page}/search/{$seach_page_no}/" , 'name="detailForm" class="form-horizontal"')}
-
   <div class="form-group">
-    <div class="col-sm-offset-1 col-sm-1">
+    <div class="col-sm-offset-2 col-sm-2">
       {$attr['name'] = '_back'}
       {$attr['type'] = 'submit'}
-      {form_button($attr , '戻&emsp;&emsp;る' , 'class="btn btn-primary  btn-sm"')}
+      {form_button($attr , '戻　　る' , 'class="btn btn-primary"')}
     </div>
+
 
 {form_close()}
 
 <!-- </form> -->
+
+{* Graph *}
+{include file="../../../../../public/js/my/kwlist_detail_graph.php"}
 
 
 {if $smarty.session.c_memKw==1}
 
-{form_open('/keywordlist/chg/' , 'name="reportForm" class="form-horizontal h-adr"')}
-
-  {form_hidden('chg_seq', $info.kw_seq)}
-
-
-  <div class="form-group">
-    <div class="col-sm-offset-6 col-sm-1">
-      {$attr['name'] = '_back'}
-      {$attr['type'] = 'submit'}
-      {form_button($attr , '編&emsp;&emsp;集' , 'class="btn btn-primary  btn-sm"')}
-    </div>
-
-{form_close()}
-<!-- </form> -->
-
-
-{form_open('/keyworddetail/del_pw/' , 'name="reportForm" class="form-horizontal h-adr"')}
+{form_open('/keywordlist/del_pw/' , 'name="reportForm" class="form-horizontal h-adr"')}
 
   {form_hidden('kw_seq', $info.kw_seq)}
 
   <!-- Button trigger modal -->
-  <div class="col-sm-1 col-sm-offset-1">
-    <button type="button" class="btn btn-primary  btn-sm" data-toggle="modal" data-target="#myModal02">削&emsp;&emsp;除</button>
+  <div class="col-sm-2 col-sm-offset-4">
+    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal02">削　　除</button>
   </div>
   </div>
 
@@ -194,13 +167,13 @@ https://github.com/etimbo/jquery-print-preview-plugin
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">キーワード&emsp;削除</h4>
+          <h4 class="modal-title">キーワード　削除</h4>
         </div>
         <div class="modal-body">
           <p>削除しますか。&hellip;</p>
         </div>
         <div class="modal-footer">
-          <button type='submit' name='submit' value='submit' class="btn btn-sm btn-primary">O&emsp;&emsp;K</button>
+          <button type='submit' name='submit' value='submit' class="btn btn-sm btn-primary">O  K</button>
           <button type='submit' name='submit' value='cancel' class="btn btn-sm btn-primary">キャンセル</button>
           {*<button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>*}
         </div>
@@ -208,11 +181,10 @@ https://github.com/etimbo/jquery-print-preview-plugin
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
 
+
 {form_close()}
 <!-- </form> -->
 
-{else}
-  </div>
 {/if}
 
 

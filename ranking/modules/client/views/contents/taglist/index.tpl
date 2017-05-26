@@ -1,121 +1,10 @@
 {* ヘッダー部分　START *}
     {include file="../header.tpl" head_index="1"}
 
-
-<link href="{base_url()}../../js/jqcloud/jqcloud.css" rel="stylesheet">
-<script src="{base_url()}../../js/jqcloud/jqcloud-1.0.4.min.js"></script>
-
-<style type="text/css">
-<!--
-.tagcloud03 ul {
-  margin: 0;
-	padding: 1;
-	list-style: none;
-}
-.tagcloud03 ul li {
-	display: inline-block;
-	margin: 0 .3em .3em 0;
-	padding: 0;
-}
-.tagcloud03 ul li a {
-	position: relative;
-	display: inline-block;
-	max-width: 300px;
-	height: 28px;
-	line-height: 28px;
-	padding: 0 2.5em 0 1em;
-	background-color: #fff;
-	border: 1px solid #aaa;
-	border-radius: 3px;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	overflow: hidden;
-	color: #333;
-	font-size: 13px;
-	text-decoration: none;
-	-webkit-transition: .2s;
-	transition: .2s;
-}
-.tagcloud03 li span {
-	position: relative;
-  display: inline-block;
-  max-width: 100px;
-	top: 0px;
-	right: -8px;
-	z-index: 2;
-	width: 22px;
-	height: 22px;
-	line-height: 22px;
-	background-color: #3498db;
-	border-radius: 100%;
-	color: #fff;
-	font-size: 12px;
-	text-align: center;
-	-webkit-transition: .2s;
-	transition: .2s;
-}
-.tagcloud03 li span1 {
-  position: absolute;
-	top: 3px;
-	right: 1px;
-	z-index: 2;
-	width: 22px;
-	height: 22px;
-	line-height: 22px;
-	background-color: #3498db;
-	border-radius: 100%;
-	color: #fff;
-	font-size: 12px;
-	text-align: center;
-	-webkit-transition: .2s;
-	transition: .2s;
-}
-.tagcloud03 ul li a:hover {
-	background-color: #3498db;
-	border: 1px solid #3498db;
-	color: #fff;
-}
-.tagcloud03 ul li a:hover span {
-	background-color: #fff;
-	color: #3498db;
-}
-.tagcloud03 ul li a:hover span1 {
-  background-color: #fff;
-	color: #3498db;
-}
--->
-</style>
-
-
-
-
-
-
 <body>
 {* ヘッダー部分　END *}
 
-<script type="text/javascript">
-<!--
-function fmSubmit(formName, url, method, num) {
-  var f1 = document.forms[formName];
-
-  console.log(num);
-
-  /* エレメント作成&データ設定&要素追加 */
-  var e1 = document.createElement('input');
-  e1.setAttribute('type', 'hidden');
-  e1.setAttribute('name', 'chg_gtseq');
-  e1.setAttribute('value', num);
-  f1.appendChild(e1);
-
-  /* サブミットするフォームを取得 */
-  f1.method = method;                                   // method(GET or POST)を設定する
-  f1.action = url;                                      // action(遷移先URL)を設定する
-  f1.submit();                                          // submit する
-  return true;
-}
-// -->
-</script>
+  <script src="{base_url()}../../js/my/fmsubmit.js"></script>
 
 <div id="contents" class="container">
 
@@ -155,58 +44,43 @@ function fmSubmit(formName, url, method, num) {
 
 {form_open('/taglist/detail/' , 'name="detailForm" class="form-horizontal"')}
 
-
-<div class="tagcloud03">
-	<ul>
-	  {$tag_list}
-	</ul>
-</div>
-
-
-
-<hr>
-
-
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th class="col-md-1">ID</th>
+                <th>タグ名</th>
+                <th class="col-md-1 text-center">rootdomain</th>
+                <th class="col-md-1 text-center">keyword</th>
+                <th class="col-md-1"></th>
+            </tr>
+        </thead>
 
 
+        {foreach from=$list item=gt}
+        <tbody>
+            <tr>
+                <td>
+                    {$gt.gt_seq}
+                </td>
+                <td>
+                    {$gt.gt_name}
+                </td>
+                <td class="text-center">
+                    {$gt.gt_domain_cnt|number_format}
+                </td>
+                <td class="text-center">
+                    {$gt.gt_keyword_cnt|number_format}
+                </td>
+                <td>
+                    <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/taglist/detail/', 'POST', '{$gt.gt_seq}', 'chg_gtseq');">順位データ一覧</button>
+                </td>
+            </tr>
+        </tbody>
+        {foreachelse}
+            検索結果はありませんでした。
+        {/foreach}
 
-<script>
-var word_array = [
-	{
-		text: "Lorem", weight: 15
-	},
-	{
-		text: "Ipsum", weight: 20, link: "../taglist/"
-	},
-	{
-		text: "Dolor", weight: 17
-	},
-	{
-		text: "Sit", weight: 18
-	},
-	{
-		text: "Amet", weight: 19
-	},
-];
-
-$(function() {
-    $("#tagcloud").jQCloud(word_array, {
-        width: 450,
-        height: 300
-    });
-});
-</script>
-
-
-<!-- Tag Cloud -->
-<div id="tagcloud"></div>
-
-
-
-
-
-
-
+    </table>
 
 {form_close()}
 

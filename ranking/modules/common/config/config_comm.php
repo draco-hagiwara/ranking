@@ -92,12 +92,28 @@ array(
 		"max_size"      => '10000',                                   // 許容する最大ファイルサイズをKB単位で設定
 );
 
+// キーワード情報：CSVアップロード
+$config['KWLIST_CSV_UPLOAD'] =
+array(
+		"upload_path"   => '../user_data/csv_up/',                    // ドキュメントルートからの相対パス
+		"allowed_types" => 'csv',                                     // 許容するファイルのMIMEタイプを設定
+		"overwrite"     => TRUE,                                      // ファイルは上書き
+		"max_size"      => '10000',                                   // 許容する最大ファイルサイズをKB単位で設定
+);
 
+// Location Criteria情報：CSVアップロード
+$config['CRITERIA_CSV_UPLOAD'] =
+array(
+		"upload_path"   => '../user_data/csv_up/',                    // ドキュメントルートからの相対パス
+		"allowed_types" => 'csv',                                     // 許容するファイルのMIMEタイプを設定
+		"overwrite"     => TRUE,                                      // ファイルは上書き
+		"max_size"      => '10000',                                   // 許容する最大ファイルサイズをKB単位で設定
+);
 
 
 // Pagination 設定:1ページ当たりの表示件数
 // ※ ～/system/libraries/Pagination.php に不具合あり
-$config['PAGINATION_PER_PAGE'] = '10';
+$config['PAGINATION_PER_PAGE'] = '25';
 
 
 /* End of file config_comm.php */

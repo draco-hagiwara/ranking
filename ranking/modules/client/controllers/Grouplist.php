@@ -42,7 +42,20 @@ class Grouplist extends MY_Controller
     	if (isset($segments[3]))
     	{
     		$tmp_offset = $segments[3];
+    		if (!is_numeric($tmp_offset))
+    		{
+    			//throw new Exception("例外発生！");
+    			show_error('指定されたIDは不正です。');
+    		}
+
     		$tmp_inputpost = $this->input->post();
+
+    		// セッションをフラッシュデータとして保存
+    		$data = array(
+    				'c_offset'     => $tmp_offset,
+    				'c_back_set'   => "grouplist",
+    		);
+    		$this->session->set_userdata($data);
     	} else {
     		$tmp_offset = 0;
     		$tmp_inputpost = array(
@@ -52,8 +65,10 @@ class Grouplist extends MY_Controller
 
     		// セッションをフラッシュデータとして保存
     		$data = array(
-    				'c_gt_name' => "",
-    				'c_orderid' => "",
+    				'c_gt_name'  => "",
+    				'c_orderid'  => "",
+    				'c_offset'   => $tmp_offset,
+    				'c_back_set' => "grouplist",
     		);
     		$this->session->set_userdata($data);
     	}
@@ -92,7 +107,7 @@ class Grouplist extends MY_Controller
     		// セッションをフラッシュデータとして保存
     		$data = array(
     				'c_gt_name' => $this->input->post('gt_name'),
-    				'c_orderid'    => $this->input->post('orderid'),
+    				'c_orderid' => $this->input->post('orderid'),
     		);
     		$this->session->set_userdata($data);
 
@@ -101,8 +116,8 @@ class Grouplist extends MY_Controller
 
     	} else {
     		// セッションからフラッシュデータ読み込み
-    		$tmp_inputpost['gt_name']   = $_SESSION['c_gt_name'];
-    		$tmp_inputpost['orderid']      = $_SESSION['c_orderid'];
+    		$tmp_inputpost['gt_name'] = $_SESSION['c_gt_name'];
+    		$tmp_inputpost['orderid'] = $_SESSION['c_orderid'];
     	}
 
     	// バリデーション・チェック
@@ -113,9 +128,21 @@ class Grouplist extends MY_Controller
     	if (isset($segments[3]))
     	{
     		$tmp_offset = $segments[3];
+    		if (!is_numeric($tmp_offset))
+    		{
+    			//throw new Exception("例外発生！");
+    			show_error('指定されたIDは不正です。');
+    		}
+
     	} else {
     		$tmp_offset = 0;
     	}
+
+    	// セッションをフラッシュデータとして保存
+    	$data = array(
+    			'c_offset'     => $tmp_offset,
+    	);
+    	$this->session->set_userdata($data);
 
     	// 1ページ当たりの表示件数
     	$this->config->load('config_comm');
@@ -150,11 +177,15 @@ class Grouplist extends MY_Controller
     public function detail()
     {
 
-    	// セッションデータをクリア
-    	$this->load->library('lib_auth');
-    	$this->lib_auth->delete_session('client');
-//     	$this->load->model('comm_auth', 'comm_auth', TRUE);
-//     	$this->comm_auth->delete_session('client');
+//     	// セッションデータをクリア
+//     	$this->load->library('lib_auth');
+//     	$this->lib_auth->delete_session('client');
+
+    	$input_post = $this->input->post();
+    	if (!isset($input_post['chg_seq']))
+    	{
+    		show_404();
+    	}
 
     	// バリデーション・チェック
     	$this->_set_validation();												// バリデーション設定
@@ -168,37 +199,45 @@ class Grouplist extends MY_Controller
     	if (isset($segments[3]))
     	{
     		$tmp_offset = $segments[3];
+    		if (!is_numeric($tmp_offset))
+    		{
+    			//throw new Exception("例外発生！");
+    			show_error('指定されたIDは不正です。');
+    		}
+
     		$tmp_inputpost = $this->input->post();
     	} else {
     		$tmp_offset = 0;
     		$tmp_inputpost = $this->input->post();
 
     		$tmp_inputpost = array(
-				    				'kw_keyword' => '',
-				    				'kw_domain'  => '',
-				    				'orderid'    => '',
+		    				'gt_name'   => '',
+		    				'orderid'   => '',
+		    				'gt_seq'    => $this->input->post('chg_seq'),
     		);
 
     		// セッションをフラッシュデータとして保存
     		$data = array(
-		    				'c_kw_keyword' => "",
-		    				'c_kw_domain'  => '',
+		    				'c_gt_name'    => "",
 		    				'c_orderid'    => "",
-		    				'c_kw_seq'     => $this->input->post('chg_gtseq'),
+		    				'c_gt_seq'     => $this->input->post('chg_seq'),
+		    				'c_kw_keyword' => "",
+		    				'c_kw_domain'  => "",
+		    				'c_kw_status'  => "",
     		);
     		$this->session->set_userdata($data);
     	}
 
     	// グループ情報の取得
     	$this->load->model('Group_tag', 'gt', TRUE);
-    	$get_gt_data = $this->gt->get_gt_seq($this->input->post('chg_gtseq'));
+    	$get_gt_data = $this->gt->get_gt_seq($this->input->post('chg_seq'));
 
     	// 該当グループが設定してあるキーワード情報を取得
     	$_set_kw_data['kw_cl_seq']  = $_SESSION['c_memGrp'];
     	$_set_kw_data['kw_group']   = $get_gt_data[0]['gt_name'];
     	$_set_kw_data['kw_keyword'] = NULL;
     	$_set_kw_data['kw_domain']  = NULL;
-    	$_set_kw_data['kw_status']  = NULL;
+    	$_set_kw_data['kw_status']  = 1;
     	$_set_kw_data['orderid']    = NULL;
 
     	$this->load->model('Keyword', 'kw', TRUE);
@@ -213,7 +252,7 @@ class Grouplist extends MY_Controller
 //     	$cnt_date = 31;
     	$date = new DateTime();
     	$_start_date   = $date->format('Y-m-d');
-    	$_set_cnt_date = "- " . $cnt_date+1 . " days";
+    	$_set_cnt_date = "- " . ($cnt_date - 1) . " days";
     	$_end_date     = $date->modify($_set_cnt_date)->format('Y-m-d');
 
 //     	$this->load->library('lib_ranking_data');
@@ -238,6 +277,18 @@ class Grouplist extends MY_Controller
     	$this->smarty->assign('seach_orderid', $_set_kw_data['orderid']);
     	$this->smarty->assign('start_date',    $_start_date);
     	$this->smarty->assign('end_date',      $_end_date);
+
+    	// 「戻る」のページャ先をセット
+    	if (isset($_SESSION['c_offset']))
+    	{
+    		$page_cnt = $_SESSION['c_offset'];
+    	} else {
+    		$page_cnt = 0;
+    	}
+    	$this->smarty->assign('seach_page_no', $page_cnt);
+
+    	// 「戻る」の画面先をセット
+    	$this->smarty->assign('back_page', $_SESSION['c_back_set']);
 
     	$this->view('grouplist/detail.tpl');
 
@@ -286,7 +337,7 @@ class Grouplist extends MY_Controller
 
     	// グループ情報の取得
     	$this->load->model('Group_tag', 'gt', TRUE);
-    	$get_gt_data = $this->gt->get_gt_seq($_SESSION['c_kw_seq']);
+    	$get_gt_data = $this->gt->get_gt_seq($_SESSION['c_gt_seq']);
 
     	// 該当グループが設定してあるキーワード情報を取得
     	$_set_kw_data['kw_cl_seq']  = $_SESSION['c_memGrp'];
@@ -310,7 +361,7 @@ class Grouplist extends MY_Controller
 //     	$cnt_date = 31;																// 表示期間。後にconfigで定義。
     	$date = new DateTime();
     	$_start_date = $date->format('Y-m-d');
-    	$_set_cnt_date = "- " . $cnt_date+1 . " days";
+    	$_set_cnt_date = "- " . ($cnt_date - 1) . " days";
     	$_end_date   = $date->modify($_set_cnt_date)->format('Y-m-d');
 
 //     	$this->load->library('lib_ranking_data');
@@ -382,10 +433,19 @@ class Grouplist extends MY_Controller
     		$set_gt_data['gt_cl_seq'] = $_SESSION['c_memGrp'];
     		$set_gt_data['gt_type']   = 0;
 
-    		// INSERT
-    		$this->gt->insert_group_tag($set_gt_data);
+    		// 重複チェック
+    		$get_gt_name = $this->gt->get_gt_name($set_gt_data['gt_name'], $_SESSION['c_memGrp'], 0);
+    		if (empty($get_gt_name))
+    		{
 
-    		$this->smarty->assign('mess02', "<font color=blue>グループ名が追加されました。</font>");
+	    		// INSERT
+	    		$this->gt->insert_group_tag($set_gt_data);
+
+	    		$this->smarty->assign('mess02', "<font color=blue>グループ名が追加されました。</font>");
+
+    		} else {
+    			$this->smarty->assign('mess02', "<font color=red>ERROR::同一グループ名が既に存在します。</font>");
+    		}
 
     	}
 
@@ -407,9 +467,10 @@ class Grouplist extends MY_Controller
 
     	$input_post = $this->input->post();
 
-    	if (!isset($input_post['gt_name']))
+//     	if (!isset($input_post['gt_name']))
+    	if ($input_post['gt_name'] == "")
     	{
-    		redirect('/grouplist/add');
+    		redirect('/grouplist/add/');
     	}
 
     	// バリデーション設定
@@ -447,26 +508,35 @@ class Grouplist extends MY_Controller
 
     		$this->load->model('Group_tag', 'gt', TRUE);
     		$this->load->model('Keyword',   'kw', TRUE);
-
     		if ($input_post['submit'] == '_change')
     		{
 
     			$_gpname = str_replace("　", " ", $input_post['gt_name']);;
-    			$set_gt_data['gt_name']     = trim($_gpname);
+    			$set_gt_data['gt_name'] = trim($_gpname);
 
-    			// UPDATE
-    			$set_gt_data['gt_cl_seq']   = $_SESSION['c_memGrp'];
-    			$set_gt_data['old_gt_name'] = $input_post['old_gt_name'];
-    			$set_gt_data['gt_memo']     = $input_post['gt_memo'];
-    			$this->gt->update_gt_name($set_gt_data, $type=0);
+    			 // 重複チェック
+    			$get_gt_name = $this->gt->get_gt_name($set_gt_data['gt_name'], $_SESSION['c_memGrp'], 0);
+    			if (empty($get_gt_name) || ($set_gt_data['gt_name'] == $input_post['old_gt_name']))
+    			{
 
-    			// キーワード情報一括書き換え
-    			$set_kw_data['kw_cl_seq']   = $_SESSION['c_memGrp'];
-    			$set_kw_data['gt_name']     = $set_gt_data['gt_name'];
-    			$set_kw_data['old_gt_name'] = $input_post['old_gt_name'];
-    			$this->kw->update_kw_all($set_kw_data);
+    				// UPDATE
+	    			$set_gt_data['gt_cl_seq']   = $_SESSION['c_memGrp'];
+	    			$set_gt_data['old_gt_name'] = $input_post['old_gt_name'];
+	    			$set_gt_data['gt_memo']     = $input_post['gt_memo'];
+	    			$this->gt->update_gt_name($set_gt_data, $type=0);
 
-    			$this->smarty->assign('mess01', "<font color=blue>グループ名が更新されました。</font>");
+	    			// キーワード情報一括書き換え
+	    			$set_kw_data['kw_cl_seq']   = $_SESSION['c_memGrp'];
+	    			$set_kw_data['gt_name']     = $set_gt_data['gt_name'];
+	    			$set_kw_data['old_gt_name'] = $input_post['old_gt_name'];
+	    			$this->kw->update_kw_all($set_kw_data, 0);
+
+	    			$this->smarty->assign('mess01', "<font color=blue>グループ名が更新されました。</font>");
+
+    			} else {
+    				$set_kw_data['gt_name'] = $input_post['old_gt_name'];
+    				$this->smarty->assign('mess01', "<font color=blue>ERROR::同一グループ名が既に存在します。</font>");
+    			}
 
     		} elseif ($input_post['submit'] == '_delete') {
 
@@ -477,24 +547,26 @@ class Grouplist extends MY_Controller
 
     			// キーワード情報一括書き換え
     			$set_kw_data['kw_cl_seq']   = $_SESSION['c_memGrp'];
-    			$set_kw_data['gt_name']     = "選択なし";
+    			$set_kw_data['gt_name']     = NULL;
     			$set_kw_data['old_gt_name'] = $input_post['old_gt_name'];
-    			$this->kw->update_kw_all($set_kw_data);
+    			$this->kw->update_kw_all($set_kw_data, 0);
 
     			$this->smarty->assign('mess01', "<font color=blue>グループ名が削除されました。</font>");
 
     		}else {
-
+    			$set_kw_data['gt_name']     = $input_post['gt_name'];
     		}
     	}
 
     	// 設定グループのセット
     	$this->load->library('lib_keyword');
-    	$this->lib_keyword->grouptag_set($_SESSION['c_memGrp'], $input_post['gt_name'], 0);
+    	$this->lib_keyword->grouptag_set($_SESSION['c_memGrp'], $set_kw_data['gt_name'], 0);
+//     	$this->lib_keyword->grouptag_set($_SESSION['c_memGrp'], $input_post['gt_name'], 0);
 //     	$this->_group_set($_SESSION['c_memGrp'], $input_post['gt_name']);
 
     	$this->smarty->assign('gt_seq',   $input_post['gt_seq']);
-    	$this->smarty->assign('gt_name',  $input_post['gt_name']);
+    	$this->smarty->assign('gt_name',  $set_kw_data['gt_name']);
+//     	$this->smarty->assign('gt_name',  $input_post['gt_name']);
     	$this->smarty->assign('disp01',   FALSE);
     	$this->smarty->assign('tmp_memo', $input_post['gt_memo']);
     	$this->smarty->assign('tmp_new_memo', NULL);
@@ -507,7 +579,7 @@ class Grouplist extends MY_Controller
     private function _get_Pagination($countall, $tmp_per_page)
     {
 
-    	$config['base_url']       = base_url() . '/grouplist/search/';        // ページの基本URIパス。「/コントローラクラス/アクションメソッド/」
+    	$config['base_url']       = base_url() . '/grouplist/search/';          // ページの基本URIパス。「/コントローラクラス/アクションメソッド/」
     	$config['per_page']       = $tmp_per_page;                              // 1ページ当たりの表示件数。
     	$config['total_rows']     = $countall;                                  // 総件数。where指定するか？
     	//$config['uri_segment']    = 4;                                        // オフセット値がURIパスの何セグメント目とするか設定

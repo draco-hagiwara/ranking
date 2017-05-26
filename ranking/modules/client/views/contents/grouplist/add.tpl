@@ -85,11 +85,10 @@ $(function() {
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-    {if $gt_name!="選択なし"}
     <!-- Button trigger modal -->
-      <div class="col-sm-offset-1 col-md-1">
-        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal02">更　　新</button>
-      </div>
+    <div class="col-sm-offset-1 col-md-1">
+      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal02">更　　新</button>
+    </div>
 
     <div class="modal fade" id="myModal02" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
       <div class="modal-dialog">
@@ -110,9 +109,8 @@ $(function() {
     </div><!-- /.modal -->
 
     <!-- Button trigger modal -->
-      <div class="col-sm-offset-1 col-md-1">
-        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal03">削　　除</button>
-      </div>
+    <div class="col-sm-offset-1 col-md-1">
+      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal03">削　　除</button>
     </div>
 
     <div class="modal fade" id="myModal03" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -132,7 +130,6 @@ $(function() {
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-    {/if}
 
   </div>
 

@@ -1,74 +1,59 @@
 {* ヘッダー部分　START *}
-  {include file="../header.tpl" head_index="1"}
-
-  <link href="{base_url()}../../css/my/keywordlist.css" rel="stylesheet">
+    {include file="../header.tpl" head_index="1"}
 
 <body>
 {* ヘッダー部分　END *}
 
   <script src="{base_url()}../../js/my/fmsubmit.js"></script>
-  <script src="{base_url()}../../js/my/toggleslide.js"></script>
 
 <div id="contents" class="container">
 
-<h5>【 キーワード管理情報　検索 】</h5>
-{form_open('/keywordlist/search/' , 'name="searchForm" class="form-horizontal"')}
-
+<h4>【ルートドメイン内検索】</h4>
+{form_open('/rootdomainlist/detail_search/' , 'name="searchForm" class="form-horizontal"')}
   <table class="table table-hover table-bordered">
     <tbody>
       <tr>
         <td class="col-md-1">キーワード</td>
-        <td colspan="3" class="col-md-5 input-group-sm">
-          {form_input('kw_keyword' , set_value('kw_keyword', {$seach_kw_keyword}) , 'class="form-control"')}
+        <td class="col-md-2">
+          {form_input('kw_keyword' , set_value('kw_keyword', {$seach_keyword}) , 'class="form-control" placeholder="キーワードを入力してください。"')}
           {if form_error('kw_keyword')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('kw_keyword')}</font></label>{/if}
         </td>
-        <td class="col-md-1">ﾙｰﾄﾄﾞﾒｲﾝ</td>
-        <td colspan="3" class="col-md-5 input-group-sm">
-          {form_input('kw_domain' , set_value('kw_domain', {$seach_kw_domain}) , 'class="form-control"')}
+        <td class="col-md-1">ドメイン名</td>
+        <td class="col-md-3">
+          {form_input('kw_domain' , set_value('kw_domain', {$seach_domain}) , 'class="form-control" placeholder="ドメイン名を入力してください。"')}
           {if form_error('kw_domain')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('kw_domain')}</font></label>{/if}
         </td>
-      </tr>
-      <tr>
-        <td class="col-md-1">ステータス</td>
-        <td class="col-md-2  btn-md">
-          {form_dropdown('kw_status', $options_kw_status, set_value('kw_status', {$seach_kw_status}))}
-        </td>
         <td class="col-md-1">ID並び替え</td>
-        <td class="col-md-2  btn-md">
+        <td class="col-md-2">
           {form_dropdown('orderid', $options_orderid, set_value('orderid', {$seach_orderid}))}
         </td>
       </tr>
     </tbody>
   </table>
 
+  {form_hidden('rd_seq', $rd_seq)}
+
   <div class="row">
     <div class="col-md-5 col-md-offset-5">
       {$attr['name']  = 'submit'}
       {$attr['type']  = 'submit'}
       {$attr['value'] = '_submit'}
-      {form_button($attr , '検　　索' , 'class="btn btn-default btn-md"')}
+      {form_button($attr , '検　　索' , 'class="btn btn-default"')}
     </div>
   </div>
 
 {form_close()}
 
 <ul class="pagination pagination-sm">
-  検索結果： {$countall}件<br />
-  {$set_pagination}
+    検索結果： {$countall}件<br />
+    {$set_pagination}
 </ul>
 
-<p>表示期間：{$end_date} ～ {$start_date} (31日間)</p>
-{form_open('/keywordlist/detail/' , 'name="detailForm" class="form-horizontal"')}
+<p>ルートドメイン名：{$rd_rootdomain}<br>表示期間：{$end_date} ～ {$start_date}</p>
+{form_open('/rootdomainlist/detail_search/' , 'name="detailForm" class="form-horizontal"')}
 
-
-  <dl id="acMenu">
-
-  {$old_rootdomain = ""}
   {foreach from=$list item=kw}
-  {if $old_rootdomain != $kw.kw_rootdomain}
-    {$old_rootdomain = $kw.kw_rootdomain}
-    </dd><dt style="font-size:24px;color:#000000;">　{$kw.kw_rootdomain}</dt><dd>
-  {/if}
+
     <div class="row">
       <div class="col-md-1">
         {if $kw.kw_status == "1"}<span class="label label-primary">有効</span>
@@ -78,10 +63,6 @@
      </div>
      <div class="col-md-11 text-right">
         <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/keyworddetail/detail/', 'POST', '{$kw.kw_seq}', 'chg_seq');">詳　細</button>
-        {*
-        <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/keyworddetail/report/', 'POST', '{$kw.kw_seq}', 'chg_seq');">report</button>
-        <button type="button" class="btn {if $kw.wt_seq}btn-warning{else}btn-success{/if} btn-xs" onclick="fmSubmit('detailForm', '/client/keywordlist/watchlist/', 'POST', '{$kw.kw_seq}', 'chg_seq');">☆ウォッチ</button>
-        *}
         {if $smarty.session.c_memKw==1}
           <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/keywordlist/chg/', 'POST', '{$kw.kw_seq}', 'chg_seq');">編　集</button>
         {/if}
@@ -119,55 +100,25 @@
           <td>
             rank
           </td>
+          {$comp_y_data=0}
           {foreach from=$tbl_y_data{$kw.kw_seq} item=y_data}
             <td class="text-right">
-              {$y_data}
+              {if $y_data<$comp_y_data}<font color="#ff0000">{$y_data}</font>{else}{$y_data}{/if}
             </td>
+            {$comp_y_data=$y_data}
           {/foreach}
         </tr>
       </tbody>
 
     </table>
 
-
   {foreachelse}
     検索結果はありませんでした。
   {/foreach}
 
-  </dl>
+  {form_hidden('rd_seq', $rd_seq)}
 
 {form_close()}
-
-
-{form_open('/data_csv/kwlist_csvdown/' , 'name="detailForm" class="form-horizontal"')}
-
-  <div class="row">
-    <div class="col-sm-2">
-      <button type="button" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#myModal01">↓　ダウンロード</button>
-    </div>
-  </div>
-
-  <!-- Button trigger modal -->
-  <div class="modal fade" id="myModal01" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">キーワード管理情報のCSVダウンロード</h4>
-        </div>
-        <div class="modal-body">
-          <p>ダウンロードしますか。&hellip;</p>
-        </div>
-        <div class="modal-footer">
-          <button type='submit' name='_submit' value='submit' class="btn btn-sm btn-primary">O  K</button>
-          <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
-        </div>
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
-
-{form_close()}
-
 
 <ul class="pagination pagination-sm">
   {$set_pagination}

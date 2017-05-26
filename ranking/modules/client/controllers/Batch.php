@@ -84,11 +84,149 @@ class Batch extends MY_Controller
     	$this->_get_ranking();
 
 
-
-
     	$_ed_day = date("Y-m-d H:i:s", time());
     	log_message('info', 'month_bat::** 夜間バッチ ** ' . $_st_day . ' => ' . $_ed_day);
     }
+
+
+
+    /**
+     *  テストデータ作成BAT
+     */
+    public function test_data_bat()
+    {
+
+    	set_time_limit(0);
+    	/*
+    	 * /opt/lampp/etc/php.ini
+    	 *   memory_limit=1024M
+    	 */
+    	ini_set('memory_limit', '1024M');
+
+
+    	$_st_day = date("Y-m-d H:i:s", time());
+
+
+    	// テストデータ作成
+    	$this->load->model('Keyword', 'kw', TRUE);
+    	$this->load->model('Ranking', 'rk', TRUE);
+
+    	// KW数
+    	$word = 20000;
+
+//     	for ($i=1; $i<=$word; $i++)
+//     	{
+
+//     		// KW作成
+//     		$set_kw_data['kw_old_seq']       = NULL;
+//     		$set_kw_data['kw_status']        = 1;
+//     		$set_kw_data['kw_url']           = "http://www.sub1.sample" . $i . ".com/";
+//     		$set_kw_data['kw_domain']        = "sub1.sample" . $i . ".com";
+//     		$set_kw_data['kw_rootdomain']    = "sample" . $i . ".com";
+//     		$set_kw_data['kw_keyword']       = "kw-" . $i;
+//     		$set_kw_data['kw_matchtype']     = 3;
+//     		$set_kw_data['kw_searchengine']  = 0;
+//     		$set_kw_data['kw_device']        = 0;
+//     		$set_kw_data['kw_location_id']   = 2392;
+//     		$set_kw_data['kw_location_name'] = "Japan";
+//     		$set_kw_data['kw_maxposition']   = 0;
+//     		$set_kw_data['kw_trytimes']      = 0;
+//     		$set_kw_data['kw_group']         = NULL;
+//     		$set_kw_data['kw_tag']           = NULL;
+//     		$set_kw_data['kw_cl_seq']        = 3;
+//     		$set_kw_data['kw_ac_seq']        = 11;
+
+//     		$this->kw->insert_keyword($set_kw_data);
+//     	}
+
+
+
+
+
+// 		// Rankingデータ作成
+// 		$set_rk_data['rk_cl_seq']        = 3;
+// 		$set_rk_data['rk_kw_old_seq']    = NULL;
+// 		$set_rk_data['rk_se_seq']        = 0;
+// 		$set_rk_data['rk_result_id']     = "xxxxx";
+// 		$set_rk_data['rk_se_seq_re']     = NULL;
+// 		$set_rk_data['rk_result_id_re']  = NULL;
+// 		$set_rk_data['rk_position_org']  = NULL;
+// 		$set_rk_data['rk_ranking_url']   = NULL;
+// 		$set_rk_data['rk_ranking_title'] = NULL;
+
+
+//     	for ($i=300; $i>=0; $i--)								// 31日*7ヶ月 = 217日
+//     	{
+//     		$date = new DateTime();
+//     		$_today_date   = $date->format('Y-m-d');
+//     		$_set_cnt_date = "- " . $i . " days";
+//     		$_set_date     = $date->modify($_set_cnt_date)->format('Y-m-d');
+
+//     		for ($j=1; $j<=$word; $j++)
+//     		{
+
+//     			// Rankingデータ作成
+//     			$set_rk_data['rk_kw_seq']        = $j;
+//     			$set_rk_data['rk_position']      = $i % 300;
+//     			$set_rk_data['rk_getdate']       = $_set_date;
+
+//     			//$this->rk->insert_ranking($set_rk_data);
+//     			$query = $this->db->insert('tb_ranking', $set_rk_data);
+
+//     		}
+//     	}
+
+
+
+
+
+
+		/*
+		 * 約2時間+
+		 */
+    	for ($i=365; $i>=0; $i--)								// 31日*7ヶ月 = 217日
+    	{
+    		$date = new DateTime();
+    		$_today_date   = $date->format('Y-m-d');
+    		$_set_cnt_date = "- " . $i . " days";
+    		$_set_date     = $date->modify($_set_cnt_date)->format('Y-m-d');
+
+    		$set_rk_data = array();
+    		for ($j=1; $j<=$word; $j++)
+    		{
+
+    			// Rankingデータ作成
+    			$set_rk_data[] = array(
+				    					'rk_cl_seq'        => 3,
+    									'rk_kw_old_seq'    => NULL,
+				    					'rk_se_seq'        => 0,
+				    					'rk_result_id'     => "xxxxx",
+				    					'rk_se_seq_re'     => NULL,
+				    					'rk_result_id_re'  => NULL,
+				    					'rk_position_org'  => NULL,
+				    					'rk_ranking_url'   => NULL,
+				    					'rk_ranking_title' => NULL,
+				    					'rk_kw_seq'        => $j,
+				    					'rk_position'      => (($i % 300) + 1),
+				    					'rk_getdate'       => $_set_date
+    			);
+
+    		}
+
+    		//$this->rk->insert_ranking($set_rk_data);
+    		//$query = $this->db->insert('tb_ranking', $set_rk_data);
+    		$query = $this->db->insert_batch('tb_ranking', $set_rk_data);			// 一括バッチ
+
+    		unset($set_rk_data[]);													// メモリ解放？
+
+    	}
+
+
+    	$_ed_day = date("Y-m-d H:i:s", time());
+    	log_message('info', 'test_data_bat::** テストデータ作成バッチ ** ' . $_st_day . ' => ' . $_ed_day);
+    }
+
+
 
     /**
      *  日次：DB & PG のシステムバックアップ処理
@@ -150,9 +288,6 @@ class Batch extends MY_Controller
         $date = new DateTime();
         $_set_time = $date->format('Y-m-d H:i:s');
 
-
-
-
         $this->load->model('Keyword',    'kw', TRUE);
         $this->load->model('Monitoring', 'mn', TRUE);
         $this->load->model('Serps',      'sp', TRUE);
@@ -168,20 +303,31 @@ class Batch extends MY_Controller
         $opt_monitoring = $this->config->item('MONITORING_STATUS');
 
         $get_mn_data = $this->mn->get_mn_date($_mn_date);
-        if (count($get_mn_data) > 0)
+        //if (count($get_mn_data) > 0)
+        if (!empty($get_mn_data))
         {
 
-        	if ($get_mn_data[0]['mn_status'] != $opt_monitoring['neutral'])
-        	{
-        		$mess = "<font color=red>ERROR::現在、データを取得中です。しばらくしてから実行してください。</font>";
-
-        		$this->smarty->assign('mess', $mess);
-        		$this->view('rank_create/index.tpl');
-
-        		return ;
-        	}
+        	//if ($get_mn_data[0]['mn_status'] != $opt_monitoring['neutral'])
+        	//{
+        	//	$mess = "<font color=red>ERROR::現在、データを取得中です。しばらくしてから実行してください。</font>";
+			//
+        	//	$this->smarty->assign('mess', $mess);
+        	//	$this->view('rank_create/index.tpl');
+			//
+        	//	return ;
+        	//}
 
         	$_get_cnt = $get_mn_data[0]['mn_cnt'];
+        	//if ($_get_cnt >= 3)
+        	//{
+        	//	$mess = "<font color=red>ERROR::１日の順位データ取得回数をオーバーしています。</font>";
+        	//
+        	//	$this->smarty->assign('mess', $mess);
+        	//	$this->view('rank_create/index.tpl');
+        	//
+        	//	return ;
+        	//}
+
         } else {
         	$_get_cnt = 0;
         }
@@ -193,14 +339,15 @@ class Batch extends MY_Controller
         $_set_mn_data['mn_date']   = $_mn_date;
         $_set_mn_data['mn_status'] = $opt_monitoring['start'];
         $_set_mn_data['mn_cnt']    = $_get_cnt;
-        if ($_get_cnt == 0)
+        if ($_get_cnt === 0)
         {
         	$this->mn->insert_monitoring($_set_mn_data, $_get_cnt);
         } else {
         	$this->mn->update_monitoring($_set_mn_data, $_get_cnt);
         }
 
-        if (count($get_kw_data) == 0)
+        //if (count($get_kw_data) == 0)
+        if (empty($get_kw_data))
         {
         	$mess = "<font color=red>対象となる検索キーワードが存在しません。</font>";
         	$this->smarty->assign('mess', $mess);
@@ -223,6 +370,9 @@ class Batch extends MY_Controller
         // ** 検索＆順位取得を実行する **
         list($_get_cnt, $_search_cnt, $_rank_cnt) = $this->lib_ranking_data->exec_ranking($get_kw_data, $_get_cnt);
 
+        // ** 引継ぎURLを含めて最高順位に書き換え対応
+        $this->lib_ranking_data->top_ranking();
+
         // 監視テーブルに検索終了を書き込む
         $_set_mn_data['mn_date']               = $_mn_date;
         $_set_mn_data['mn_status']             = $opt_monitoring['neutral'];
@@ -232,12 +382,6 @@ class Batch extends MY_Controller
         $_set_mn_data['mn_ranking_cnt' . $_no] = $_rank_cnt;
 
         $this->mn->update_monitoring($_set_mn_data, $_get_cnt-1);
-
-
-
-
-
-
 
         // ログ出力
         $date = new DateTime();

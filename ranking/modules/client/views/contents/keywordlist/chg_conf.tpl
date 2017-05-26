@@ -17,13 +17,9 @@
     </div>
   </div>
 
-
   <div class="form-group">
     <label class="col-xs-2 col-md-2 control-label">対象キーワード設定</label>
   </div>
-
-
-
 
   <div class="form-group">
     <div class="col-md-offset-2 col-md-9">■ 検索キーワード<font color=red> *</font>：</div>
@@ -78,14 +74,12 @@
     </div>
   </div>
 
-
   <div class="form-group">
     <label for="kw_group" class="col-xs-2 col-md-2 control-label">グループ設定</label>
     <div class="col-sm-9">
       {$info.kw_group}
     </div>
   </div>
-
 
   <div class="form-group">
     <label for="kw_tag" class="col-xs-2 col-md-2 control-label">タグ設定</label>
@@ -103,7 +97,6 @@
     </div>
   </div>
 
-
   <div class="form-group">
     <label for="kw_group" class="col-xs-2 col-md-2 control-label">他キーワードへの反映</label>
     <div class="col-sm-10">
@@ -113,10 +106,7 @@
   </div>
 
 
-
   {form_hidden('info', $info)}
-
-
 
 
   <div class="form-group">

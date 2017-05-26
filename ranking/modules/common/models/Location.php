@@ -35,7 +35,7 @@ class Location extends CI_Model
     }
 
     /**
-     * tb_locationから個別ロケーション情報を取得する
+     * location_id から個別ロケーション情報を取得する
      *
      * @param    int
      * @return   array()
@@ -55,6 +55,72 @@ class Location extends CI_Model
 
         return $get_data;
 
+    }
+
+    /**
+     * location_name から個別ロケーション情報を取得する
+     *
+     * @param    int
+     * @return   array()
+     */
+    public function get_location_name($location_name)
+    {
+
+    	$sql = 'SELECT
+                  lo_criteria_id,
+                  lo_canonical_name
+                FROM tb_location WHERE lo_canonical_name = \'' . $location_name . '\''
+                ;
+
+        $query = $this->db->query($sql);
+
+        $get_data = $query->result('array');
+
+        return $get_data;
+
+    }
+
+    /**
+     * Location Criteria情報の更新＆登録
+     *
+     * @param    array()
+     * @param    text
+     * @return   int
+     */
+    public function up_insert_criteria($setdata)
+    {
+
+    	// 同一データの有無確認
+    	$sql = 'SELECT
+                  lo_criteria_id
+                FROM tb_location
+    			WHERE
+    				 lo_criteria_id = \'' . $setdata['lo_criteria_id'] . '\''
+	    		;
+
+    	// クエリー実行
+    	$query = $this->db->query($sql);
+    	$get_data = $query->result('array');
+
+    	if (count($get_data) > 0)
+    	{
+    		// UPDATE
+    		$where = array(
+    				'lo_criteria_id' => $get_data[0]['lo_criteria_id']
+    		);
+    		$result = $this->db->update('tb_location', $setdata, $where);
+    		$_last_sql = $this->db->last_query();
+
+    	} else {
+    		// INSERT
+    		$result = $this->db->insert('tb_location', $setdata);
+    		$_last_sql = $this->db->last_query();
+
+    		// 挿入した ID 番号を取得
+    		$row_id = $this->db->insert_id();
+    	}
+
+    	return $result;
     }
 
     /**
