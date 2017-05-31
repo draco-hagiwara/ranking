@@ -506,8 +506,9 @@ class Grouplist extends MY_Controller
     	if ($this->form_validation->run() == TRUE)
     	{
 
-    		$this->load->model('Group_tag', 'gt', TRUE);
-    		$this->load->model('Keyword',   'kw', TRUE);
+    		$this->load->model('Group_tag',  'gt', TRUE);
+    		$this->load->model('Keyword',    'kw', TRUE);
+    		$this->load->model('Rootdomain', 'rd', TRUE);
     		if ($input_post['submit'] == '_change')
     		{
 
@@ -531,6 +532,12 @@ class Grouplist extends MY_Controller
 	    			$set_kw_data['old_gt_name'] = $input_post['old_gt_name'];
 	    			$this->kw->update_kw_all($set_kw_data, 0);
 
+	    			// ルートドメイン情報一括書き換え
+	    			$set_rd_data['rd_cl_seq']   = $_SESSION['c_memGrp'];
+	    			$set_rd_data['gt_name']     = "[" . $set_gt_data['gt_name'] . "]";
+	    			$set_rd_data['old_gt_name'] = "[" . $input_post['old_gt_name'] . "]";
+	    			$this->rd->update_rd_grp($set_rd_data);
+
 	    			$this->smarty->assign('mess01', "<font color=blue>グループ名が更新されました。</font>");
 
     			} else {
@@ -550,6 +557,12 @@ class Grouplist extends MY_Controller
     			$set_kw_data['gt_name']     = NULL;
     			$set_kw_data['old_gt_name'] = $input_post['old_gt_name'];
     			$this->kw->update_kw_all($set_kw_data, 0);
+
+    			// ルートドメイン情報一括書き換え
+    			$set_rd_data['rd_cl_seq']   = $_SESSION['c_memGrp'];
+    			$set_rd_data['gt_name']     = NULL;
+    			$set_rd_data['old_gt_name'] = "[" . $input_post['old_gt_name'] . "]";
+    			$this->rd->update_rd_grp($set_rd_data);
 
     			$this->smarty->assign('mess01', "<font color=blue>グループ名が削除されました。</font>");
 

@@ -232,7 +232,7 @@ class Lib_keyword
 	}
 
 	/**
-	 * ロケーションのセット
+	 * ロケーションのセット (登録＆更新用)
 	 *
 	 * @param  int
 	 * @return
@@ -265,6 +265,31 @@ class Lib_keyword
 		}
 
 		$CI->smarty->assign('options_location', $opt_location);
+
+	}
+
+	/**
+	 * ロケーションのセット (検索用)
+	 *
+	 * @param  int
+	 * @return
+	 */
+	public static function search_location()
+	{
+
+		$CI =& get_instance();
+		$CI->load->model('Location', 'lc', TRUE);
+
+		$location_list = $CI->lc->get_location_list();
+
+		// 既存ロケーションのリスト作成
+		$opt_location[""] = " -- 選択してください -- ";
+		foreach ($location_list as $key => $value)
+		{
+			$opt_location[$value['lo_criteria_id']] = $value['lo_canonical_name'];
+		}
+
+		return $opt_location;
 
 	}
 

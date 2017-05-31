@@ -589,8 +589,9 @@ class Taglist extends MY_Controller
     	if ($this->form_validation->run() == TRUE)
     	{
 
-    		$this->load->model('Group_tag', 'gt', TRUE);
-    		$this->load->model('Keyword',   'kw', TRUE);
+    		$this->load->model('Group_tag',  'gt', TRUE);
+    		$this->load->model('Keyword',    'kw', TRUE);
+    		$this->load->model('Rootdomain', 'rd', TRUE);
 
     		if ($input_post['submit'] == '_change')
     		{
@@ -609,7 +610,7 @@ class Taglist extends MY_Controller
     				$set_gt_data['gt_memo']     = $input_post['gt_memo'];
     				$this->gt->update_gt_name($set_gt_data, $type=1);
 
-    				// タグ情報一括書き換え
+    				// タグ(キーワード情報)一括書き換え
     				$set_kw_data['kw_cl_seq']   = $_SESSION['c_memGrp'];
     				$set_kw_data['kw_tag']      = $input_post['old_gt_name'];
     				$get_tag_data = $this->kw->get_kw_tag($set_kw_data);
@@ -623,6 +624,26 @@ class Taglist extends MY_Controller
     						$get_tag_data[$key]['kw_tag'] = str_replace($_org_word, $_chg_word, $value['kw_tag']);
 
     						$this->kw->update_keyword($get_tag_data[$key]);
+    					}
+    				}
+
+    				// タグ(ルートドメイン情報)一括書き換え
+    				$set_rd_data['rd_cl_seq']   = $_SESSION['c_memGrp'];
+    				$set_rd_data['rd_tag']      = $input_post['old_gt_name'];
+    				$set_rd_data['old_gt_name'] = $input_post['old_gt_name'];
+    				$get_tag_data = $this->rd->get_rd_tag($set_rd_data);
+
+    				if (!empty($get_tag_data))
+    				{
+    					foreach ($get_tag_data as $key => $value)
+    					{
+    						$_org_word = "[" . $input_post['old_gt_name'] . "]";
+    						$_chg_word = "[" . $input_post['gt_name'] . "]";
+    						$set_rd_data['rd_tag'] = str_replace($_org_word, $_chg_word, $value['rd_tag']);
+
+    						$set_rd_data['rd_seq'] = $value['rd_seq'];
+
+    						$this->rd->update_rd_tag($set_rd_data);
     					}
     				}
 
@@ -641,7 +662,7 @@ class Taglist extends MY_Controller
     			$set_gt_data['old_gt_name'] = $input_post['old_gt_name'];
     			$this->gt->delete_group_tag($set_gt_data, $type=1);
 
-    			// タグ情報一括書き換え
+    			// タグ(キーワード情報)一括削除
     			$set_kw_data['kw_cl_seq']   = $_SESSION['c_memGrp'];
     			$set_kw_data['kw_tag']      = $input_post['old_gt_name'];
     			$get_tag_data = $this->kw->get_kw_tag($set_kw_data);
@@ -656,6 +677,27 @@ class Taglist extends MY_Controller
     					$get_tag_data[$key]['kw_tag'] = str_replace($_org_word, $_chg_word, $value['kw_tag']);
 
     					$this->kw->update_keyword($get_tag_data[$key]);
+    				}
+    			}
+
+    			// タグ(ルートドメイン情報)一括削除
+    			$set_rd_data['rd_cl_seq']   = $_SESSION['c_memGrp'];
+    			$set_rd_data['rd_tag']      = $input_post['old_gt_name'];
+    			$set_rd_data['old_gt_name'] = $input_post['old_gt_name'];
+    			$get_tag_data = $this->rd->get_rd_tag($set_rd_data);
+
+    			if (!empty($get_tag_data))
+    			{
+    				// タグ名の場合は置き換え
+    				foreach ($get_tag_data as $key => $value)
+    				{
+    					$_org_word = "[" . $input_post['old_gt_name'] . "]";
+    					$_chg_word = "";
+    					$set_rd_data['rd_tag'] = str_replace($_org_word, $_chg_word, $value['rd_tag']);
+
+    					$set_rd_data['rd_seq'] = $value['rd_seq'];
+
+    					$this->rd->update_rd_tag($set_rd_data);
     				}
     			}
 

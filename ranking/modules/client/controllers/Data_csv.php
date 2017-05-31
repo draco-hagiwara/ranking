@@ -36,30 +36,26 @@ class Data_csv extends MY_Controller
     public function project_csvup()
     {
 
+    	set_time_limit(0);
+    	/*
+    	 * /opt/lampp/etc/php.ini
+    	 *   memory_limit=1024M
+    	 */
+    	ini_set('memory_limit', '1024M');
+
+
         $input_post = $this->input->post();
 
         $up_errflg = FALSE;
         $up_mess   = '';
 
 
-
-
-
         // **********************************
         $this->load->helper('form');
         // **********************************
-
-
-
-
-
         $this->config->load('config_comm');
         $this->load->library('lib_csvparser');
         $this->load->library('lib_validator');
-
-
-
-
 
 
         // CSVファイルのアップロード
@@ -329,9 +325,12 @@ class Data_csv extends MY_Controller
 	        	$this->lib_rootdomain->get_rootdomain_chg($set_csv_data['kw_cl_seq'], $set_csv_data['kw_rootdomain']);
 
         	}
+
+        	unset($set_csv_data);
         }
 
         $up_mess .= "<br><font color=blue>>> CSVファイルによる更新が完了しました。 　　　：　" . $cnt .  " 件</font>";
+        log_message('info', 'client::[Data_csv->project_csvup()]キーワード情報データ（ラベンダー専用）のCSV取込 CSVファイルによる更新が完了しました');
 
         // バリデーション・チェック
         $this->_set_validation();                                            // バリデーション設定
@@ -346,6 +345,14 @@ class Data_csv extends MY_Controller
     // キーワード情報データのCSV取込
     public function kwlist_csvup()
     {
+
+    	set_time_limit(0);
+    	/*
+    	 * /opt/lampp/etc/php.ini
+    	 *   memory_limit=1024M
+    	 */
+    	ini_set('memory_limit', '1024M');
+
 
     	$input_post = $this->input->post();
 
@@ -751,6 +758,7 @@ class Data_csv extends MY_Controller
     	}
 
     	$up_mess .= "<br><font color=blue>>> CSVファイルによる更新が完了しました。 　　　：　" . $cnt .  " 件</font>";
+    	log_message('info', 'client::[Data_csv->kwlist_csvup()]キーワード情報データのCSV取込 CSVファイルによる更新が完了しました');
 
     	// バリデーション・チェック
     	$this->_set_validation();                                            // バリデーション設定
@@ -850,6 +858,7 @@ class Data_csv extends MY_Controller
    		}
 
    		$up_mess .= "<br><font color=blue>>> CSVファイルによる更新が完了しました。 　　　：　" . $cnt .  " 件</font>";
+   		log_message('info', 'client::[Data_csv->criteria_csvup()]Location criteria情報データのCSV取込 CSVファイルによる更新が完了しました');
 
    		// バリデーション・チェック
    		$this->_set_validation();
@@ -890,6 +899,7 @@ class Data_csv extends MY_Controller
 //         $this->smarty->assign('dl_mess', "<br><font color=blue>>> CSVダウンロードが完了しました。</font>");
 
         $this->view('keywordlist/index.tpl');
+//         redirect('/keywordlist/');
 
     }
 

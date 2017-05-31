@@ -35,6 +35,7 @@
   <div class="form-group">
     <div class="col-md-offset-2 col-md-9">■ 対象URL<font color=red> *</font>：</div>
     <div class="col-md-offset-2 col-md-9">
+      {*form_input('kw_url' , set_value('kw_url', '') , 'id="set_url" class="form-control" placeholder="対象URLを入力してください。max.510文字。http://～"')*}
       {form_input('kw_url' , set_value('kw_url', '') , 'class="form-control" placeholder="対象URLを入力してください。max.510文字。http://～"')}
       {*form_input('kw_url' , set_value('kw_url', '') , 'id="id_url" class="form-control" placeholder="対象URLを入力してください。max.510文字。http://～"')*}
       {*form_input('kw_url' , set_value('kw_url', '') , 'id="id_urlBox" class="form-control" placeholder="対象URLを入力してください。max.510文字。http://～"')*}
@@ -44,6 +45,39 @@
 
 
 
+<script>
+$(function() {
+	  // 入力されたURLの存在有無をチェック
+	  $('#set_url').blur(function(e) {
+	    //console.log($('#set_url').val());
+
+	    var in_url = $("#set_url").val();
+	    //var in_url = "Origin: " + $("#id_urlBox").val();
+	    //console.log(in_url);
+
+	    $.ajax({
+	      url: "https://ranking.dev.local/index.php?url="+in_url,
+	      //url: "https://ranking.dev.local/client/check_url?url="+in_url,
+	      //url: in_url,
+	      type: 'GET',
+	      //async: true,
+	      //cache: false,
+	      dataType:'xml',
+	      //type: 'PATCH',
+	      //dataType: 'json',
+	      //headers: { 'X-Greeting': 'hello, world' },
+	      error: function(){
+		        console.log(in_url);
+	    	  alert('URLが存在しません');
+	      },
+	      success: function(xml){
+	        console.log(xml);
+	        alert('成功');
+	      },
+	    });
+	  });
+	});
+</script>
 
 
 <script>

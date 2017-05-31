@@ -654,6 +654,7 @@ class Keywordlist extends MY_Controller
     		$this->db->trans_strict(FALSE);                                     // StrictモードをOFF
     		$this->db->trans_start();                                           // trans_begin
 
+    		// 「有効」と「無効」で処理を分けるか？
 //     		if ($input_post['kw_status'] == 0)
 //     		{
 //     			/*

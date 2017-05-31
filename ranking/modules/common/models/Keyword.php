@@ -438,7 +438,7 @@ class Keyword extends CI_Model
                   kw_cl_seq,
                   kw_ac_seq,
     			  kw_rootdomain
-    	    	FROM tb_keyword WHERE kw_cl_seq = ' . $client_no
+    	    	FROM tb_keyword WHERE kw_cl_seq = ' . $client_no . ' AND kw_old_seq is NULL'
     	;
 
     	if ($set_select["kw_status"] !== '')
@@ -469,6 +469,13 @@ class Keyword extends CI_Model
     	// 対象全件数を取得
     	$query = $this->db->query($sql);
     	$rootdomain_countall = $query->num_rows();
+
+//     	print($sql);
+//     	print("<br><br>");
+//     	print($rootdomain_countall);
+//     	print("<br><br>");
+
+
 
     	// LIMIT ＆ OFFSET 値をセット
     	$sql .= ' LIMIT ' . $tmp_per_page . ' OFFSET ' . $tmp_offset;
@@ -548,8 +555,8 @@ class Keyword extends CI_Model
             {
             	if ($tmp_firstitem == FALSE)
                 {
-                	$sql .= ' ORDER BY ' . $key . ' ' . $val;
-                	//$sql .= ' ORDER BY  kw_rootdomain ASC, ' . $key . ' ' . $val;
+                	//$sql .= ' ORDER BY ' . $key . ' ' . $val;
+                	$sql .= ' ORDER BY  kw_rootdomain ASC, ' . $key . ' ' . $val;
                     $tmp_firstitem = TRUE;
                 } else {
                     $sql .= ' , ' . $key . ' ' . $val;
@@ -598,6 +605,11 @@ class Keyword extends CI_Model
     	$set_select["kw_ac_seq"]       = $get_post['kw_ac_seq'];
     	$set_select["kw_status"]       = $get_post['kw_status'];
     	$set_select["kw_cl_seq"]       = $client_no;
+    	$set_select["kw_matchtype"]    = $get_post['kw_matchtype'];
+    	$set_select["kw_searchengine"] = $get_post['kw_searchengine'];
+    	$set_select["kw_device"]       = $get_post['kw_device'];
+    	$set_select["kw_location_id"]  = $get_post['kw_location_id'];
+
 
     	if ($get_post['watchlist'] === '0')
     	{
@@ -664,10 +676,27 @@ class Keyword extends CI_Model
     			WHERE kw_old_seq is NULL AND kw_cl_seq = ' . $client_no
         ;
 
-//         if ($set_select["kw_status"] != '')
-//         {
-        	$sql .= ' AND `kw_status`  = ' . $set_select["kw_status"];
-//         }
+        $sql .= ' AND `kw_status`  = ' . $set_select["kw_status"];
+
+		if ($set_select["kw_matchtype"] !== '')
+		{
+			$sql .= ' AND `kw_matchtype`  = ' . $set_select["kw_matchtype"];
+		}
+
+		if ($set_select["kw_searchengine"] !== '')
+		{
+			$sql .= ' AND `kw_searchengine`  = ' . $set_select["kw_searchengine"];
+		}
+
+		if ($set_select["kw_device"] !== '')
+		{
+			$sql .= ' AND `kw_device`  = ' . $set_select["kw_device"];
+		}
+
+		if ($set_select["kw_location_id"] !== '')
+		{
+			$sql .= ' AND `kw_location_id`  = ' . $set_select["kw_location_id"];
+		}
 
         if ($set_select["kw_ac_seq"] !== "0")
         {
@@ -717,6 +746,13 @@ class Keyword extends CI_Model
 //         	$set_orderby["kw_location_name"] = 'ASC';
 
 //         }
+
+
+
+// 		print($sql);
+// 		print("<br><br>");
+
+
 
         // 対象全件数を取得
         $query = $this->db->query($sql);

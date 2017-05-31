@@ -48,13 +48,39 @@ class Account extends CI_Model
     	} else {
     		$set_where["ac_status"] = 0;						// ステータス=登録中
     	}
+
     	$set_where["ac_cl_seq"] = $seq_no;
+    	$set_where["ac_type"]   = "!= 9";
 
     	$query = $this->db->get_where('mt_account', $set_where);
 
     	$get_data = $query->result('array');
 
     	return $get_data;
+
+    }
+
+    /**
+     * TOP検索用のアカウントリストを取得する
+     *
+     * @param    int
+     * @return   bool
+     */
+    public function get_search_ac($cl_seq)
+    {
+
+    	$sql = 'SELECT *
+    			FROM `mt_account`
+    			WHERE ac_delflg = 0
+    			  AND ac_type != 9
+    			  AND ac_cl_seq = ' . $cl_seq
+    	;
+
+    	// クエリー実行
+    	$query = $this->db->query($sql);
+    	$account_list = $query->result('array');
+
+    	return $account_list;
 
     }
 

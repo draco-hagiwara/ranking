@@ -54,6 +54,26 @@
         </td>
       </tr>
       <tr>
+        <td class="col-md-1">URL一致</td>
+        <td class="col-md-2  btn-md">
+          {form_dropdown('kw_matchtype', $options_matchtype, set_value('kw_matchtype', {$seach_matchtype}))}
+        </td>
+        <td class="col-md-1">検索ｴﾝｼﾞﾝ</td>
+        <td class="col-md-2  btn-md">
+          {form_dropdown('kw_searchengine', $options_searchengine, set_value('kw_searchengine', {$seach_searchengine}))}
+        </td>
+        <td class="col-md-1">デバイス</td>
+        <td class="col-md-2  btn-md">
+          {form_dropdown('kw_device', $options_device, set_value('kw_device', {$seach_device}))}
+        </td>
+      </tr>
+      <tr>
+        <td class="col-md-1">location</td>
+        <td colspan="3" class="col-md-5 input-group-sm">
+          {form_dropdown('kw_location_id', $options_location, set_value('kw_location_id', {$seach_location}))}
+        </td>
+      </tr>
+      <tr>
         <td class="col-md-1">ステータス</td>
         <td class="col-md-2  btn-md">
           {form_dropdown('kw_status', $options_kw_status, set_value('kw_status', {$seach_status}))}

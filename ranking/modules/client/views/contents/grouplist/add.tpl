@@ -20,8 +20,10 @@
         {$options_group}
       </select>
     </div>
-    <div class="col-md-2">
-      <button type="button" name="_select" onclick="submit();">選　択</button>
+    <div class="col-sm-2">
+      {$attr['name'] = '_select'}
+      {$attr['type'] = 'submit'}
+      {form_button($attr , '選&emsp;&emsp;択' , 'class="btn btn-primary btn-xs"')}
     </div>
   </div>
   {/if}
@@ -153,8 +155,10 @@ $(function() {
       {form_input('new_name' , set_value('new_name', '') , 'class="form-control" placeholder="グループ名を入力してください。max.50文字"')}
       {if form_error('new_name')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('new_name')}</font></label>{/if}
     </div>
-    <div class="col-sm-offset-1 col-md-2">
-      <button type="button" name="_add" onclick="submit();">追　加</button>
+    <div class="col-sm-offset-1 col-sm-2">
+      {$attr['name'] = '_add'}
+      {$attr['type'] = 'submit'}
+      {form_button($attr , '追&emsp;&emsp;加' , 'class="btn btn-primary btn-xs"')}
     </div>
   </div>
 

@@ -28,6 +28,34 @@ class Rootdomain extends CI_Model
     }
 
     /**
+     * 設定タグから情報を取得する
+     *
+     * @param    array()
+     * @return   array()
+     */
+    public function get_rd_tag($setdata)
+    {
+
+    	// 同一データの有無確認
+    	$sql = 'SELECT
+                  rd_seq,
+                  rd_cl_seq,
+    			  rd_tag
+                FROM tb_rootdomain
+    			WHERE
+    			     rd_cl_seq = ' . $setdata['rd_cl_seq'] . '
+    			     AND rd_tag LIKE \'%[' . $setdata['rd_tag'] . ']%\'
+	     		';
+
+    	// クエリー実行
+    	$query = $this->db->query($sql);
+    	$get_data = $query->result('array');
+
+    	return $get_data;
+
+    }
+
+    /**
      * ルートドメイン情報の重複チェック
      *
      * @param    array()
@@ -217,6 +245,61 @@ class Rootdomain extends CI_Model
     	$set_data['lg_func']   = 'update_rootdomain';
     	$set_data['lg_detail'] = 'rd_seq = ' . $setdata['rd_seq'] . ' <= ' . $_last_sql;
     	$this->insert_log($set_data);
+
+    }
+
+    /**
+     * ルートドメイン情報のグループ一括更新
+     *
+     * @param    array()
+     * @return   int
+     */
+    public function update_rd_grp($setdata)
+    {
+
+    	// UPDATE
+    	$sql = 'UPDATE `tb_rootdomain` SET `rd_group`= \''
+    			. $setdata['gt_name'] . '\''
+    			. ' WHERE `rd_cl_seq`= ' . $setdata['rd_cl_seq']
+    			. ' AND `rd_group`= \'' . $setdata['old_gt_name'] . '\''
+    	;
+
+    	$query = $this->db->query($sql);
+    	$_last_sql = $this->db->last_query();
+
+    	// ログ書き込み
+    	$set_data['lg_func']   = 'update_rd_all';
+    	$set_data['lg_detail'] = $_last_sql;
+    	$this->insert_log($set_data);
+
+    	return;
+
+    }
+
+    /**
+     * ルートドメイン情報のタグ一括更新
+     *
+     * @param    array()
+     * @return   int
+     */
+    public function update_rd_tag($setdata)
+    {
+
+    	// UPDATE
+    	$sql = 'UPDATE `tb_rootdomain` SET `rd_tag`= \''
+    			. $setdata['rd_tag'] . '\''
+    			. ' WHERE `rd_seq`= ' . $setdata['rd_seq']
+    	;
+
+    	$query = $this->db->query($sql);
+    	$_last_sql = $this->db->last_query();
+
+    	// ログ書き込み
+    	$set_data['lg_func']   = 'update_rd_all';
+    	$set_data['lg_detail'] = $_last_sql;
+    	$this->insert_log($set_data);
+
+    	return;
 
     }
 

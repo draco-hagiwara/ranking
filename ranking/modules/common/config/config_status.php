@@ -38,6 +38,7 @@ array(
 // キーワード管理:URLマッチタイプ
 $config['KEYWORD_KW_MATCHTYPE'] =
 array(
+		""  => " -- 選択してください -- ",
 		"0" => "完全一致",
 		"1" => "前方一致",
 		"2" => "ドメイン一致",
@@ -47,6 +48,7 @@ array(
 // キーワード管理:検索エンジン
 $config['KEYWORD_KW_ENGINE'] =
 array(
+		""  => " -- 指定なし -- ",
 		"0" => "Google",
 		"1" => "Yahoo!",
 );
@@ -54,6 +56,7 @@ array(
 // キーワード管理:対象デバイス
 $config['KEYWORD_KW_DEVICE'] =
 array(
+		""  => " -- 指定なし -- ",
 		"0" => "ＰＣ版",
 		"1" => "モバイル版",
 );

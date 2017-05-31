@@ -324,10 +324,12 @@ class Rootdomainlist extends MY_Controller
 					'c_kw_domain'  => "",
 					'c_kw_status'  => 1,
 					'c_orderid'    => "",
+// 					'c_rd_seq'     => "",
 			);
 			$this->session->set_userdata($data);
 
 			$tmp_inputpost = $this->input->post();
+			$tmp_inputpost['kw_status']  = 1;
 			unset($tmp_inputpost["submit"]);
 
 		} else {
@@ -336,6 +338,7 @@ class Rootdomainlist extends MY_Controller
 			$tmp_inputpost['kw_domain']  = $_SESSION['c_kw_domain'];
 			$tmp_inputpost['kw_status']  = $_SESSION['c_kw_status'];
 			$tmp_inputpost['orderid']    = $_SESSION['c_orderid'];
+// 			$tmp_inputpost['rd_seq']     = $_SESSION['c_rd_seq'];
 		}
 
 		// バリデーション・チェック
@@ -373,7 +376,7 @@ class Rootdomainlist extends MY_Controller
 		$_set_kw_data['orderid']       = $tmp_inputpost['orderid'];
 
 		$this->load->model('Keyword', 'kw', TRUE);
-		list($kw_list, $kw_countall) = $this->kw->get_kw_taglist($_set_kw_data, $tmp_per_page, $tmp_offset);
+		list($kw_list, $kw_countall) = $this->kw->get_kw_rootdomainlist($_set_kw_data, $tmp_per_page, $tmp_offset);
 
 		$this->smarty->assign('list', $kw_list);
 
@@ -508,7 +511,7 @@ class Rootdomainlist extends MY_Controller
     		unset($set_rd_data['_submit']);
 
     		// グループ入力情報を分解＆生成＆セット
-    		if ($set_rd_data['rd_group'] == "")
+    		if (empty($set_rd_data['rd_group']))
     		{
     			$this->_group_set($set_rd_data['rd_cl_seq'], "");
     			$set_rd_data['rd_group'] = "";
@@ -526,7 +529,7 @@ class Rootdomainlist extends MY_Controller
 
 
     		// タグ入力情報を分解＆生成＆セット
-    		if ($set_rd_data['rd_tag'] == "")
+    		if (empty($set_rd_data['rd_tag']))
     		{
     			$this->_tag_set($set_rd_data['rd_cl_seq'], "");
     			$set_rd_data['rd_tag'] = "";
@@ -546,9 +549,9 @@ class Rootdomainlist extends MY_Controller
     		$this->rd->update_rootdomain($set_rd_data);
 
     		// 新規に追加された設定グループをレコード追加
-    		if ($input_post['info']['rd_group'] != "")
+    		if (!empty($input_post['rd_group']))
     		{
-    			foreach ($input_post['info']['rd_group'] as $key => $value)
+    			foreach ($input_post['rd_group'] as $key => $value)
     			{
     				$get_gt_name = $this->gt->get_gt_name($value, $set_rd_data['rd_cl_seq'], 0);
 
@@ -564,11 +567,10 @@ class Rootdomainlist extends MY_Controller
     			}
     		}
 
-
     		// 新規に追加された設定タグをレコード追加
-    		if ($input_post['info']['rd_tag'] != "")
+    		if (!empty($input_post['rd_tag']))
     		{
-    			foreach ($input_post['info']['rd_tag'] as $key => $value)
+    			foreach ($input_post['rd_tag'] as $key => $value)
     			{
     				$get_gt_name = $this->gt->get_gt_name($value, $set_rd_data['rd_cl_seq'], 1);
 
@@ -585,7 +587,6 @@ class Rootdomainlist extends MY_Controller
     		}
 
     		redirect('/rootdomainlist/search/' . $page_cnt);
-
     	}
     }
 

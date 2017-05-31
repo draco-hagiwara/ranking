@@ -53,7 +53,7 @@
 {form_close()}
 
 <ul class="pagination pagination-sm">
-  検索結果： {$countall}件<br />
+  ﾙｰﾄﾄﾞﾒｲﾝ検索結果： {$countall}件<br />
   {$set_pagination}
 </ul>
 

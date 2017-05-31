@@ -123,8 +123,10 @@ class Lib_rootdomain
     public static function get_rootdomain($val)
     {
 
+    	set_time_limit(0);
+
     	$CI =& get_instance();
-    	$CI->load->library('lib_rootdomain');
+//     	$CI->load->library('lib_rootdomain');
 
     	// TLDリストをセット
     	$tld_array = $CI->lib_rootdomain->_set_tld_list();

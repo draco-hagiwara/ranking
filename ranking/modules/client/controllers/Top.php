@@ -30,14 +30,21 @@ class Top extends MY_Controller
 		if (isset($_POST['_back']))
 		{
 			// 検索条件を保持 :: 「戻る」ボタン処理
-			$tmp_inputpost['kw_keyword'] = $_SESSION['c_kw_keyword'];
-			$tmp_inputpost['kw_domain']  = $_SESSION['c_kw_domain'];
-			$tmp_inputpost['kw_group']   = $_SESSION['c_kw_group'];
-			$tmp_inputpost['kw_tag']     = $_SESSION['c_kw_tag'];
-			$tmp_inputpost['kw_status']  = $_SESSION['c_kw_status'];
-			$tmp_inputpost['watchlist']  = $_SESSION['c_watchlist'];
-			$tmp_inputpost['kw_ac_seq']  = $_SESSION['c_kw_ac_seq'];
-			$tmp_inputpost['orderid']    = $_SESSION['c_orderid'];
+			$tmp_inputpost['kw_keyword']      = $_SESSION['c_kw_keyword'];
+			$tmp_inputpost['kw_domain']       = $_SESSION['c_kw_domain'];
+
+			$tmp_inputpost['kw_group']        = $_SESSION['c_kw_group'];
+			$tmp_inputpost['kw_tag']          = $_SESSION['c_kw_tag'];
+			$tmp_inputpost['kw_status']       = $_SESSION['c_kw_status'];
+			$tmp_inputpost['watchlist']       = $_SESSION['c_watchlist'];
+			$tmp_inputpost['kw_ac_seq']       = $_SESSION['c_kw_ac_seq'];
+
+			$tmp_inputpost['kw_matchtype']    = $_SESSION['c_kw_matchtype'];
+			$tmp_inputpost['kw_searchengine'] = $_SESSION['c_kw_searchengine'];
+			$tmp_inputpost['kw_device']       = $_SESSION['c_kw_device'];
+			$tmp_inputpost['kw_location_id']  = $_SESSION['c_kw_location_id'];
+
+			$tmp_inputpost['orderid']         = $_SESSION['c_orderid'];
 
 		} else {
 			// セッションデータをクリア
@@ -66,28 +73,39 @@ class Top extends MY_Controller
 			} else {
 				$tmp_offset = 0;
 				$tmp_inputpost = array(
-						'kw_keyword'    => '',
-						'kw_domain'     => '',
-						'kw_group'      => '',
-						'kw_tag'        => '',
-						'kw_status'     => 1,
-						'orderid'       => '',
-						'watchlist'     => '0',
-						'kw_ac_seq'   => $_SESSION['c_memSeq'],
+						'kw_keyword'      => '',
+						'kw_domain'       => '',
+						'kw_group'        => '',
+						'kw_tag'          => '',
+						'kw_status'       => 1,
+						'orderid'         => '',
+						'watchlist'       => '0',
+						'kw_ac_seq'       => $_SESSION['c_memSeq'],
+
+						'kw_matchtype'    => '',
+						'kw_searchengine' => 0,
+						'kw_device'       => 0,
+						'kw_location_id'  => '',
 				);
 
 				// セッションをフラッシュデータとして保存
 				$data = array(
-						'c_kw_keyword'  => '',
-						'c_kw_domain'   => '',
-						'c_kw_group'    => '',
-						'c_kw_tag'      => '',
-						'c_kw_status'   => 1,
-						'c_orderid'     => '',
-						'c_watchlist'   => '0',
-						'c_kw_ac_seq' => $_SESSION['c_memSeq'],
-						'c_offset'      => $tmp_offset,
-						'c_back_set'    => "top",
+						'c_kw_keyword'      => '',
+						'c_kw_domain'       => '',
+						'c_kw_group'        => '',
+						'c_kw_tag'          => '',
+						'c_kw_status'       => 1,
+						'c_orderid'         => '',
+						'c_watchlist'       => '0',
+						'c_kw_ac_seq'       => $_SESSION['c_memSeq'],
+
+						'c_kw_matchtype'    => '',
+						'c_kw_searchengine' => 0,
+						'c_kw_device'       => 0,
+						'c_kw_location_id'  => '',
+
+						'c_offset'          => $tmp_offset,
+						'c_back_set'        => "top",
 				);
 				$this->session->set_userdata($data);
 			}
@@ -113,14 +131,19 @@ class Top extends MY_Controller
 		$this->smarty->assign('set_pagination',    $set_pagination['page_link']);
 		$this->smarty->assign('countall',          $kw_countall);
 
-		$this->smarty->assign('seach_kw_keyword',  $tmp_inputpost['kw_keyword']);
-		$this->smarty->assign('seach_kw_domain',   $tmp_inputpost['kw_domain']);
-		$this->smarty->assign('seach_kw_group',    $tmp_inputpost['kw_group']);
-		$this->smarty->assign('seach_kw_tag',      $tmp_inputpost['kw_tag']);
-		$this->smarty->assign('seach_kw_status',   $tmp_inputpost['kw_status']);
-		$this->smarty->assign('seach_orderid',     $tmp_inputpost['orderid']);
-		$this->smarty->assign('seach_watchlist',   $tmp_inputpost['watchlist']);
-		$this->smarty->assign('seach_accountlist', $tmp_inputpost['kw_ac_seq']);
+		$this->smarty->assign('seach_kw_keyword',   $tmp_inputpost['kw_keyword']);
+		$this->smarty->assign('seach_kw_domain',    $tmp_inputpost['kw_domain']);
+		$this->smarty->assign('seach_kw_group',     $tmp_inputpost['kw_group']);
+		$this->smarty->assign('seach_kw_tag',       $tmp_inputpost['kw_tag']);
+		$this->smarty->assign('seach_kw_status',    $tmp_inputpost['kw_status']);
+		$this->smarty->assign('seach_orderid',      $tmp_inputpost['orderid']);
+		$this->smarty->assign('seach_watchlist',    $tmp_inputpost['watchlist']);
+		$this->smarty->assign('seach_accountlist',  $tmp_inputpost['kw_ac_seq']);
+
+		$this->smarty->assign('seach_matchtype',    $tmp_inputpost['kw_matchtype']);
+		$this->smarty->assign('seach_searchengine', $tmp_inputpost['kw_searchengine']);
+		$this->smarty->assign('seach_device',       $tmp_inputpost['kw_device']);
+		$this->smarty->assign('seach_location_id',  $tmp_inputpost['kw_location_id']);
 
 		$date = new DateTime();
 		$_start_date   = $date->format('Y-m-d');
@@ -142,14 +165,18 @@ class Top extends MY_Controller
 		{
 			// セッションをフラッシュデータとして保存
 			$data = array(
-					'c_kw_keyword'  => $this->input->post('kw_keyword'),
-					'c_kw_domain'   => $this->input->post('kw_domain'),
-					'c_kw_group'    => $this->input->post('kw_group'),
-					'c_kw_tag'      => $this->input->post('kw_tag'),
-					'c_kw_status'   => $this->input->post('kw_status'),
-					'c_orderid'     => $this->input->post('orderid'),
-					'c_watchlist'   => $this->input->post('watchlist'),
-					'c_kw_ac_seq' => $this->input->post('kw_ac_seq'),
+					'c_kw_keyword'      => $this->input->post('kw_keyword'),
+					'c_kw_domain'       => $this->input->post('kw_domain'),
+					'c_kw_group'        => $this->input->post('kw_group'),
+					'c_kw_tag'          => $this->input->post('kw_tag'),
+					'c_kw_status'       => $this->input->post('kw_status'),
+					'c_orderid'         => $this->input->post('orderid'),
+					'c_watchlist'       => $this->input->post('watchlist'),
+					'c_kw_ac_seq'       => $this->input->post('kw_ac_seq'),
+					'c_kw_matchtype'    => $this->input->post('kw_matchtype'),
+					'c_kw_searchengine' => $this->input->post('kw_searchengine'),
+					'c_kw_device'       => $this->input->post('kw_device'),
+					'c_kw_location_id'  => $this->input->post('kw_location_id'),
 			);
 			$this->session->set_userdata($data);
 
@@ -158,14 +185,19 @@ class Top extends MY_Controller
 
 		} else {
 			// セッションからフラッシュデータ読み込み
-			$tmp_inputpost['kw_keyword']   = $_SESSION['c_kw_keyword'];
-			$tmp_inputpost['kw_domain']    = $_SESSION['c_kw_domain'];
-			$tmp_inputpost['kw_group']     = $_SESSION['c_kw_group'];
-			$tmp_inputpost['kw_tag']       = $_SESSION['c_kw_tag'];
-			$tmp_inputpost['kw_status']    = $_SESSION['c_kw_status'];
-			$tmp_inputpost['orderid']      = $_SESSION['c_orderid'];
-			$tmp_inputpost['watchlist']    = $_SESSION['c_watchlist'];
-			$tmp_inputpost['kw_ac_seq']  = $_SESSION['c_kw_ac_seq'];
+			$tmp_inputpost['kw_keyword']      = $_SESSION['c_kw_keyword'];
+			$tmp_inputpost['kw_domain']       = $_SESSION['c_kw_domain'];
+			$tmp_inputpost['kw_group']        = $_SESSION['c_kw_group'];
+			$tmp_inputpost['kw_tag']          = $_SESSION['c_kw_tag'];
+			$tmp_inputpost['kw_status']       = $_SESSION['c_kw_status'];
+			$tmp_inputpost['orderid']         = $_SESSION['c_orderid'];
+			$tmp_inputpost['watchlist']       = $_SESSION['c_watchlist'];
+			$tmp_inputpost['kw_ac_seq']       = $_SESSION['c_kw_ac_seq'];
+
+			$tmp_inputpost['kw_matchtype']    = $_SESSION['c_kw_matchtype'];
+			$tmp_inputpost['kw_searchengine'] = $_SESSION['c_kw_searchengine'];
+			$tmp_inputpost['kw_device']       = $_SESSION['c_kw_device'];
+			$tmp_inputpost['kw_location_id']  = $_SESSION['c_kw_location_id'];
 		}
 
 		// バリデーション・チェック
@@ -213,25 +245,30 @@ class Top extends MY_Controller
 		// 初期値セット
 		$this->_search_set();
 
-		$this->smarty->assign('set_pagination',    $set_pagination['page_link']);
-		$this->smarty->assign('countall',          $kw_countall);
+		$this->smarty->assign('set_pagination',     $set_pagination['page_link']);
+		$this->smarty->assign('countall',           $kw_countall);
 
-		$this->smarty->assign('seach_kw_keyword',  $tmp_inputpost['kw_keyword']);
-		$this->smarty->assign('seach_kw_domain',   $tmp_inputpost['kw_domain']);
-		$this->smarty->assign('seach_kw_group',    $tmp_inputpost['kw_group']);
-		$this->smarty->assign('seach_kw_tag',      $tmp_inputpost['kw_tag']);
-		$this->smarty->assign('seach_kw_status',   $tmp_inputpost['kw_status']);
-		$this->smarty->assign('seach_orderid',     $tmp_inputpost['orderid']);
-		$this->smarty->assign('seach_watchlist',   $tmp_inputpost['watchlist']);
-		$this->smarty->assign('seach_accountlist', $tmp_inputpost['kw_ac_seq']);
+		$this->smarty->assign('seach_kw_keyword',   $tmp_inputpost['kw_keyword']);
+		$this->smarty->assign('seach_kw_domain',    $tmp_inputpost['kw_domain']);
+		$this->smarty->assign('seach_kw_group',     $tmp_inputpost['kw_group']);
+		$this->smarty->assign('seach_kw_tag',       $tmp_inputpost['kw_tag']);
+		$this->smarty->assign('seach_kw_status',    $tmp_inputpost['kw_status']);
+		$this->smarty->assign('seach_orderid',      $tmp_inputpost['orderid']);
+		$this->smarty->assign('seach_watchlist',    $tmp_inputpost['watchlist']);
+		$this->smarty->assign('seach_accountlist',  $tmp_inputpost['kw_ac_seq']);
+
+		$this->smarty->assign('seach_matchtype',    $tmp_inputpost['kw_matchtype']);
+		$this->smarty->assign('seach_searchengine', $tmp_inputpost['kw_searchengine']);
+		$this->smarty->assign('seach_device',       $tmp_inputpost['kw_device']);
+		$this->smarty->assign('seach_location_id',  $tmp_inputpost['kw_location_id']);
 
 		$date = new DateTime();
 		$_start_date   = $date->format('Y-m-d');
 		$_set_cnt_date = "- " . ($cnt_date - 1) . " days";
 		$_end_date     = $date->modify($_set_cnt_date)->format('Y-m-d');
 
-		$this->smarty->assign('start_date',       $_start_date);
-		$this->smarty->assign('end_date',         $_end_date);
+		$this->smarty->assign('start_date',         $_start_date);
+		$this->smarty->assign('end_date',           $_end_date);
 
 		$this->view('top/index.tpl');
 
@@ -375,6 +412,19 @@ class Top extends MY_Controller
 		$this->config->load('config_status');
 		$opt_kw_status = $this->config->item('KEYWORD_KW_STATUS');
 
+		// URL一致方式 選択項目セット
+		$opt_matchtype = $this->config->item('KEYWORD_KW_MATCHTYPE');
+
+		// 検索エンジン 選択項目セット
+		$opt_searchengine = $this->config->item('KEYWORD_KW_ENGINE');
+
+		// デバイス 選択項目セット
+		$opt_device = $this->config->item('KEYWORD_KW_DEVICE');
+
+		// Canonical Name 選択項目セット
+		$this->load->library('lib_keyword');
+		$opt_location = $this->lib_keyword->search_location();
+
 		// キーワードID 並び替え選択項目セット
 		$arropt_id = array (
 				''     => '-- 選択してください --',
@@ -390,17 +440,23 @@ class Top extends MY_Controller
 
 		// アカウントリスト 表示有無選択項目セット
 		$this->load->model('Account', 'ac', TRUE);
-		$get_ac_list = $this->ac->get_ac_clseq($_SESSION['c_memGrp'], TRUE);
+		$get_ac_list = $this->ac->get_search_ac($_SESSION['c_memGrp']);
 		$arropt_account[0] = "すべて表示";
 		foreach ($get_ac_list as $key => $val)
 		{
 			$arropt_account[$val['ac_seq']] = $val['ac_name01'] . ' ' . $val['ac_name02'];
 		}
 
-		$this->smarty->assign('options_kw_status',   $opt_kw_status);
-		$this->smarty->assign('options_orderid',     $arropt_id);
-		$this->smarty->assign('options_watchlist',   $arropt_watch);
-		$this->smarty->assign('options_accountlist', $arropt_account);
+		$this->smarty->assign('options_kw_status',    $opt_kw_status);
+
+		$this->smarty->assign('options_matchtype',    $opt_matchtype);
+		$this->smarty->assign('options_searchengine', $opt_searchengine);
+		$this->smarty->assign('options_device',       $opt_device);
+		$this->smarty->assign('options_location',     $opt_location);
+
+		$this->smarty->assign('options_orderid',      $arropt_id);
+		$this->smarty->assign('options_watchlist',    $arropt_watch);
+		$this->smarty->assign('options_accountlist',  $arropt_account);
 
 	}
 
