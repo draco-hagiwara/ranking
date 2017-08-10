@@ -4,88 +4,6 @@
 <link href="{base_url()}../../js/select2/select2.css" rel="stylesheet">
 <script src="{base_url()}../../js/select2/select2.min.js"></script>
 
-<script src="{base_url()}../../js/my/fmsubmit.js"></script>
-
-
-
-
-
-
-
-<script>
-$(function() {
-  // 入力されたURLの存在有無をチェック
-  $('#set_url').blur(function(e) {
-
-    var in_url = $("#set_url").val();
-    //var in_url = encodeURI($("#set_url").val());
-    //var in_url = decodeURI($("#set_url").val());
-    //console.log(in_url);
-
-    $.ajax({
-           url: in_url,
-           type: 'POST',
-           dataType: 'jsonp',
-           crossDomain: true,
-           timeout : 10000,																// タイムアウト:10秒
-           //statusCode: {
-           //  200: function(){
-           //    console.log("200");
-           //  },
-           //  404: function(){
-           //    console.log("404");
-           //  }
-           //}
-
-           //})
-           //.done(function(data, textStatus, jqXHR) {									// 通信が成功
-        	   //console.log("done_textStatus : " + textStatus);
-           //})
-           //.fail(function(jqXHR, textStatus, errorThrown) {							// 通信が失敗
-        	   //console.log("fail_jqXHRstatus : " + jqXHR.status);
-        	   //console.log("fail_textStatus : " + textStatus);
-               //$("#XMLHttpRequest").html("XMLHttpRequest : " + jqXHR.status);
-               //$("#textStatus").html("textStatus : " + textStatus);
-               //$("#errorThrown").html("errorThrown : " + errorThrown);
-           })
-           .always(function(jqXHR, textStatus) {										// 「fail」を含め、処理が完了
-        	   //console.log("always_jqXHRstatus : " + jqXHR.status);
-        	   //console.log("always_textStatus : " + textStatus);
-
-               switch (jqXHR.status) {
-			      case 200:
-				        // ステータスコードが200の時
-
-				        break;
-			      case 404:
-			        	// ステータスコードが404の時
-				        alert("対象URLが見つかりません。よろしいですか？\n" + "404 Not Found" + "\n\n※日本語が含まれるURLは、この画面が表示されます。");
-
-			        break;
-			      case 500:
-				        // ステータスコードが500の時
-				        alert("対象URLでエラーが発生しています。よろしいですか？\n" + "500 Internal Server Error");
-
-			        break;
-			      default:
-				        // その他のステータスコードの時
-				        alert("対象URLにて以下のステータスコードが発生しています。\nHTTPレスポンスステータスコード : " + jqXHR.status);
-
-			        break;
-			   }
-
-    });
-  });
-});
-</script>
-
-
-
-
-
-
-
-
 <body>
 
 {* ヘッダー部分　END *}
@@ -117,7 +35,7 @@ $(function() {
     <div class="col-md-offset-2 col-md-9">■ 対象URL<font color=red> *</font>：</div>
     <div class="col-md-offset-2 col-md-9">
       {if $info.kw_status == 1}
-        {form_input('kw_url' , set_value('kw_url', $info.kw_url) , 'id="set_url" class="form-control" placeholder="対象URLを入力してください。max.510文字"')}
+        {form_input('kw_url' , set_value('kw_url', $info.kw_url) , 'class="form-control" placeholder="対象URLを入力してください。max.510文字"')}
         ※URLを変更する場合、旧URLの順位データを引き継ぎます。<br>
         {if form_error('kw_url')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('kw_url')}</font></label>{/if}
       {else}
@@ -220,9 +138,8 @@ $(function() {
       <tbody>
         <tr>
           <td>
-            <br>-- {$me.me_create_date} --&emsp;
-            <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/keywordlist/chg/', 'POST', '{$me.me_seq}', 'del_seq');">メモ削除</button>
-            <br>{$me.me_memo}<hr>
+            <br>{$me.me_create_date}
+            <br>{$me.me_memo}
           </td>
         </tr>
       </tbody>
@@ -251,88 +168,50 @@ $(function() {
 
   <br>
 
-  <!-- Button trigger -->
-  {form_hidden('back_page', $back_page)}
-  {form_hidden('seach_page_no', $seach_page_no)}
+  <!-- Button trigger modal -->
   <div class="row">
     <div class="col-sm-2 col-sm-offset-2">
-      {$attr['name'] = '_submit'}
-      {$attr['value'] = '_back'}
-      {$attr['type'] = 'submit'}
-      {form_button($attr , '一覧へ戻る' , 'class="btn btn-primary btn-sm"')}
-    </div>
-  <!-- / -->
-
-{if $smarty.session.c_memKw==1}
-  <!-- Button trigger modal -->
-    <div class="col-sm-offset-4 col-sm-1">
       <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal01">更&emsp;&emsp;新</button>
     </div>
 
-    <div class="modal fade" id="myModal01" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">キーワード管理　編集</h4>
-          </div>
-          <div class="modal-body">
-            <p>この内容で、更新しますか。&hellip;</p>
-          </div>
-          <div class="modal-footer">
-            <button type='submit' name='_submit' value='save' class="btn btn-sm btn-primary">O  K</button>
-            <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-{else}
-  </div>
-{/if}
-
-{form_close()}
-
-<!-- </form> -->
-
-{if $smarty.session.c_memKw==1}
-{form_open('/keywordlist/del_pw/' , 'name="reportForm" class="form-horizontal h-adr"')}
-
-  {form_hidden('kw_seq', $info.kw_seq)}
-
-  <!-- Button trigger modal -->
-  <div class="col-sm-offset-1 col-sm-2">
-    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#myModal02">削&emsp;&emsp;除</button>
-  </div>
-  </div>
-
-  <div class="modal fade" id="myModal02" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal fade" id="myModal01" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">キーワード&emsp;削除</h4>
+          <h4 class="modal-title">キーワード管理　編集</h4>
         </div>
         <div class="modal-body">
-          <p>このキーワード情報を削除しますか。&hellip;</p>
+          <p>この内容で、更新しますか。&hellip;</p>
         </div>
         <div class="modal-footer">
-          <button type='submit' name='submit' value='submit' class="btn btn-sm btn-primary">O&emsp;&emsp;K</button>
-          <button type='submit' name='submit' value='cancel' class="btn btn-sm btn-primary">キャンセル</button>
+          <button type='submit' name='_submit' value='save' class="btn btn-sm btn-primary">O  K</button>
+          <button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
 
+
 {form_close()}
+
 <!-- </form> -->
 
-{else}
+
+{*form_open("keywordlist/search/{$seach_page_no}/" , 'name="detailForm" class="form-horizontal"')*}
+{form_open("{$back_page}/search/{$seach_page_no}/" , 'name="detailForm" class="form-horizontal"')}
+
+    <div class="col-sm-offset-5 col-sm-1">
+      {$attr['name'] = '_back'}
+      {$attr['type'] = 'submit'}
+      {form_button($attr , '戻&emsp;&emsp;る' , 'class="btn btn-primary btn-sm"')}
+    </div>
   </div>
-{/if}
+
+{form_close()}
 
 
-
-<br>
+<br><br>
 {* フッター部分　START *}
   {include file="../footer.tpl"}
 {* フッター部分　END *}

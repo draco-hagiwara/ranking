@@ -38,37 +38,6 @@ class Watchlist extends CI_Model
     }
 
     /**
-     * ルートドメイン指定のウォッチリストを取得する
-     *
-     * @param    int
-     * @param    int
-     * @param    int
-     * @return   array()
-     */
-    public function get_watchlist_domain($ac_seq, $cl_seq, $rd_seq)
-    {
-
-    	$sql = 'SELECT
-	                  wt_seq,
-	                  wt_cl_seq,
-	                  wt_ac_seq,
-	    			  wt_rd_seq,
-    				  wt_kw_rootdomain
-	    	    	FROM tb_watchlist
-	    			WHERE wt_ac_seq = ' . $ac_seq
-	    				. ' AND wt_cl_seq = ' . $cl_seq
-	    				. ' AND wt_kw_seq is NULL AND wt_rd_seq = ' . $rd_seq
-    	;
-
-    	// クエリー実行
-    	$query = $this->db->query($sql);
-    	$get_data = $query->result('array');
-
-    	return $get_data;
-
-    }
-
-    /**
      * ウォッチリスト登録
      *
      * @param    array()

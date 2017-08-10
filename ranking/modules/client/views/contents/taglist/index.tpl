@@ -38,51 +38,49 @@
 {form_close()}
 
 <ul class="pagination pagination-sm">
-  検索結果： {$countall}件<br />
-  {$set_pagination}
+    検索結果： {$countall}件<br />
+    {$set_pagination}
 </ul>
 
 {form_open('/taglist/detail/' , 'name="detailForm" class="form-horizontal"')}
 
-  <table class="table table-striped table-hover">
-    <thead>
-      <tr>
-        <th class="col-md-1">ID</th>
-        <th>タグ名</th>
-        <th class="col-md-1 text-center">rootdomain</th>
-        <th class="col-md-1 text-center">keyword</th>
-        <th class="col-md-1">
-          {if $mem_Tg==1}<button type="button" class="btn btn-warning btn-xs" onclick="fmSubmit('detailForm', '/client/taglist/add/', 'POST', '', '');">タグ登録ボタン</button>{/if}
-        </th>
-      </tr>
-    </thead>
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th class="col-md-1">ID</th>
+                <th>タグ名</th>
+                <th class="col-md-1 text-center">rootdomain</th>
+                <th class="col-md-1 text-center">keyword</th>
+                <th class="col-md-1"></th>
+            </tr>
+        </thead>
 
-    {foreach from=$list item=gt}
-    <tbody>
-      <tr>
-        <td>
-          {$gt.gt_seq}
-        </td>
-        <td>
-          {$gt.gt_name}
-        </td>
-        <td class="text-center">
-          {$gt.gt_domain_cnt|number_format}
-        </td>
-        <td class="text-center">
-          {$gt.gt_keyword_cnt|number_format}
-        </td>
-        <td>
-          <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/top/search/', 'POST', '{$gt.gt_name}', 'sel_tagname');">一 覧</button>
-          {if $mem_Tg==1}<button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/taglist/chg/', 'POST', '{$gt.gt_name}', 'gt_name');">編 集</button>{/if}
-        </td>
-      </tr>
-    </tbody>
-    {foreachelse}
-      検索結果はありませんでした。
-    {/foreach}
 
-  </table>
+        {foreach from=$list item=gt}
+        <tbody>
+            <tr>
+                <td>
+                    {$gt.gt_seq}
+                </td>
+                <td>
+                    {$gt.gt_name}
+                </td>
+                <td class="text-center">
+                    {$gt.gt_domain_cnt|number_format}
+                </td>
+                <td class="text-center">
+                    {$gt.gt_keyword_cnt|number_format}
+                </td>
+                <td>
+                    <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/taglist/detail/', 'POST', '{$gt.gt_seq}', 'chg_gtseq');">順位データ一覧</button>
+                </td>
+            </tr>
+        </tbody>
+        {foreachelse}
+            検索結果はありませんでした。
+        {/foreach}
+
+    </table>
 
 {form_close()}
 

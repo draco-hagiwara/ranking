@@ -36,18 +36,15 @@ class System extends MY_Controller
     {
 
         // sh に記述
-        $arg = 1;                                                    // 判定用に引数を渡す
 
         // DBのバックアップ
         $app_path = "/var/www/kaikei/backup/";
-        $strCommand = $app_path . 'backup4mysql.sh "'.$arg.'"';
-        //$strCommand = $app_path . 'backup4mysql.sh';
+        $strCommand = $app_path . 'backup4mysql.sh';
         exec( $strCommand );
 
-        // システムのバックアップ (手動データ作成)
+        // システムのバックアップ
         $app_path = "/var/www/kaikei/backup/";
-        $strCommand = $app_path . 'backup4pg.sh "'.$arg.'"';
-        //$strCommand = $app_path . 'backup4pg.sh';
+        $strCommand = $app_path . 'backup4pg.sh';
         exec( $strCommand );
 
         $this->view('system/index.tpl');

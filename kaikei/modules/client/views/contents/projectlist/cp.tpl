@@ -28,7 +28,7 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="pj_invoice_status" class="col-sm-3 control-label">請求書一括発行<font color=red> *</font></label>
+    <label for="pj_invoice_status" class="col-sm-3 control-label">請求書発行ステータス選択<font color=red> *</font></label>
     <div class="col-sm-2 btn-lg">
       {form_dropdown('pj_invoice_status', $options_pj_iv_type, set_value('pj_invoice_status', $info_pj.pj_invoice_status))}
       {if form_error('pj_invoice_status')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_invoice_status')}</font></label>{/if}
@@ -101,10 +101,9 @@
   </div>
 *}
   <div class="form-group">
-    <label for="pj_keyword" class="col-xs-3 col-md-3 control-label">検索キーワードまたは明細コメント<font color=red> *</font></label>
+    <label for="pj_keyword" class="col-xs-3 col-md-3 control-label">検索キーワード<font color=red> *</font></label>
     <div class="col-xs-8 col-md-8">
       {form_input('pj_keyword' , set_value('pj_keyword', $info_pj.pj_keyword) , 'class="form-control" placeholder="検索キーワードを入力してください。max.100文字"')}
-      ※明細タイトルに月度を表示したくない場合には、文字の最後に「#（半角文字）」を付けてください。&emsp;例：○○○○#
       {if form_error('pj_keyword')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('pj_keyword')}</font></label>{/if}
     </div>
   </div>

@@ -24,8 +24,8 @@ class Keyworddetail extends MY_Controller
     {
 
         // セッションデータをクリア
-//         $this->load->library('lib_auth');
-//         $this->lib_auth->delete_session('client');
+        $this->load->library('lib_auth');
+        $this->lib_auth->delete_session('client');
 
         // バリデーション・チェック
         $this->_set_validation();                                                       // バリデーション設定
@@ -251,8 +251,8 @@ class Keyworddetail extends MY_Controller
     {
 
     	// セッションデータをクリア
-//     	$this->load->library('lib_auth');
-//     	$this->lib_auth->delete_session('client');
+    	$this->load->library('lib_auth');
+    	$this->lib_auth->delete_session('client');
 
     	$input_post = $this->input->post();
 

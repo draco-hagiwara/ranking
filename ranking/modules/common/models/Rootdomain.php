@@ -91,7 +91,7 @@ class Rootdomain extends CI_Model
      * @param    int     : クライアントSEQ
      * @return   array()
      */
-    public function get_rootdomainlist($get_post, $tmp_per_page, $tmp_offset=0, $member)
+    public function get_rootdomainlist($get_post, $tmp_per_page, $tmp_offset=0, $client_no)
     {
 
     	// 各SQL項目へセット
@@ -118,7 +118,7 @@ class Rootdomain extends CI_Model
     	}
 
     	// 対象クアカウントメンバーの取得
-    	$rd_list = $this->_select_rootdomainlist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset, $member);
+    	$rd_list = $this->_select_rootdomainlist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset, $client_no);
 
     	return $rd_list;
 
@@ -135,7 +135,7 @@ class Rootdomain extends CI_Model
      * @param    int     : クライアントSEQ
      * @return   array()
      */
-    public function _select_rootdomainlist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset=0, $member)
+    public function _select_rootdomainlist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset=0, $client_no)
     {
 
         // ** ルートドメイン情報 を検索
@@ -145,10 +145,9 @@ class Rootdomain extends CI_Model
                   rd_rootdomain,
                   rd_sitename,
         		  rd_keyword_cnt,
-        		  T2.wt_seq,
-        		  T2.wt_ac_seq
-        		FROM `tb_rootdomain` LEFT JOIN `tb_watchlist` as T2 on ((rd_seq = wt_rd_seq) AND (wt_ac_seq = ' . $member['account'] . '))
-    			WHERE rd_cl_seq = ' . $member['group']
+        		  T2.wt_seq
+        		FROM tb_rootdomain LEFT JOIN tb_watchlist as T2 on (rd_seq = wt_rd_seq)
+    			WHERE rd_cl_seq = ' . $client_no
         ;
 
         // WHERE文 作成

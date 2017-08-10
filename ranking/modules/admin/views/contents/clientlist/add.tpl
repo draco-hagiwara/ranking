@@ -191,9 +191,8 @@
       {if form_error('cl_fax')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('cl_fax')}</font></label>{/if}
     </div>
   </div>
-  <hr>
   <div class="form-group">
-    <label for="cl_id" class="col-xs-3 col-md-3 control-label">テミス管理用ログインID<font color=red> *</font><br>(メールアドレス)</label>
+    <label for="cl_id" class="col-xs-3 col-md-3 control-label">管理ログインID<font color=red> *</font><br>(メールアドレス)</label>
     <div class="col-xs-9 col-md-5">
       {form_input('cl_id' , set_value('cl_id', '') , 'class="form-control" placeholder="ログインID　(メールアドレス）"')}
       <p class="redText"><small>※メールアドレス(英数字、アンダースコア(_)、ダッシュ(-))を入力してください。 max.50文字</small></p>

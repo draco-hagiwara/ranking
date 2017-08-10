@@ -53,6 +53,7 @@ class Invoicelist extends MY_Controller
                                 'iv_company'    => '',
                                 'iv_status'     => '',
                                 'iv_issue_yymm' => $_date_ym,
+            					'iv_salesman'   => '',
                                 'orderid'       => '',
             );
 
@@ -63,6 +64,7 @@ class Invoicelist extends MY_Controller
                             'c_iv_company'     => "",
                             'c_iv_status'      => "",
                             'c_iv_issue_yymm'  => $_date_ym,
+            				'c_iv_salesman'    => '',
                             'c_orderid'        => "",
             );
             $this->session->set_userdata($data);
@@ -88,6 +90,7 @@ class Invoicelist extends MY_Controller
         $this->smarty->assign('seach_iv_company',    $tmp_inputpost['iv_company']);
         $this->smarty->assign('seach_iv_status',     $tmp_inputpost['iv_status']);
         $this->smarty->assign('seach_iv_issue_yymm', $tmp_inputpost['iv_issue_yymm']);
+        $this->smarty->assign('seach_iv_salesman',   $tmp_inputpost['iv_salesman']);
         $this->smarty->assign('seach_orderid',       $tmp_inputpost['orderid']);
 
         $this->view('invoicelist/index.tpl');
@@ -107,6 +110,7 @@ class Invoicelist extends MY_Controller
                             'c_iv_company'    => $this->input->post('iv_company'),
                             'c_iv_status'     => $this->input->post('iv_status'),
                             'c_iv_issue_yymm' => $this->input->post('iv_issue_yymm'),
+            				'c_iv_salesman'   => $this->input->post('iv_salesman'),
                             'c_orderid'       => $this->input->post('orderid'),
             );
             $this->session->set_userdata($data);
@@ -121,6 +125,7 @@ class Invoicelist extends MY_Controller
             $tmp_inputpost['iv_company']    = $_SESSION['c_iv_company'];
             $tmp_inputpost['iv_status']     = $_SESSION['c_iv_status'];
             $tmp_inputpost['iv_issue_yymm'] = $_SESSION['c_iv_issue_yymm'];
+            $tmp_inputpost['iv_salesman']   = $_SESSION['c_iv_salesman'];
             $tmp_inputpost['orderid']       = $_SESSION['c_orderid'];
         }
 
@@ -161,6 +166,7 @@ class Invoicelist extends MY_Controller
         $this->smarty->assign('seach_iv_company',    $tmp_inputpost['iv_company']);
         $this->smarty->assign('seach_iv_status',     $tmp_inputpost['iv_status']);
         $this->smarty->assign('seach_iv_issue_yymm', $tmp_inputpost['iv_issue_yymm']);
+        $this->smarty->assign('seach_iv_salesman',   $tmp_inputpost['iv_salesman']);
         $this->smarty->assign('seach_orderid',       $tmp_inputpost['orderid']);
 
         $this->view('invoicelist/index.tpl');
@@ -636,6 +642,17 @@ class Invoicelist extends MY_Controller
             $opt_date_fix[$_date_ym] = substr($_date_ym, 0, 4) . '年' . substr($_date_ym, 4, 2) . '月分';
         }
 
+        // 営業担当セット
+        $opt_cl_seq = $this->config->item('PROJECT_CL_SEQ');
+        $this->load->model('Account', 'ac', TRUE);
+        $salesman_list = $this->ac->get_salesman($opt_cl_seq, 'projects');       // 「ラベンダー」固定 : ac_cl_seq = 2
+
+        $opt_iv_salesman[''] = " -- 選択してください -- ";
+        foreach ($salesman_list as $key => $val)
+        {
+        	$opt_iv_salesman[$val['ac_seq']] = $val['ac_name01'] . ' ' . $val['ac_name02'];
+        }
+
         // ID 並び替え選択項目セット
         $arropt_id = array (
                 ''     => '-- 選択してください --',
@@ -643,9 +660,10 @@ class Invoicelist extends MY_Controller
                 'ASC'  => '昇順',
         );
 
-        $this->smarty->assign('options_iv_status', $opt_iv_status);
-        $this->smarty->assign('options_date_fix',  $opt_date_fix);
-        $this->smarty->assign('options_orderid',   $arropt_id);
+        $this->smarty->assign('options_iv_status',   $opt_iv_status);
+        $this->smarty->assign('options_date_fix',    $opt_date_fix);
+        $this->smarty->assign('options_orderid',     $arropt_id);
+        $this->smarty->assign('options_iv_salesman', $opt_iv_salesman);
 
     }
 

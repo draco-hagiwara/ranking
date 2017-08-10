@@ -51,12 +51,12 @@ class Login extends MY_Controller
             $login_member = $this->config->item('LOGIN_ADMIN');
 
             // ログインID＆パスワードチェック
-            $this->load->library('lib_auth');
+            $this->load->model('comm_auth', 'auth', TRUE);
 
             $loginid  = $this->input->post('ac_id');
             $password = $this->input->post('ac_pw');
 
-            $err_mess = $this->lib_auth->check_Login($loginid, $password, $login_member);
+            $err_mess = $this->auth->check_Login($loginid, $password, $login_member);
             if (isset($err_mess)) {
                 // 入力エラー
                 $this->smarty->assign('err_mess', $err_mess);
@@ -78,8 +78,8 @@ class Login extends MY_Controller
     {
 
         // SESSION クリア
-    	$this->load->library('lib_auth');
-        $this->lib_auth->logout('admin');
+        $this->load->model('comm_auth', 'auth', TRUE);
+        $this->auth->logout('admin');
 
         // TOPへリダイレクト
         redirect(base_url());

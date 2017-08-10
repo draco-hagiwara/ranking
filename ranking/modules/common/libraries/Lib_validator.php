@@ -191,8 +191,7 @@ class Lib_validator
      */
     public static function checkUri($arg)
     {
-    	//if (Lib_validator::checkString($arg) && preg_match(';^(https?://).+|(mailto:).+@.+;', $arg)) {
-    	if (Lib_validator::checkString($arg) && preg_match('/^(https?)(:\/\/[-_.!~*\'()a-zA-Z0-9;\/?:\@&=+\$,%#]+)$/', $arg)) {
+        if (Lib_validator::checkString($arg) && preg_match(';^(https?://).+|(mailto:).+@.+;', $arg)) {
             return true;
         } else {
             return false;

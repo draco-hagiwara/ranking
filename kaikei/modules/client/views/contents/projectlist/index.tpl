@@ -118,15 +118,15 @@ function fmSubmit(formName, url, method, num) {
             {$pj.pj_seq}
           </td>
           <td>
-            {if $pj.pj_status == "0"}<span class="label label-primary">有 効</span>
-            {elseif $pj.pj_status == "1"}<span class="label label-default">停 止</span>
-            {elseif $pj.pj_status == "2"}<span class="label label-default">解 約</span>
+            {if $pj.pj_status == "0"}<font color="#ffffff" style="background-color:royalblue">[ 有効 ]</font>
+            {elseif $pj.pj_status == "1"}<font color="#ffffff" style="background-color:dimgray">[ 停止 ]</font>
+            {elseif $pj.pj_status == "2"}<font color="#ffffff" style="background-color:dimgray">[ 解約 ]</font>
             {else}エラー
             {/if}
           </td>
           <td>
-            {if $pj.pj_invoice_status == "0"}<span class="label label-primary">発 行</span>
-            {elseif $pj.pj_invoice_status == "1"}<span class="label label-default">停 止</span>
+            {if $pj.pj_invoice_status == "0"}<font color="#ffffff" style="background-color:royalblue">[ 発行 ]</font>
+            {elseif $pj.pj_invoice_status == "1"}<font color="#ffffff" style="background-color:dimgray">[ 停止 ]</font>
             {else}エラー
             {/if}
           </td>
@@ -169,16 +169,6 @@ function fmSubmit(formName, url, method, num) {
       {/foreach}
 
   </table>
-
-{form_close()}
-
-{form_open('/data_csvup/projects_csvdown/' , 'name="csvForm" class="form-horizontal"')}
-
-  <div class="col-md-12">
-    {$attr['name'] = '_submit'}
-    {$attr['type'] = 'submit'}
-    {form_button($attr , '↓ 受注案件情報のダウンロード' , 'class="btn btn-warning btn-xs"')}
-  </div>
 
 {form_close()}
 

@@ -24,13 +24,11 @@ class Taglist extends MY_Controller
     public function index()
     {
 
-
-//     	print_r($_SESSION);
-
-
     	// セッションデータをクリア
-//     	$this->load->library('lib_auth');
-//     	$this->lib_auth->delete_session('client');
+    	$this->load->library('lib_auth');
+    	$this->lib_auth->delete_session('client');
+//     	$this->load->model('comm_auth', 'comm_auth', TRUE);
+//     	$this->comm_auth->delete_session('client');
 
     	// バリデーション・チェック
     	$this->_set_validation();												// バリデーション設定
@@ -474,17 +472,17 @@ class Taglist extends MY_Controller
     {
 
     	// セッションデータをクリア
-//     	$this->load->library('lib_auth');
-//     	$this->lib_auth->delete_session('client');
+    	$this->load->library('lib_auth');
+    	$this->lib_auth->delete_session('client');
 
     	// バリデーション設定
     	$this->_set_validation();
 
-//     	// 設定タグのセット
-//     	$this->load->library('lib_keyword');
-//     	$this->lib_keyword->grouptag_set($_SESSION['c_memGrp'], NULL, 1);
+    	// 設定タグのセット
+    	$this->load->library('lib_keyword');
+    	$this->lib_keyword->grouptag_set($_SESSION['c_memGrp'], NULL, 1);
 
-//     	$this->smarty->assign('disp01', FALSE);
+    	$this->smarty->assign('disp01', FALSE);
     	$this->smarty->assign('tmp_new_memo', NULL);
 
     	$this->view('taglist/add.tpl');
@@ -531,8 +529,9 @@ class Taglist extends MY_Controller
     	// 設定タグのセット
     	$this->load->library('lib_keyword');
     	$this->lib_keyword->grouptag_set($_SESSION['c_memGrp'], NULL, 1);
+//     	$this->_group_set($_SESSION['c_memGrp'], NULL);
 
-//     	$this->smarty->assign('disp01', FALSE);
+    	$this->smarty->assign('disp01', FALSE);
     	$this->smarty->assign('tmp_new_memo', $input_post['new_memo']);
 
     	$this->view('taglist/add.tpl');
@@ -540,14 +539,14 @@ class Taglist extends MY_Controller
     }
 
     // タグ情報編集
-    public function chg()
+    public function chg_conf()
     {
 
     	$input_post = $this->input->post();
 
     	if (!isset($input_post['gt_name']))
     	{
-    		redirect('/taglist/chg/');
+    		redirect('/taglist/add');
     	}
 
     	// バリデーション設定
@@ -568,7 +567,7 @@ class Taglist extends MY_Controller
     	$this->smarty->assign('tmp_memo', $get_gt_data[0]['gt_memo']);
     	$this->smarty->assign('tmp_new_memo', NULL);
 
-    	$this->view('taglist/chg.tpl');
+    	$this->view('taglist/add.tpl');
 
     }
 
@@ -648,7 +647,7 @@ class Taglist extends MY_Controller
     					}
     				}
 
-    				$this->smarty->assign('mess01', "<font color=blue>タグ名またはその内容が更新されました。</font>");
+    				$this->smarty->assign('mess01', "<font color=blue>タグ名が更新されました。</font>");
 
     			} else {
 
@@ -702,7 +701,7 @@ class Taglist extends MY_Controller
     				}
     			}
 
-    			$this->smarty->assign('mess01', "<font color=blue>「" . $input_post['old_gt_name'] . "」タグ名が削除されました。</font>");
+    			$this->smarty->assign('mess01', "<font color=blue>タグ名が削除されました。</font>");
 
     		}else {
 
@@ -720,7 +719,7 @@ class Taglist extends MY_Controller
     	$this->smarty->assign('tmp_memo', $input_post['gt_memo']);
     	$this->smarty->assign('tmp_new_memo', NULL);
 
-    	$this->view('taglist/chg.tpl');
+    	$this->view('taglist/add.tpl');
 
     }
 
@@ -918,7 +917,7 @@ class Taglist extends MY_Controller
     	$rule_set = array(
     			array(
     					'field'   => 'new_name',
-    					'label'   => 'タグ名',
+    					'label'   => 'グループ名',
     					'rules'   => 'trim|required|max_length[50]'
     			),
     			array(

@@ -31,8 +31,8 @@ class Rootdomainlist extends MY_Controller
 
 
         // セッションデータをクリア
-//         $this->load->library('lib_auth');
-//         $this->lib_auth->delete_session('client');
+        $this->load->library('lib_auth');
+        $this->lib_auth->delete_session('client');
 
         // バリデーション・チェック
         $this->_set_validation();                                                       // バリデーション設定
@@ -88,9 +88,7 @@ class Rootdomainlist extends MY_Controller
 
         // ルートドメイン情報の取得
         $this->load->model('Rootdomain', 'rd', TRUE);
-        $_member['group']   = $_SESSION['c_memGrp'];
-        $_member['account'] = $_SESSION['c_memSeq'];
-        list($rd_list, $rd_countall) = $this->rd->get_rootdomainlist($tmp_inputpost, $tmp_per_page, $tmp_offset, $_member);
+        list($rd_list, $rd_countall) = $this->rd->get_rootdomainlist($tmp_inputpost, $tmp_per_page, $tmp_offset, $_SESSION['c_memGrp']);
 
         $this->smarty->assign('list', $rd_list);
 
@@ -175,9 +173,7 @@ class Rootdomainlist extends MY_Controller
 
         // ルートドメイン情報の取得
         $this->load->model('Rootdomain', 'rd', TRUE);
-        $_member['group']   = $_SESSION['c_memGrp'];
-        $_member['account'] = $_SESSION['c_memSeq'];
-        list($rd_list, $rd_countall) = $this->rd->get_rootdomainlist($tmp_inputpost, $tmp_per_page, $tmp_offset, $_member);
+        list($rd_list, $rd_countall) = $this->rd->get_rootdomainlist($tmp_inputpost, $tmp_per_page, $tmp_offset, $_SESSION['c_memGrp']);
 
         $this->smarty->assign('list', $rd_list);
 
@@ -803,9 +799,7 @@ class Rootdomainlist extends MY_Controller
 
     	// ルートドメイン情報の取得
     	$this->load->model('Rootdomain', 'rd', TRUE);
-    	$_member['group']   = $_SESSION['c_memGrp'];
-    	$_member['account'] = $_SESSION['c_memSeq'];
-    	list($rd_list, $rd_countall) = $this->rd->get_rootdomainlist($tmp_inputpost, $tmp_per_page, $tmp_offset, $_member);
+    	list($rd_list, $rd_countall) = $this->rd->get_rootdomainlist($tmp_inputpost, $tmp_per_page, $tmp_offset, $_SESSION['c_memGrp']);
 
     	$this->smarty->assign('list', $rd_list);
 

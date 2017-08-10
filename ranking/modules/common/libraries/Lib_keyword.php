@@ -105,9 +105,6 @@ class Lib_keyword
 		$keyword_cnt = $CI->kw->get_keyword_cnt($set_data, $gt_type);
 
 		// UPDATE
-
-		$set_gt_data['gt_seq']         = $value['gt_seq'];				// ←これが必要
-
 		$set_gt_data['gt_cl_seq']      = $set_data['kw_cl_seq'];
 		$set_gt_data['gt_name']        = $set_data['kw_group'];
 		$set_gt_data['gt_domain_cnt']  = $rootdomain_cnt;
@@ -149,7 +146,6 @@ class Lib_keyword
 			$keyword_cnt = $CI->kw->get_keyword_cnt($set_data, $gt_type);
 
 			// UPDATE
-			$set_gt_data['gt_seq']         = $value['gt_seq'];
 			$set_gt_data['gt_cl_seq']      = $set_data['kw_cl_seq'];
 			$set_gt_data['gt_name']        = $set_data['kw_group'];
 			$set_gt_data['gt_domain_cnt']  = $rootdomain_cnt;
@@ -193,7 +189,6 @@ class Lib_keyword
 			$keyword_cnt = $CI->kw->get_keyword_cnt($set_data, $gt_type);
 
 			// UPDATE
-			$set_gt_data['gt_seq']         = $value['gt_seq'];
 			$set_gt_data['gt_cl_seq']      = $set_data['kw_cl_seq'];
 			$set_gt_data['gt_name']        = $set_data['kw_tag'];
 			$set_gt_data['gt_domain_cnt']  = $rootdomain_cnt;

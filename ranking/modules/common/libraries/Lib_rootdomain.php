@@ -44,9 +44,6 @@ class Lib_rootdomain
 			$CI->rd->update_rootdomain($set_data_rd);
 		}
 
-// 		unset($set_data_rd);
-// 		unset($get_rd_data);
-
 	}
 
 	/**
@@ -166,8 +163,6 @@ class Lib_rootdomain
     		}
 
     	}
-
-    	unset($tld_array);
 
     	$result['request'] = $val;
     	$result['host']    = $host;

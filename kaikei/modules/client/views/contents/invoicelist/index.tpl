@@ -110,9 +110,9 @@ function fmSubmit(formName, url, method, num) {
           <td>
             <label>
             <input type="checkbox" name="invoice{$smarty.foreach.seq.iteration}" id="invoice" value="{$iv.iv_seq}" class="invoice">
-            {if $iv.iv_status == "0"}<span class="label label-primary">未発行</span>
-            {elseif $iv.iv_status == "1"}<span class="label label-default">発行済</span>
-            {elseif $iv.iv_status == "9"}<span class="label label-default">ｷｬﾝｾﾙ</span>
+            {if $iv.iv_status == "0"}<font color="#ffffff" style="background-color:royalblue">[ 未発行 ]</font>
+            {elseif $iv.iv_status == "1"}<font color="#ffffff" style="background-color:dimgray">[ 発行済 ]</font>
+            {elseif $iv.iv_status == "9"}<font color="#ffffff" style="background-color:dimgray">[ ｷｬﾝｾﾙ  ]</font>
             {else}エラー
             {/if}
             </label>
@@ -160,15 +160,12 @@ function fmSubmit(formName, url, method, num) {
 
   {form_hidden('iv_issue_yymm', $seach_iv_issue_yymm)}
 
-<div class="row">
-  <div class="col-md-3">
-    <input type="checkbox" id="invoice_all" name="invoice_all">
-    <label for="invoice_all"> 全てチェック　</label>
-    <button type='submit' class="btn btn-warning btn-xs" name='_submit' value='submit'>請求書PDF作成</button>
-  </div>
+  <input type="checkbox" id="invoice_all" name="invoice_all">
+  <label for="invoice_all"> 全てチェック　</label>
+  {*<button type='submit' class="btn btn-warning btn-xs" name='action' value='pdf'>請求書PDF作成</button>*}
 
-  {*
-  <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#myModal">請求書PDF作成</button>
+
+    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#myModal">請求書PDF作成</button>
 
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog">
@@ -183,33 +180,23 @@ function fmSubmit(formName, url, method, num) {
         <div class="modal-footer">
           <button type='submit' name='_submit' value='submit' class="btn btn-sm btn-primary">O  K</button>
           <button type='submit' name='_submit' value='cancel' class="btn btn-sm btn-primary">キャンセル</button>
+          {*<button type="button" class="btn btn-sm" data-dismiss="modal">キャンセル</button>*}
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
-  *}
+
+
+
+
 
 {form_close()}
 
-{form_open('/data_csvup/invoice_csvdown/' , 'name="csvForm" class="form-horizontal"')}
-
-
-  <div class="col-md-offset-6 col-md-3">
-    {$attr['name'] = '_submit'}
-    {$attr['type'] = 'submit'}
-    {form_button($attr , '↓ 請求書情報 CSVダウンロード' , 'class="btn btn-warning btn-xs"')}
-  </div>
-</div>
-
-{form_close()}
-
-<ul class="pagination pagination-md">
+<ul class="pagination pagination-sm">
   {$set_pagination}
 </ul>
 
 </div>
-
-
 
 
 <script type="text/javascript">

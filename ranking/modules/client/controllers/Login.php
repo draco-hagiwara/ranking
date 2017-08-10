@@ -46,16 +46,6 @@ class Login extends MY_Controller
 
     	$this->_set_validation();												// バリデーション設定
 
-    	if (isset($_SESSION['c_login']) && $_SESSION['c_login'] == TRUE)
-    	{
-    		redirect("/top/");
-    	} else {
-    		$this->smarty->assign('err_mess',  '');
-    		$this->view('login/index.tpl');
-    	}
-
-//     	$this->view('login/index.tpl');
-
     }
 
     // ログインID＆パスワード チェック

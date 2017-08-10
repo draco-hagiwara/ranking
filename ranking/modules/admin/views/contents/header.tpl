@@ -25,7 +25,7 @@
         <ul class="list-inline text-right"></ul>
         <nav class="navbar navbar-inverse">
         <div class="navbar-header">
-          <a href="#" class="navbar-brand">RANKING</a>
+            <a href="#" class="navbar-brand">SEO</a>
         </div>
         <div id="patern01" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
@@ -36,32 +36,35 @@
             {*<li class="active"><a href="/admin/accountlist/add"><i class="glyphicon glyphicon-pencil"></i> アカウント発行</a></li>*}
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-wrench"></i> システム管理<b class="caret"></b></a>
+            {*<li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-wrench"></i> システム設定<b class="caret"></b></a>
               <ul class="dropdown-menu right">
-                <li><a href="/admin/rank_create/"><i class="glyphicon glyphicon-signal"></i> 検索 & 順位データ取得</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="/admin/system/rank_csvup/"><i class="glyphicon glyphicon-refresh"></i> Location Criteria情報更新</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="/admin/system/backup/"><i class="glyphicon glyphicon-save"></i> 手動バックアップ</a></li>
-                <li><a href="/admin/system/sess_destroy/"><i class="glyphicon glyphicon-trash"></i> セッション削除</a></li>
-                <li><a href="/admin/test_data_create/create_kw_ranking/"><i class="glyphicon glyphicon-tent"></i> テストデータの作成</a></li>
+                <li><a href="/admin/system/mailtpl/"><i class="glyphicon glyphicon-envelope"></i> メールテンプレ管理</a></li>
+                  <li><a href="/admin/system/categroup_new/"><i class="glyphicon glyphicon-th-list"></i> カテゴリ並替</a></li>
+                  <li><a href="/admin/system/categroup_search/"><i class="glyphicon glyphicon-th-list"></i> カテゴリ編集</a></li>
+                  <li><a href="/admin/system/backup/"><i class="glyphicon glyphicon-floppy-save"></i> 手動バックアップ</a></li>
+                  <li><a href="/admin/system/sess_destroy/"><i class="glyphicon glyphicon-remove-circle"></i> セッション削除</a></li>
               </ul>
-            </li>
+            </li>*}
             <li class="active"><a href="/admin/login/logout/"><i class="glyphicon glyphicon-log-out"></i> ログアウト</a></li>
           </ul>
         </div>
         </nav>
     {else}
-      <div class="page-header">
-        <ul class="list-inline text-right">
-          <li><a href="/">TOP</a></li>
-          <li><a href="/client/login/">Clientログイン</a></li>
-        </ul>
-        <nav class="navbar navbar-inverse">
-          <div class="navbar-header">
-            <a href="#" class="navbar-brand">RANKING</a>
-          </div>
-        </nav>
+    <div class="page-header">
+      <ul class="list-inline text-right">
+        <li><a href="/">TOP</a></li>
+        <li><a href="/client/login/">Clientログイン</a></li>
+      </ul>
+
+      <nav class="navbar navbar-inverse">
+        <div class="navbar-header">toggle="collapse" data-target="#patern05">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <a href="/admin/login/" class="navbar-brand">アドミン管理</a>
+        </div>
+      </nav>
+
     </div>
     {/if}
 

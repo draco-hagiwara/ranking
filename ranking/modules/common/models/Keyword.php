@@ -167,7 +167,6 @@ class Keyword extends CI_Model
     	$sql = 'SELECT
                   kw_seq,
                   kw_cl_seq,
-    			  kw_searchengine,
                   kw_maxposition,
     			  kw_trytimes
                 FROM tb_keyword
@@ -399,12 +398,17 @@ class Keyword extends CI_Model
     	$set_select["kw_cl_seq"]       = $client_no;
 
     	// ORDER BY
-    	$set_orderby = $get_post['orderid'];
-    	if ($get_post['orderid'] === 'ASC')
+    	if ($get_post['orderid'] != '')
     	{
-    		$set_orderby = 'ASC';
+    		$set_orderby["kw_seq"]           = $get_post['orderid'];
     	}else {
-    		$set_orderby = 'DESC';
+    		// デフォルト設定
+    		$set_orderby["kw_keyword"]       = 'ASC';
+    		$set_orderby["kw_matchtype"]     = 'ASC';
+    		$set_orderby["kw_searchengine"]  = 'ASC';
+    		$set_orderby["kw_device"]        = 'ASC';
+    		$set_orderby["kw_location_name"] = 'ASC';
+    		//$set_orderby["kw_seq"] = 'DESC';
     	}
 
     	// 対象クアカウントメンバーの取得
@@ -433,10 +437,8 @@ class Keyword extends CI_Model
                   kw_seq,
                   kw_cl_seq,
                   kw_ac_seq,
-    			  kw_rootdomain,
-    			  T3.rd_seq
-    	    	FROM `tb_keyword` LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-    			WHERE kw_cl_seq = ' . $client_no . ' AND kw_old_seq is NULL'
+    			  kw_rootdomain
+    	    	FROM tb_keyword WHERE kw_cl_seq = ' . $client_no . ' AND kw_old_seq is NULL'
     	;
 
     	if ($set_select["kw_status"] !== '')
@@ -453,16 +455,27 @@ class Keyword extends CI_Model
     		}
     	}
 
-     	// GROUP BY文 作成
+     	// ORDER BY文 作成
     	$sql .= ' GROUP BY kw_rootdomain';
+
+    	// ORDER BY文 作成
+    	if (isset($set_orderby['kw_seq']))
+    	{
+    		$sql .= ' ORDER BY kw_seq ' . $set_orderby['kw_seq'];
+    	}else {
+    		$sql .= ' ORDER BY kw_rootdomain ASC';                                    // デフォルト
+    	}
 
     	// 対象全件数を取得
     	$query = $this->db->query($sql);
     	$rootdomain_countall = $query->num_rows();
 
-    	// ORDER BY文 作成
-    	$sql .= ' ORDER BY T3.rd_seq ' .  $set_orderby;
-//     	$sql .= ' ORDER BY kw_update_date ' .  $set_orderby;
+//     	print($sql);
+//     	print("<br><br>");
+//     	print($rootdomain_countall);
+//     	print("<br><br>");
+
+
 
     	// LIMIT ＆ OFFSET 値をセット
     	$sql .= ' LIMIT ' . $tmp_per_page . ' OFFSET ' . $tmp_offset;
@@ -470,6 +483,13 @@ class Keyword extends CI_Model
     	// クエリー実行
     	$query = $this->db->query($sql);
     	$rootdomain_list = $query->result('array');
+
+
+
+//     	print($sql);
+//     	print("<br><br>");
+
+
 
     	// ** キーワード情報 を検索
     	$sql = 'SELECT
@@ -489,9 +509,11 @@ class Keyword extends CI_Model
                   kw_trytimes,
                   kw_group,
                   kw_tag,
-    			  T3.rd_seq
-                FROM `tb_keyword` LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
+    			  T2.wt_seq
+                FROM tb_keyword LEFT JOIN tb_watchlist as T2 on (kw_seq = wt_kw_seq)
     			WHERE kw_old_seq is NULL AND kw_cl_seq = ' . $client_no
+    			//FROM tb_keyword WHERE kw_cl_seq = ' . $client_no
+    			//WHERE kw_cl_seq = ' . $client_no
 		;
 
         if ($set_select["kw_status"] !== '')
@@ -526,11 +548,34 @@ class Keyword extends CI_Model
         }
 
         // ORDER BY文 作成
-        $sql .= ' ORDER BY T3.rd_seq ' .  $set_orderby;
+        $tmp_firstitem = FALSE;
+        foreach ($set_orderby as $key => $val)
+        {
+        	if (isset($val) && $val !== '')
+            {
+            	if ($tmp_firstitem == FALSE)
+                {
+                	//$sql .= ' ORDER BY ' . $key . ' ' . $val;
+                	$sql .= ' ORDER BY  kw_rootdomain ASC, ' . $key . ' ' . $val;
+                    $tmp_firstitem = TRUE;
+                } else {
+                    $sql .= ' , ' . $key . ' ' . $val;
+                }
+            }
+        }
+        if ($tmp_firstitem === FALSE)
+        {
+        	$sql .= ' ORDER BY kw_rootdomain ASC, kw_keyword DESC';                                    // デフォルト
+        }
 
         // クエリー実行
         $query = $this->db->query($sql);
         $kw_list = $query->result('array');
+
+
+//         print($sql);
+//         print("<br><br>");
+
 
         return array($kw_list, $rootdomain_countall);
         //return array($kw_list, $kw_countall);
@@ -549,51 +594,46 @@ class Keyword extends CI_Model
     public function get_kw_toplist($get_post, $tmp_per_page, $tmp_offset=0, $client_no)
     {
 
-
-//     	print_r($get_post);
-//     	print("<br><br>");
-
-
-
     	// 各SQL項目へセット
     	// WHERE
     	$set_select_like["kw_keyword"] = $get_post['kw_keyword'];
     	$set_select_like["kw_url"]     = $get_post['kw_domain'];
+    	//$set_select_like["kw_domain"]  = $get_post['kw_domain'];
     	$set_select_like["kw_group"]   = $get_post['kw_group'];
     	$set_select_like["kw_tag"]     = $get_post['kw_tag'];
 
-//     	$set_select["kw_ac_seq"]       = $get_post['kw_ac_seq'];
+    	$set_select["kw_ac_seq"]       = $get_post['kw_ac_seq'];
     	$set_select["kw_status"]       = $get_post['kw_status'];
     	$set_select["kw_cl_seq"]       = $client_no;
     	$set_select["kw_matchtype"]    = $get_post['kw_matchtype'];
     	$set_select["kw_searchengine"] = $get_post['kw_searchengine'];
     	$set_select["kw_device"]       = $get_post['kw_device'];
+    	$set_select["kw_location_id"]  = $get_post['kw_location_id'];
 
-    	if ($get_post['watch_kw'] === '0')
-    	{
-    		$set_select["watchkw_flg"] = 0;
-    	} else {
-    		$set_select["watchkw_flg"] = 1;
-    	}
 
-    	if ($get_post['watch_domain'] === '0')
+    	if ($get_post['watchlist'] === '0')
     	{
-    		$set_select["watchdomain_flg"] = 0;
+    		$set_select["wt_seq"]      = 0;
     	} else {
-    		$set_select["watchdomain_flg"] = 1;
+    		$set_select["wt_seq"]      = 1;
     	}
 
     	// ORDER BY
-    	$set_orderby = $get_post['orderid'];
     	if ($get_post['orderid'] === 'ASC')
     	{
-    		$set_orderby = 'ASC';
+    		$set_orderby["kw_seq"] = $get_post['orderid'];
     	}else {
-    		$set_orderby = 'DESC';
+    		// デフォルト設定
+//     		$set_orderby["kw_keyword"]       = 'ASC';
+//     		$set_orderby["kw_matchtype"]     = 'ASC';
+//     		$set_orderby["kw_searchengine"]  = 'ASC';
+//     		$set_orderby["kw_device"]        = 'ASC';
+//     		$set_orderby["kw_location_name"] = 'ASC';
+    		$set_orderby["kw_seq"] = 'DESC';
     	}
 
     	// 対象クアカウントメンバーの取得
-    	$kw_list = $this->_select_kwtoplist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset, $client_no, $get_post['free_keyword']);
+    	$kw_list = $this->_select_kwtoplist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset, $client_no);
 
     	return $kw_list;
 
@@ -610,420 +650,122 @@ class Keyword extends CI_Model
      * @param    int     : クライアントSEQ
      * @return   array()
      */
-    public function _select_kwtoplist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset=0, $client_no, $free_kw)
+    public function _select_kwtoplist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset=0, $client_no)
     {
 
-    	/*
-    	 * ウォッチリスト指定有無により処理を分ける
-    	 */
-    	if (($set_select["watchkw_flg"] === 1) && ($set_select["watchdomain_flg"] === 0))
-    	{
-    		// ** rootdomain を検索
-    		$sql1 = 'SELECT
-	                  kw_seq,
-	    			  kw_rootdomain,
-    				  T2.wt_kw_seq,
-    				  T2.wt_ac_seq,
-    				  T2.wt_rd_seq,
-    				  T2.wt_kw_rootdomain,
-    				  T3.rd_seq
-	    	    	FROM `tb_keyword` LEFT JOIN `tb_watchlist` as T2 on ((`kw_seq` = `wt_kw_seq`) AND (`wt_ac_seq` = ' . $_SESSION['c_memSeq'] . '))
-	    	    			          LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	    			WHERE `wt_kw_seq` IS NOT NULL AND `kw_old_seq` is NULL'
-    		;
-
-    		// ** 該当KW を検索
-    		$sql2 = 'SELECT
-	                  kw_seq,
-	                  kw_cl_seq,
-	                  kw_status,
-	                  kw_url,
-	                  kw_domain,
-	                  kw_rootdomain,
-	                  kw_keyword,
-	                  kw_matchtype,
-	                  kw_searchengine,
-	                  kw_device,
-	                  kw_location_id,
-	                  kw_location_name,
-	                  kw_maxposition,
-	                  kw_trytimes,
-	                  kw_group,
-	                  kw_tag,
-	    			  T2.wt_seq,
-	        		  T2.wt_ac_seq,
-	        		  T3.rd_seq
-	        		FROM `tb_keyword` LEFT JOIN `tb_watchlist` as T2 on ((`kw_seq` = `wt_kw_seq`) AND (`wt_ac_seq` = ' . $_SESSION['c_memSeq'] . '))
-	        		                  LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	        		WHERE `kw_old_seq` is NULL AND `wt_ac_seq` is NOT NULL '
-    		;
-
-    	} elseif (($set_select["watchkw_flg"] === 0) && ($set_select["watchdomain_flg"] === 1)) {
-
-    		// ** rootdomain を検索
-    		$sql1 = 'SELECT
-	                  kw_seq,
-	    			  kw_rootdomain,
-    				  T2.wt_kw_seq,
-    				  T2.wt_kw_rootdomain,
-    				  T3.rd_seq
-	    	    	FROM `tb_keyword` LEFT JOIN `tb_watchlist` as T2 on (`kw_rootdomain` = `wt_kw_rootdomain`)
-    				                  LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	    			WHERE `wt_ac_seq` = ' . $_SESSION['c_memSeq'] . ' AND `wt_kw_seq` is NULL AND `kw_old_seq` is NULL'
-    		;
-
-    		// ** 該当KW を検索
-    		$sql2 = 'SELECT
-	                  kw_seq,
-	                  kw_cl_seq,
-	                  kw_status,
-	                  kw_url,
-	                  kw_domain,
-	                  kw_rootdomain,
-	                  kw_keyword,
-	                  kw_matchtype,
-	                  kw_searchengine,
-	                  kw_device,
-	                  kw_location_id,
-	                  kw_location_name,
-	                  kw_maxposition,
-	                  kw_trytimes,
-	                  kw_group,
-	                  kw_tag,
-	    			  T2.wt_seq,
-	        		  T2.wt_ac_seq,
-	        		  T3.rd_seq
-	        		FROM `tb_keyword` LEFT JOIN `tb_watchlist` as T2 on ((`kw_seq` = `wt_kw_seq`) AND (`wt_ac_seq` = ' . $_SESSION['c_memSeq'] . '))
-	        		                  LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	        		WHERE `kw_old_seq` is NULL'
-    		;
-
-    	} elseif (($set_select["watchkw_flg"] === 1) && ($set_select["watchdomain_flg"] === 1)) {
-
-    		/*
-    		 * これで良いのか？？
-    		 * 重そう！
-    		 */
-
-    		// ** rootdomain を検索
-    		$sql1_d = 'SELECT wt_kw_rootdomain
-	    	    	  FROM `tb_watchlist`
-	    			  WHERE `wt_kw_seq` is NULL AND `wt_ac_seq` = ' . $_SESSION['c_memSeq']
-    		;
-
-    		$query = $this->db->query($sql1_d);
-    		$wt_dlist = $query->result('array');
-
-    		$sql1_k = 'SELECT wt_kw_rootdomain, wt_kw_seq
-	    	    	  FROM `tb_watchlist`
-	    			  WHERE `wt_rd_seq` is NULL AND `wt_ac_seq` = ' . $_SESSION['c_memSeq']
-    		;
-
-    		$query = $this->db->query($sql1_k);
-    		$wt_klist = $query->result('array');
-
-    		$_watch_list = array();
-    		$i = 0;
-    		foreach ($wt_dlist as $key1 => $val1)
-    		{
-    			foreach ($wt_klist as $key2 => $val2)
-    			{
-    				 if ($val1['wt_kw_rootdomain'] == $val2['wt_kw_rootdomain'])
-    				 {
-    				 	$_watch_list[$i] = $val2['wt_kw_seq'];
-    				 	++$i;
-    				 }
-    			}
-    		}
-
-    		$sql1 = 'SELECT
-	                  kw_seq,
-    				  kw_rootdomain,
-    				  T3.rd_seq
-	    	    	FROM `tb_keyword` LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	    			WHERE `kw_old_seq` is NULL'
-    		;
-
-    		if (empty($_watch_list))
-    		{
-    			$sql1 .= ' AND kw_seq = 0';
-    		} else {
-	    		$sql1 .= ' AND (';
-	    		for($i = 0; $i < count($_watch_list); $i++){
-	    			$sql1 .= ' `kw_seq` = ' . $_watch_list[$i];
-
-	    			if ($i < count($_watch_list) -1){
-	    				$sql1 .= ' OR ';
-	    			}
-	    		}
-	    		$sql1 .= ' ) ';
-    		}
-
-    		// ** 該当KW を検索
-    		$sql2 = 'SELECT
-	                  kw_seq,
-	                  kw_cl_seq,
-	                  kw_status,
-	                  kw_url,
-	                  kw_domain,
-	                  kw_rootdomain,
-	                  kw_keyword,
-	                  kw_matchtype,
-	                  kw_searchengine,
-	                  kw_device,
-	                  kw_location_id,
-	                  kw_location_name,
-	                  kw_maxposition,
-	                  kw_trytimes,
-	                  kw_group,
-	                  kw_tag,
-	    			  T2.wt_seq,
-	        		  T2.wt_ac_seq,
-	        		  T3.rd_seq
-	        		FROM `tb_keyword` LEFT JOIN `tb_watchlist` as T2 on ((`kw_seq` = `wt_kw_seq`) AND (`wt_ac_seq` = ' . $_SESSION['c_memSeq'] . '))
-	        		                  LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	        		WHERE `kw_old_seq` is NULL'
-    		;
-
-    		if (empty($_watch_list))
-    		{
-    			$sql2 .= ' AND kw_seq = 0';
-    		} else {
-    			$sql2 .= ' AND (';
-    			for($i = 0; $i < count($_watch_list); $i++){
-    				$sql2 .= ' `kw_seq` = ' . $_watch_list[$i];
-
-    				if ($i < count($_watch_list) -1){
-    					$sql2 .= ' OR ';
-    				}
-    			}
-    			$sql2 .= ' ) ';
-    		}
-
-    	} else {
-
-    		// ** rootdomain を検索
-    		$sql1 = 'SELECT
-	                  kw_seq,
-	    			  kw_rootdomain,
-    				  T3.rd_seq
-	    	    	FROM `tb_keyword` LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	    			WHERE `kw_old_seq` is NULL'
-			;
-
-			// ** 該当KW を検索
-			$sql2 = 'SELECT
-	                  kw_seq,
-	                  kw_cl_seq,
-	                  kw_status,
-	                  kw_url,
-	                  kw_domain,
-	                  kw_rootdomain,
-	                  kw_keyword,
-	                  kw_matchtype,
-	                  kw_searchengine,
-	                  kw_device,
-	                  kw_location_id,
-	                  kw_location_name,
-	                  kw_maxposition,
-	                  kw_trytimes,
-	                  kw_group,
-	                  kw_tag,
-	    			  T2.wt_seq,
-	        		  T2.wt_ac_seq,
-	        		  T3.rd_seq
-	        		FROM `tb_keyword` LEFT JOIN `tb_watchlist` as T2 on ((`kw_seq` = `wt_kw_seq`) AND (`wt_ac_seq` = ' . $_SESSION['c_memSeq'] . '))
-	        		                  LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	        		WHERE `kw_old_seq` is NULL'
-			;
-
-    	}
-
-    	$sql1 .= ' AND `kw_cl_seq`  = ' . $client_no;
-
-	    if ($set_select["kw_status"] !== '')
-	    {
-	    	$sql1 .= ' AND `kw_status`  = ' . $set_select["kw_status"];
-	    }
-
-	    if ($set_select["kw_matchtype"] !== '')
-	    {
-	    	$sql1 .= ' AND `kw_matchtype`  = ' . $set_select["kw_matchtype"];
-	    }
-
-	    if ($set_select["kw_searchengine"] !== '')
-	    {
-	    	$sql1 .= ' AND `kw_searchengine`  = ' . $set_select["kw_searchengine"];
-	    }
-
-	    if ($set_select["kw_device"] !== '')
-	    {
-	    	$sql1 .= ' AND `kw_device`  = ' . $set_select["kw_device"];
-	    }
-
-    	// WHERE文 作成
-    	foreach ($set_select_like as $key => $val)
-    	{
-    		if (isset($val) && $val !== '')
-    		{
-    			$sql1 .= ' AND ' . $key . ' LIKE \'%' . $this->db->escape_like_str($val) . '%\'';
-    		}
-    	}
-
-    	if (!empty($free_kw))
-    	{
-
-    		$free_word = str_replace("　", " ", $free_kw);
-    		$array = explode(" ", $free_word);
-
-    		$sql1 .= ' AND ';
-    		for($i = 0; $i < count($array); $i++){
-    			$sql1 .= '( kw_keyword LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\'';
-    			$sql1 .= ' OR kw_url LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\'';
-    			$sql1 .= ' OR kw_group LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\'';
-    			$sql1 .= ' OR kw_tag LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\')';
-
-    			if ($i < count($array) -1){
-    				$sql1 .= " AND ";						// 絞り込み
-    				//$sql1 .= " OR ";						// 部分一致
-    			}
-    		}
-
-    	}
-
-    	// GROUP BY文 作成
-   		$sql1 .= ' GROUP BY kw_rootdomain';
-
-    	// 対象全件数を取得
-    	$query = $this->db->query($sql1);
-    	$rootdomain_countall = $query->num_rows();
-
-    	// ORDER BY文 作成
-    	$sql1 .= ' ORDER BY T3.rd_seq ' .  $set_orderby;
-//     	$sql1 .= ' ORDER BY kw_update_date ' .  $set_orderby;
-
-    	// LIMIT ＆ OFFSET 値をセット
-    	$sql1 .= ' LIMIT ' . $tmp_per_page . ' OFFSET ' . $tmp_offset;
-
-
-
-//     	print("ルートドメイン：：<br>");
-//     	print($sql1);
-//     	print("<br><br>");
-
-
-    	// クエリー実行
-    	$query = $this->db->query($sql1);
-    	$rootdomain_list = $query->result('array');
-
-
-//     	print_r($rootdomain_list);
-//     	print("<br><br>");
-
-
         // ** キーワード情報 を検索
+        $sql = 'SELECT
+                  kw_seq,
+                  kw_cl_seq,
+                  kw_status,
+                  kw_url,
+                  kw_domain,
+                  kw_rootdomain,
+                  kw_keyword,
+                  kw_matchtype,
+                  kw_searchengine,
+                  kw_device,
+                  kw_location_id,
+                  kw_location_name,
+                  kw_maxposition,
+                  kw_trytimes,
+                  kw_group,
+                  kw_tag,
+    			  T2.wt_seq
+                FROM tb_keyword LEFT JOIN tb_watchlist as T2 on (kw_seq = wt_kw_seq)
+    			WHERE kw_old_seq is NULL AND kw_cl_seq = ' . $client_no
+        ;
 
-        $sql2 .= ' AND `kw_status`  = ' . $set_select["kw_status"];
+        $sql .= ' AND `kw_status`  = ' . $set_select["kw_status"];
 
-        $sql2 .= ' AND `kw_cl_seq`  = ' . $client_no;
-        $sql2 .= ' AND `rd_cl_seq`  = ' . $client_no;
-
-        if ($set_select["kw_matchtype"] !== '')
+		if ($set_select["kw_matchtype"] !== '')
 		{
-			$sql2 .= ' AND `kw_matchtype`  = ' . $set_select["kw_matchtype"];
+			$sql .= ' AND `kw_matchtype`  = ' . $set_select["kw_matchtype"];
 		}
 
 		if ($set_select["kw_searchengine"] !== '')
 		{
-			$sql2 .= ' AND `kw_searchengine`  = ' . $set_select["kw_searchengine"];
+			$sql .= ' AND `kw_searchengine`  = ' . $set_select["kw_searchengine"];
 		}
 
 		if ($set_select["kw_device"] !== '')
 		{
-			$sql2 .= ' AND `kw_device`  = ' . $set_select["kw_device"];
+			$sql .= ' AND `kw_device`  = ' . $set_select["kw_device"];
 		}
 
-        // WHERE文 作成
-        if (empty($free_kw))
+		if ($set_select["kw_location_id"] !== '')
+		{
+			$sql .= ' AND `kw_location_id`  = ' . $set_select["kw_location_id"];
+		}
+
+        if ($set_select["kw_ac_seq"] !== "0")
         {
-	        foreach ($set_select_like as $key => $val)
-	        {
-	        	if (isset($val) && $val !== '')
-	        	{
-	        		$sql2 .= ' AND ' . $key . ' LIKE \'%' . $this->db->escape_like_str($val) . '%\'';
-	        	}
-	        }
-        } else {
+        	$sql .= ' AND `kw_ac_seq`  = ' . $set_select["kw_ac_seq"];
+        }
 
-        	$free_word = str_replace("　", " ", $free_kw);
-        	$array = explode(" ", $free_word);
+        if ($set_select["wt_seq"] === 1)
+        {
+        	$sql .= ' AND `wt_seq` IS NOT NULL ';
+        }
 
-        	$sql2 .= ' AND ';
-        	for($i = 0; $i < count($array); $i++){
-        		$sql2 .= '( kw_keyword LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\'';
-        		$sql2 .= ' OR kw_url LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\'';
-        		$sql2 .= ' OR kw_group LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\'';
-        		$sql2 .= ' OR kw_tag LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\')';
+        // WHERE文 作成
+        foreach ($set_select_like as $key => $val)
+        {
+        	if (isset($val) && $val !== '')
+        	{
+        		$sql .= ' AND ' . $key . ' LIKE \'%' . $this->db->escape_like_str($val) . '%\'';
+        	}
+        }
 
-        		if ($i < count($array) -1){
-        			$sql2 .= " AND ";						// 絞り込み
-        			//$sql2 .= " OR ";						// 部分一致
+        // ORDER BY文 作成
+        $tmp_firstitem = FALSE;
+        foreach ($set_orderby as $key => $val)
+        {
+        	if (isset($val) && $val !== '')
+        	{
+        		if ($tmp_firstitem === FALSE)
+        		{
+        			$sql .= ' ORDER BY ' . $key . ' ' . $val;
+        			//$sql .= ' ORDER BY  kw_rootdomain ASC, ' . $key . ' ' . $val;
+
+        			$tmp_firstitem = TRUE;
+        		} else {
+        			$sql .= ' , ' . $key . ' ' . $val;
         		}
         	}
         }
 
-        // WHERE文(rootdomain) 作成
-        if (!empty($rootdomain_list))
-        {
-	        $tmp_firstitem = FALSE;
-	        foreach ($rootdomain_list as $key => $val)
-	        {
-	        	if (empty($val['kw_rootdomain']))
-	        	{
-	        		$_tmp_rootdomain = $val['wt_kw_rootdomain'];
-	        	} else {
-	        		$_tmp_rootdomain = $val['kw_rootdomain'];
-	        	}
+//         if ($tmp_firstitem == FALSE)
+//         {
+//         	$sql .= ' ORDER BY kw_rootdomain ASC, kw_searchengine ASC, kw_keyword DESC';       // デフォルト
 
-	        	if ($tmp_firstitem === FALSE)
-	        	{
-	        		$sql2 .= ' AND ( kw_rootdomain = \'' . $_tmp_rootdomain . '\'';
-	        		//$sql2 .= ' AND ( kw_rootdomain = \'' . $val['kw_rootdomain'] . '\'';
-	        		//$sql2 .= ' AND ( kw_rootdomain LIKE \'%' . $val['kw_rootdomain'] . '%\'';
-	        		$tmp_firstitem = TRUE;
-	        	} else {
-	        		$sql2 .= ' OR kw_rootdomain = \'' . $_tmp_rootdomain . '\'';
-	        		//$sql2 .= ' OR kw_rootdomain = \'' . $val['kw_rootdomain'] . '\'';
-	        		//$sql2 .= ' OR kw_rootdomain LIKE \'%' . $val['kw_rootdomain'] . '%\'';
-	        	}
-	        }
-	        $sql2 .= ' ) ';
+//         	$set_orderby["kw_keyword"]       = 'ASC';
+//         	$set_orderby["kw_matchtype"]     = 'ASC';
+//         	$set_orderby["kw_searchengine"]  = 'ASC';
+//         	$set_orderby["kw_device"]        = 'ASC';
+//         	$set_orderby["kw_location_name"] = 'ASC';
 
-	        // ORDER BY文 作成
-	        //$sql2 .= ' ORDER BY T3.rd_seq ' .  $set_orderby;
-	        $sql2 .= ' ORDER BY T3.rd_seq ' .  $set_orderby . " , kw_seq DESC";
-
-
-// 			print("一覧：：<br>");
-// 			print($sql2);
-// 			print("<br><br>");
-
-
-	        // クエリー実行
-	        $query = $this->db->query($sql2);
-	        $kw_list = $query->result('array');
-
-//         print_r($kw_list);
-//         print("<br><br>");
-
-        } else {
-        	$kw_list = array();
-        }
+//         }
 
 
 
-        return array($kw_list, $rootdomain_countall);
-//         return array($kw_list, $kw_countall);
+// 		print($sql);
+// 		print("<br><br>");
+
+
+
+        // 対象全件数を取得
+        $query = $this->db->query($sql);
+        $kw_countall = $query->num_rows();
+
+        // LIMIT ＆ OFFSET 値をセット
+        $sql .= ' LIMIT ' . $tmp_per_page . ' OFFSET ' . $tmp_offset;
+
+        // クエリー実行
+        $query = $this->db->query($sql);
+        $kw_list = $query->result('array');
+
+        return array($kw_list, $kw_countall);
 
     }
 
@@ -1384,7 +1126,7 @@ class Keyword extends CI_Model
     }
 
     /**
-     * CSVダウンロード：キーワード情報の取得
+     * キーワード情報の取得
      *
      * @param    array() : 検索項目値
      * @param    int     : 1ページ当たりの表示件数(LIMIT値)
@@ -1421,7 +1163,7 @@ class Keyword extends CI_Model
     }
 
     /**
-     * CSVダウンロード：キーワード情報の取得
+     * キーワード情報の取得
      *
      * @param    array() : WHERE句項目
      * @param    array() : ORDER BY句項目
@@ -1502,503 +1244,6 @@ class Keyword extends CI_Model
     }
 
     /**
-     * CSVダウンロード：TOP検索キーワード情報の取得
-     *
-     * @param    array() : 検索項目値
-     * @param    int     : 1ページ当たりの表示件数(LIMIT値)
-     * @param    int     : オフセット値(ページ番号)
-     * @param    int     : クライアントSEQ
-     * @return   array()
-     */
-    public function get_csvdl_toplist($get_post, $tmp_per_page, $tmp_offset=0, $client_no)
-    {
-
-    	// 各SQL項目へセット
-    	// WHERE
-    	$set_select_like["kw_keyword"] = $get_post['kw_keyword'];
-    	$set_select_like["kw_url"]     = $get_post['kw_domain'];
-    	$set_select_like["kw_group"]   = $get_post['kw_group'];
-    	$set_select_like["kw_tag"]     = $get_post['kw_tag'];
-
-    	$set_select["kw_status"]       = $get_post['kw_status'];
-    	$set_select["kw_cl_seq"]       = $client_no;
-    	$set_select["kw_matchtype"]    = $get_post['kw_matchtype'];
-    	$set_select["kw_searchengine"] = $get_post['kw_searchengine'];
-    	$set_select["kw_device"]       = $get_post['kw_device'];
-
-    	if ($get_post['watch_kw'] === '0')
-    	{
-    		$set_select["watchkw_flg"] = 0;
-    	} else {
-    		$set_select["watchkw_flg"] = 1;
-    	}
-
-    	if ($get_post['watch_domain'] === '0')
-    	{
-    		$set_select["watchdomain_flg"] = 0;
-    	} else {
-    		$set_select["watchdomain_flg"] = 1;
-    	}
-
-    	// ORDER BY
-    	$set_orderby = $get_post['orderid'];
-    	if ($get_post['orderid'] === 'ASC')
-    	{
-    		$set_orderby = 'ASC';
-    	}else {
-    		$set_orderby = 'DESC';
-    	}
-
-    	// 対象クアカウントメンバーの取得
-    	$query = $this->_select_dltoplist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset, $client_no, $get_post['free_keyword']);
-
-    	return $query;
-
-    }
-
-    /**
-     * CSVダウンロード：検索キーワード情報(TOP)の取得
-     *
-     * @param    array() : WHERE句項目
-     * @param    array() : WHERE句項目
-     * @param    array() : ORDER BY句項目
-     * @param    int     : 1ページ当たりの表示件数
-     * @param    int     : オフセット値(ページ番号)
-     * @param    int     : クライアントSEQ
-     * @return   array()
-     */
-    public function _select_dltoplist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset=0, $client_no, $free_kw)
-    {
-
-    	/*
-    	 * ウォッチリスト指定有無により処理を分ける
-    	 */
-    	if (($set_select["watchkw_flg"] === 1) && ($set_select["watchdomain_flg"] === 0))
-    	{
-    		// ** rootdomain を検索
-    		$sql1 = 'SELECT
-	                  kw_seq,
-	    			  kw_rootdomain,
-    				  T2.wt_kw_seq,
-    				  T2.wt_ac_seq,
-    				  T2.wt_rd_seq,
-    				  T2.wt_kw_rootdomain,
-    				  T3.rd_seq
-	    	    	FROM `tb_keyword` LEFT JOIN `tb_watchlist` as T2 on ((`kw_seq` = `wt_kw_seq`) AND (`wt_ac_seq` = ' . $_SESSION['c_memSeq'] . '))
-	    	    			          LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	    			WHERE `wt_kw_seq` IS NOT NULL AND `kw_old_seq` is NULL'
-    	    ;
-
-    	    // ** 該当KW を検索
-    	    $sql2 = 'SELECT
-	                  kw_seq AS `seq`,
-	                  kw_cl_seq AS `クライアントseq`,
-	                  kw_status AS `ステータス`,
-	                  kw_url AS `対象URL`,
-	                  kw_domain AS `ドメイン`,
-	                  kw_rootdomain AS `ルートドメイン`,
-	                  kw_keyword AS `検索キーワード`,
-	                  kw_matchtype AS `URL一致方式`,
-	                  kw_searchengine AS `検索エンジン選択`,
-	                  kw_device AS `デバイス選択`,
-	                  kw_location_id AS `Canonical id`,
-	                  kw_location_name AS `Canonical Name`,
-	                  kw_maxposition AS `最大取得順位`,
-	                  kw_trytimes AS `データ取得回数`,
-	                  kw_group AS `設定グループ`,
-	                  kw_tag AS `設定タグ`,
-	    			  T2.wt_seq AS `ウォッチリストseq`,
-	        		  T2.wt_ac_seq AS `アカウントseq`,
-	        		  T3.rd_seq AS `ドメインseq`
-	        		FROM `tb_keyword` LEFT JOIN `tb_watchlist` as T2 on ((`kw_seq` = `wt_kw_seq`) AND (`wt_ac_seq` = ' . $_SESSION['c_memSeq'] . '))
-	        		                  LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	        		WHERE `kw_old_seq` is NULL AND `wt_ac_seq` is NOT NULL '
-    	    ;
-
-    	} elseif (($set_select["watchkw_flg"] === 0) && ($set_select["watchdomain_flg"] === 1)) {
-
-    		// ** rootdomain を検索
-    		$sql1 = 'SELECT
-	                  kw_seq,
-	    			  kw_rootdomain,
-    				  T2.wt_kw_seq,
-    				  T2.wt_kw_rootdomain,
-    				  T3.rd_seq
-	    	    	FROM `tb_keyword` LEFT JOIN `tb_watchlist` as T2 on (`kw_rootdomain` = `wt_kw_rootdomain`)
-    				                  LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	    			WHERE `wt_ac_seq` = ' . $_SESSION['c_memSeq'] . ' AND `wt_kw_seq` is NULL AND `kw_old_seq` is NULL'
-    	    ;
-
-    	    // ** 該当KW を検索
-    	    $sql2 = 'SELECT
-	                  kw_seq AS `seq`,
-	                  kw_cl_seq AS `クライアントseq`,
-	                  kw_status AS `ステータス`,
-	                  kw_url AS `対象URL`,
-	                  kw_domain AS `ドメイン`,
-	                  kw_rootdomain AS `ルートドメイン`,
-	                  kw_keyword AS `検索キーワード`,
-	                  kw_matchtype AS `URL一致方式`,
-	                  kw_searchengine AS `検索エンジン選択`,
-	                  kw_device AS `デバイス選択`,
-	                  kw_location_id AS `Canonical id`,
-	                  kw_location_name AS `Canonical Name`,
-	                  kw_maxposition AS `最大取得順位`,
-	                  kw_trytimes AS `データ取得回数`,
-	                  kw_group AS `設定グループ`,
-	                  kw_tag AS `設定タグ`,
-	    			  T2.wt_seq AS `ウォッチリストseq`,
-	        		  T2.wt_ac_seq AS `アカウントseq`,
-	        		  T3.rd_seq AS `ドメインseq`
-	        		FROM `tb_keyword` LEFT JOIN `tb_watchlist` as T2 on ((`kw_seq` = `wt_kw_seq`) AND (`wt_ac_seq` = ' . $_SESSION['c_memSeq'] . '))
-	        		                  LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	        		WHERE `kw_old_seq` is NULL'
-    	    ;
-
-    	} elseif (($set_select["watchkw_flg"] === 1) && ($set_select["watchdomain_flg"] === 1)) {
-
-    		/*
-    		 * これで良いのか？？
-    		 * 重そう！
-    		 */
-
-    		// ** rootdomain を検索
-    		$sql1_d = 'SELECT wt_kw_rootdomain
-	    	    	  FROM `tb_watchlist`
-	    			  WHERE `wt_kw_seq` is NULL AND `wt_ac_seq` = ' . $_SESSION['c_memSeq']
-    	    ;
-
-    		$query = $this->db->query($sql1_d);
-    		$wt_dlist = $query->result('array');
-
-    		$sql1_k = 'SELECT wt_kw_rootdomain, wt_kw_seq
-	    	    	  FROM `tb_watchlist`
-	    			  WHERE `wt_rd_seq` is NULL AND `wt_ac_seq` = ' . $_SESSION['c_memSeq']
-    	    ;
-
-    		$query = $this->db->query($sql1_k);
-    		$wt_klist = $query->result('array');
-
-    		$_watch_list = array();
-    		$i = 0;
-    		foreach ($wt_dlist as $key1 => $val1)
-    		{
-    			foreach ($wt_klist as $key2 => $val2)
-    			{
-    				if ($val1['wt_kw_rootdomain'] == $val2['wt_kw_rootdomain'])
-    				{
-    					$_watch_list[$i] = $val2['wt_kw_seq'];
-    					++$i;
-    				}
-    			}
-    		}
-
-    		$sql1 = 'SELECT
-	                  kw_seq,
-    				  kw_rootdomain,
-    				  T3.rd_seq
-	    	    	FROM `tb_keyword` LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	    			WHERE `kw_old_seq` is NULL'
-    		;
-
-    		if (empty($_watch_list))
-    		{
-    			$sql1 .= ' AND kw_seq = 0';
-    		} else {
-    			$sql1 .= ' AND (';
-    			for($i = 0; $i < count($_watch_list); $i++){
-    				$sql1 .= ' `kw_seq` = ' . $_watch_list[$i];
-
-    				if ($i < count($_watch_list) -1){
-    					$sql1 .= ' OR ';
-    				}
-    			}
-    			$sql1 .= ' ) ';
-    		}
-
-    		// ** 該当KW を検索
-    		$sql2 = 'SELECT
-	                  kw_seq AS `seq`,
-	                  kw_cl_seq AS `クライアントseq`,
-	                  kw_status AS `ステータス`,
-	                  kw_url AS `対象URL`,
-	                  kw_domain AS `ドメイン`,
-	                  kw_rootdomain AS `ルートドメイン`,
-	                  kw_keyword AS `検索キーワード`,
-	                  kw_matchtype AS `URL一致方式`,
-	                  kw_searchengine AS `検索エンジン選択`,
-	                  kw_device AS `デバイス選択`,
-	                  kw_location_id AS `Canonical id`,
-	                  kw_location_name AS `Canonical Name`,
-	                  kw_maxposition AS `最大取得順位`,
-	                  kw_trytimes AS `データ取得回数`,
-	                  kw_group AS `設定グループ`,
-	                  kw_tag AS `設定タグ`,
-	    			  T2.wt_seq AS `ウォッチリストseq`,
-	        		  T2.wt_ac_seq AS `アカウントseq`,
-	        		  T3.rd_seq AS `ドメインseq`
-	        		FROM `tb_keyword` LEFT JOIN `tb_watchlist` as T2 on ((`kw_seq` = `wt_kw_seq`) AND (`wt_ac_seq` = ' . $_SESSION['c_memSeq'] . '))
-	        		                  LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	        		WHERE `kw_old_seq` is NULL'
-    	    ;
-
-    	    if (empty($_watch_list))
-    	    {
-    	    	$sql2 .= ' AND kw_seq = 0';
-    	    } else {
-    	    	$sql2 .= ' AND (';
-    	    	for($i = 0; $i < count($_watch_list); $i++){
-    	    		$sql2 .= ' `kw_seq` = ' . $_watch_list[$i];
-
-    	    		if ($i < count($_watch_list) -1){
-    	    			$sql2 .= ' OR ';
-    	    		}
-    	    	}
-    	    	$sql2 .= ' ) ';
-    	    }
-
-    	} else {
-
-    		// ** rootdomain を検索
-    		$sql1 = 'SELECT
-	                  kw_seq,
-	    			  kw_rootdomain,
-    				  T3.rd_seq
-	    	    	FROM `tb_keyword` LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	    			WHERE `kw_old_seq` is NULL'
-    		;
-
-    		// ** 該当KW を検索
-    		$sql2 = 'SELECT
-	                  kw_seq AS `seq`,
-	                  kw_cl_seq AS `クライアントseq`,
-	                  kw_status AS `ステータス`,
-	                  kw_url AS `対象URL`,
-	                  kw_domain AS `ドメイン`,
-	                  kw_rootdomain AS `ルートドメイン`,
-	                  kw_keyword AS `検索キーワード`,
-	                  kw_matchtype AS `URL一致方式`,
-	                  kw_searchengine AS `検索エンジン選択`,
-	                  kw_device AS `デバイス選択`,
-	                  kw_location_id AS `Canonical id`,
-	                  kw_location_name AS `Canonical Name`,
-	                  kw_maxposition AS `最大取得順位`,
-	                  kw_trytimes AS `データ取得回数`,
-	                  kw_group AS `設定グループ`,
-	                  kw_tag AS `設定タグ`,
-	    			  T2.wt_seq AS `ウォッチリストseq`,
-	        		  T2.wt_ac_seq AS `アカウントseq`,
-	        		  T3.rd_seq AS `ドメインseq`
-	        		FROM `tb_keyword` LEFT JOIN `tb_watchlist` as T2 on ((`kw_seq` = `wt_kw_seq`) AND (`wt_ac_seq` = ' . $_SESSION['c_memSeq'] . '))
-	        		                  LEFT JOIN `tb_rootdomain` as T3 on (`kw_rootdomain` = `rd_rootdomain`)
-	        		WHERE `kw_old_seq` is NULL'
-    	    ;
-
-    	}
-
-    	$sql1 .= ' AND `kw_cl_seq`  = ' . $client_no;
-
-    	if ($set_select["kw_status"] !== '')
-    	{
-    		$sql1 .= ' AND `kw_status`  = ' . $set_select["kw_status"];
-    	}
-
-    	if ($set_select["kw_matchtype"] !== '')
-    	{
-    		$sql1 .= ' AND `kw_matchtype`  = ' . $set_select["kw_matchtype"];
-    	}
-
-    	if ($set_select["kw_searchengine"] !== '')
-    	{
-    		$sql1 .= ' AND `kw_searchengine`  = ' . $set_select["kw_searchengine"];
-    	}
-
-    	if ($set_select["kw_device"] !== '')
-    	{
-    		$sql1 .= ' AND `kw_device`  = ' . $set_select["kw_device"];
-    	}
-
-    	// WHERE文 作成
-    	foreach ($set_select_like as $key => $val)
-    	{
-    		if (isset($val) && $val !== '')
-    		{
-    			$sql1 .= ' AND ' . $key . ' LIKE \'%' . $this->db->escape_like_str($val) . '%\'';
-    		}
-    	}
-
-    	if (!empty($free_kw))
-    	{
-
-    		$free_word = str_replace("　", " ", $free_kw);
-    		$array = explode(" ", $free_word);
-
-    		$sql1 .= ' AND ';
-    		for($i = 0; $i < count($array); $i++){
-    			$sql1 .= '( kw_keyword LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\'';
-    			$sql1 .= ' OR kw_url LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\'';
-    			$sql1 .= ' OR kw_group LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\'';
-    			$sql1 .= ' OR kw_tag LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\')';
-
-    			if ($i < count($array) -1){
-    				$sql1 .= " AND ";						// 絞り込み
-    				//$sql1 .= " OR ";						// 部分一致
-    			}
-    		}
-
-    	}
-
-    	// GROUP BY文 作成
-    	$sql1 .= ' GROUP BY kw_rootdomain';
-
-    	// 対象全件数を取得
-    	$query = $this->db->query($sql1);
-    	$rootdomain_countall = $query->num_rows();
-
-    	// ORDER BY文 作成
-    	$sql1 .= ' ORDER BY T3.rd_seq ' .  $set_orderby;
-    	//     	$sql1 .= ' ORDER BY kw_update_date ' .  $set_orderby;
-
-    	// LIMIT ＆ OFFSET 値をセット
-    	$sql1 .= ' LIMIT ' . $tmp_per_page . ' OFFSET ' . $tmp_offset;
-
-    	// クエリー実行
-    	$query = $this->db->query($sql1);
-    	$rootdomain_list = $query->result('array');
-
-    	// ** キーワード情報 を検索
-    	$sql2 .= ' AND `kw_status`  = ' . $set_select["kw_status"];
-
-    	$sql2 .= ' AND `kw_cl_seq`  = ' . $client_no;
-
-    	if ($set_select["kw_matchtype"] !== '')
-    	{
-    		$sql2 .= ' AND `kw_matchtype`  = ' . $set_select["kw_matchtype"];
-    	}
-
-    	if ($set_select["kw_searchengine"] !== '')
-    	{
-    		$sql2 .= ' AND `kw_searchengine`  = ' . $set_select["kw_searchengine"];
-    	}
-
-    	if ($set_select["kw_device"] !== '')
-    	{
-    		$sql2 .= ' AND `kw_device`  = ' . $set_select["kw_device"];
-    	}
-
-    	// WHERE文 作成
-    	if (empty($free_kw))
-    	{
-    		foreach ($set_select_like as $key => $val)
-    		{
-    			if (isset($val) && $val !== '')
-    			{
-    				$sql2 .= ' AND ' . $key . ' LIKE \'%' . $this->db->escape_like_str($val) . '%\'';
-    			}
-    		}
-    	} else {
-
-    		$free_word = str_replace("　", " ", $free_kw);
-    		$array = explode(" ", $free_word);
-
-    		$sql2 .= ' AND ';
-    		for($i = 0; $i < count($array); $i++){
-    			$sql2 .= '( kw_keyword LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\'';
-    			$sql2 .= ' OR kw_url LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\'';
-    			$sql2 .= ' OR kw_group LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\'';
-    			$sql2 .= ' OR kw_tag LIKE \'%' . $this->db->escape_like_str($array[$i]) . '%\')';
-
-    			if ($i < count($array) -1){
-    				$sql2 .= " AND ";						// 絞り込み
-    				//$sql2 .= " OR ";						// 部分一致
-    			}
-    		}
-    	}
-
-    	// WHERE文(rootdomain) 作成
-    	if (!empty($rootdomain_list))
-    	{
-    		$tmp_firstitem = FALSE;
-    		foreach ($rootdomain_list as $key => $val)
-    		{
-    			if (empty($val['kw_rootdomain']))
-    			{
-    				$_tmp_rootdomain = $val['wt_kw_rootdomain'];
-    			} else {
-    				$_tmp_rootdomain = $val['kw_rootdomain'];
-    			}
-
-    			if ($tmp_firstitem === FALSE)
-    			{
-    				$sql2 .= ' AND ( kw_rootdomain = \'' . $_tmp_rootdomain . '\'';
-    				//$sql2 .= ' AND ( kw_rootdomain = \'' . $val['kw_rootdomain'] . '\'';
-    				//$sql2 .= ' AND ( kw_rootdomain LIKE \'%' . $val['kw_rootdomain'] . '%\'';
-    				$tmp_firstitem = TRUE;
-    			} else {
-    				$sql2 .= ' OR kw_rootdomain = \'' . $_tmp_rootdomain . '\'';
-    				//$sql2 .= ' OR kw_rootdomain = \'' . $val['kw_rootdomain'] . '\'';
-    				//$sql2 .= ' OR kw_rootdomain LIKE \'%' . $val['kw_rootdomain'] . '%\'';
-    			}
-    		}
-    		$sql2 .= ' ) ';
-
-    		// ORDER BY文 作成
-    		$sql2 .= ' ORDER BY T3.rd_seq ' .  $set_orderby;
-
-    		// クエリー実行
-    		$query = $this->db->query($sql2);
-
-    	}
-
-    	return $query;
-
-    }
-
-    /**
-     * CSVダウンロード：レポート情報の取得
-     *
-     * @param    array()
-     * @param    int
-     * @param    int
-     * @return   array()
-     */
-    public function get_csvdl_report($get_post, $kw_seq01, $kw_seq02)
-    {
-
-    	$sql = 'SELECT
-		          kw_seq,
-		          T1.rk_position,
-		          T1.rk_getdate,
-		          kw_searchengine,
-    			  kw_url,
-		          kw_domain,
-		          kw_rootdomain,
-		          kw_keyword,
-		          kw_matchtype,
-		          kw_device,
-		          kw_location_name
-		        FROM tb_keyword LEFT JOIN tb_ranking AS T1 ON (kw_seq = rk_kw_seq)
-		        WHERE '
-		;
-
-		if (isset($kw_seq02))
-		{
-			$sql .= '(kw_seq = ' . $kw_seq01 . ' OR kw_seq = '. $kw_seq02 . ') ';
-		} else {
-			$sql .= 'kw_seq = ' . $kw_seq01;
-		}
-
-		$sql .= ' AND T1.rk_getdate BETWEEN \'' . $get_post['start_date'] . '\' AND \'' . $get_post['end_date'] . '\'';
-		$sql .= ' ORDER BY kw_searchengine ASC, T1.rk_seq ASC';
-
-		// クエリー実行
-		$query = $this->db->query($sql);
-
-		return $query;
-
-    }
-
-    /**
      * キーワード情報の重複チェック
      *
      * @param    array()
@@ -2039,55 +1284,6 @@ class Keyword extends CI_Model
     	$query = $this->db->query($sql);
     	$get_data = $query->result('array');
 //     	$get_rows = $query->num_rows();
-
-    	return $get_data;
-
-    }
-
-    /**
-     * キーワード情報のURL重複チェック (check_keyword の改良)
-     *
-     * @param    array()
-     * @return   int
-     */
-    public function check_url($setdata, $old_seq=NULL, $status=NULL)
-    {
-
-    	$sql = 'SELECT
-                  kw_seq,
-    			  kw_old_seq,
-    			  kw_status,
-                  kw_cl_seq
-                FROM tb_keyword
-    			WHERE
-    			     kw_cl_seq = ' . $setdata['kw_cl_seq'] . '
-    			     AND kw_url = \'' . $setdata['kw_url'] . '\'
-    			     AND kw_keyword = \'' . $setdata['kw_keyword'] . '\'
-    			     AND kw_matchtype = ' . $setdata['kw_matchtype'] . '
-    			     AND kw_searchengine = ' . $setdata['kw_searchengine'] . '
-    			     AND kw_device = ' . $setdata['kw_device'] . '
-    			     AND kw_location_id = \'' . $setdata['kw_location_id'] . '\'
-    			     AND kw_seq != ' . $setdata['kw_seq'] . '
-	    ';
-
-    	if ($old_seq == NULL)
-    	{
-    		$sql .= ' AND kw_old_seq is NULL ';
-    	} else {
-    		$sql .= ' AND kw_old_seq = ' . $old_seq;
-    	}
-
-    	if ($status != NULL)
-    	{
-    		$sql .= ' AND kw_status = ' . $status;
-    	}
-
-    	$sql .= ' ORDER BY kw_seq ASC';
-
-    	// クエリー実行
-    	$query = $this->db->query($sql);
-    	$get_data = $query->result('array');
-    	//     	$get_rows = $query->num_rows();
 
     	return $get_data;
 
@@ -2179,10 +1375,9 @@ class Keyword extends CI_Model
 
 
 
-    		// ↓***** ここは要らないような！？ 様子見。
-    		//if (($setdata['kw_maxposition'] > $get_data[0]['kw_maxposition'])
-    		//	|| ($setdata['kw_trytimes'] > $get_data[0]['kw_trytimes']))
-    		//{
+    		if (($setdata['kw_maxposition'] > $get_data[0]['kw_maxposition'])
+    			|| ($setdata['kw_trytimes'] > $get_data[0]['kw_trytimes']))
+    		{
 //     			print("<br>更新<br>");
 
     			if ($setdata['kw_maxposition'] < $get_data[0]['kw_maxposition'])
@@ -2222,11 +1417,11 @@ class Keyword extends CI_Model
     			$set_data['lg_detail']    = 'kw_seq = ' . $get_data[0]['kw_seq'] . ' <= ' . $_last_sql;
     			$this->insert_log($set_data);
 
-    		//} else {
+    		} else {
 //     			print("<br>現行<br>");
 
-    		//	$result = TRUE;
-    		//}
+    			$result = TRUE;
+    		}
     	} else {
 //     		print("<br>挿入<br>");
 

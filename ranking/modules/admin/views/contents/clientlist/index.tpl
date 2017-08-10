@@ -104,9 +104,7 @@ function fmSubmit(formName, url, method, num) {
                     {$cl.cl_mail}<br>{$cl.cl_mailsub}
                 </td>
                 <td>
-                  {if $cl.cl_status!=99}
                     <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/admin/clientlist/detail/', 'POST', '{$cl.cl_seq}', 'chg_clseq');">編　集</button>
-                  {/if}
                 </td>
             </tr>
         </tbody>

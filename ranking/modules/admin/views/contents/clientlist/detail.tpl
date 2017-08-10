@@ -196,12 +196,6 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="cl_id" class="col-md-3 control-label">テミス管理用ログインID</label>
-    <div class="col-md-8">
-      {$info.cl_id}
-    </div>
-  </div>
-  <div class="form-group">
     <label for="cl_memo" class="col-sm-3 control-label">備　　考</label>
     <div class="col-md-8">
       <textarea class="form-control input-sm" id="cl_memo" name="cl_memo" placeholder="max.1000文字">{$info.cl_memo}</textarea>
@@ -211,10 +205,9 @@
 
   {form_hidden('cl_seq', $info.cl_seq)}
 
-  {if $smarty.session.a_memSeq!=1}
   <!-- Button trigger modal -->
   <div class="row">
-  <div class="col-sm-2 col-sm-offset-3">
+  <div class="col-sm-2 col-sm-offset-4">
     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">更新する</button>
   </div>
   </div>
@@ -236,7 +229,7 @@
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
-  {/if}
+
 
 {form_close()}
 <!-- </form> -->

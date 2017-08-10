@@ -246,7 +246,7 @@ class Clientlist extends MY_Controller
 
     	$input_post = $this->input->post();
 
-		// バリデーション・チェック
+    	// バリデーション・チェック
     	$this->_set_validation03();
     	if ($this->form_validation->run() == FALSE)
     	{
@@ -288,6 +288,10 @@ class Clientlist extends MY_Controller
     				$this->db->trans_strict(FALSE);                                     // StrictモードをOFF
     				$this->db->trans_start();                                           // trans_begin
 
+	    				// アカウント情報セット
+	    				$set_ac['ac_id'] = $input_post['cl_id'];
+	    				$set_ac['ac_pw'] = $input_post['cl_pw'];
+
 	    				// 不要パラメータ削除
 	    				unset($input_post["retype_password"]) ;
 	    				unset($input_post["_submit"]) ;
@@ -295,13 +299,8 @@ class Clientlist extends MY_Controller
 	    				// DB書き込み
 	    				$_row_id = $this->cl->insert_client($input_post);
 
-	    				// アカウント情報セット
-	    				$set_ac['ac_id']         = $input_post['cl_id'];
-	    				$set_ac['ac_pw']         = $input_post['cl_pw'];
-	    				$set_ac['ac_department'] = "テミス管理用";
-
 	    				// DB書き込み
-	    				$set_ac['ac_type'] = 9;
+	    				$set_ac['ac_type'] = 1;
 	    				$set_ac['ac_cl_seq'] = $_row_id;
 	    				$this->ac->insert_account($set_ac);
 

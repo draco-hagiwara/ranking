@@ -28,7 +28,7 @@ class Ranking extends CI_Model
     			WHERE
     			     rk_kw_seq = ' . $kw_seq . '
     			     AND rk_getdate = \'' . $start_date . '\'
-	    ';
+	     		';
 
 
 
@@ -110,8 +110,8 @@ class Ranking extends CI_Model
     	if ($old_seq == NULL)
     	{
     		$sql .= ' AND rk_kw_old_seq is NULL ';
-//     	} else {
-//     		$sql .= ' AND ' . $old_seq;
+    	} else {
+    		$sql .= ' AND ' . $old_seq;
     	}
 
     	$sql .= ' ORDER BY rk_seq ASC';
@@ -188,20 +188,15 @@ class Ranking extends CI_Model
     			  rk_getdate
     			FROM tb_ranking
     			WHERE
-    			     rk_getdate = \'' . $rk_getdate . '\''
+    			     rk_getdate = \'' . $rk_getdate . '\'
+    			     AND rk_cl_seq = ' . $client_no
 	    ;
-
-	    if (!is_null($client_no ))
-	    {
-	    	$sql .= ' AND rk_cl_seq = ' . $client_no;
-	    }
 
 	    // WHERE文 作成
 	    if ($kind === 1)
 	    {
 	    	// 一部データ
-	    	$sql .= ' AND rk_position = 90009';
-	    	//$sql .= ' AND ((rk_position = 9999) OR (rk_position = 90009))';
+	    	$sql .= ' AND (rk_position = 9999 OR rk_position = 90009)';
 	    } elseif ($kind === 2) {
 	    	// 個別データ
 	    	$sql .= ' AND rk_kw_seq = ' . $kw_seq;

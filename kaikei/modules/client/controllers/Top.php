@@ -64,6 +64,21 @@ class Top extends MY_Controller
 
         $this->load->driver('cache', array('adapter' => 'memcached'));
 
+        if ($this->cache->is_supported('memcached')) {
+            // Memcached キャッシングの利用が可能です。
+            print("キャッシングの利用が可能");
+        }
+        else {
+            // Memcached キャッシングは利用できません。
+            print("キャッシングの利用できません");
+        }
+
+
+//      $this->load->driver('cache', array('adapter' => 'memcached'));
+//      $this->cache->save('memcached test', 111, 3600);
+//      var_dump($this->cache->get('memcached test'));exit;
+
+
         $this->view('top/index.tpl');
 
     }

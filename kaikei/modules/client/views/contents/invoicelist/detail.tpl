@@ -294,14 +294,8 @@ $('#mydate2').datepicker({
   <!-- Button trigger modal -->
   {if $info.iv_status!=9}
   <div class="col-sm-2 col-sm-offset-2">
-    <button type='submit' class="btn btn-primary btn-sm" name='submit' value='submit'>請求書(PDF)作成</button>
-  </div>
-
-{*
-  <div class="col-sm-2 col-sm-offset-2">
     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal02">請求書(PDF)作成</button>
   </div>
-*}
   </div>
   {/if}
 
