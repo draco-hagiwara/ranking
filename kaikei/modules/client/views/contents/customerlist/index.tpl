@@ -71,8 +71,7 @@ function fmSubmit(formName, url, method, num) {
   <table class="table table-striped table-hover">
     <thead>
       <tr>
-        <th>ID</th>
-        <th>status</th>
+        <th>ID<br>status</th>
         <th>会社名<br>代表電話番号</th>
         <th>担当者<br>担当電話番号</th>
         <th>メールアドレス</th>
@@ -86,12 +85,10 @@ function fmSubmit(formName, url, method, num) {
       <tbody>
         <tr>
           <td>
-            {$cm.cm_seq}
-          </td>
-          <td>
-            {if $cm.cm_status == "0"}<font color="#ffffff" style="background-color:royalblue">[ 有効 ]</font>
-            {elseif $cm.cm_status == "1"}<font color="#ffffff" style="background-color:gray">[ 停止 ]</font>
-            {elseif $cm.cm_status == "2"}<font color="#ffffff" style="background-color:gray">[ 解約 ]</font>
+            {$cm.cm_seq}<br>
+            {if $cm.cm_status == "0"}<span class="label label-primary">有 効</span>
+            {elseif $cm.cm_status == "1"}<span class="label label-default">停 止</span>
+            {elseif $cm.cm_status == "2"}<span class="label label-default">解 約</span>
             {else}エラー
             {/if}
           </td>

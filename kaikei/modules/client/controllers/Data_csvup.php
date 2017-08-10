@@ -374,6 +374,96 @@ class Data_csvup extends MY_Controller
 
     }
 
+
+
+
+
+
+
+
+    // 受注案件情報CSV 検索ダウンロード
+    public function projects_csvdown()
+    {
+
+    	// 件数(max1000件)を取得。とりあえず制限をかけておきます
+    	$tmp_offset   = 0;
+    	$tmp_per_page = 1000;
+
+    	// セッションからフラッシュデータ読み込み
+    	$tmp_inputpost = array(
+		    	'pj_seq'            => $_SESSION['c_pj_seq'],
+		    	'pj_cm_seq'         => $_SESSION['c_pj_cm_seq'],
+		    	'pj_cm_company'     => $_SESSION['c_pj_cm_company'],
+		    	'pj_status'         => $_SESSION['c_pj_status'],
+		    	'pj_invoice_status' => $_SESSION['c_pj_invoice_status'],
+		    	'pj_accounting'     => $_SESSION['c_pj_accounting'],
+		    	'pj_salesman'       => $_SESSION['c_pj_salesman'],
+    			'orderid'           => $_SESSION['c_orderid'],
+    	 );
+
+    	// 受注案件情報の取得
+    	$this->load->model('Project', 'pj', TRUE);
+    	$query = $this->pj->get_csvdl_projectlist($tmp_inputpost, $tmp_per_page, $tmp_offset, $_SESSION['c_memGrp'], 'projects');
+
+    	// 作成したヘルパーを読み込む
+    	$this->load->helper(array('download', 'csvdata'));
+
+    	// ヘルパーに追加した関数を呼び出し、CSVデータ取得
+    	$get_dl_csv = csv_from_result($query);
+
+    	$file_name = 'dlcsv_projects_' . date('YmdHis') . '.csv';
+    	force_download($file_name, $get_dl_csv);
+
+//     	$this->view('data_csvup/customer_csvup.tpl');
+    	redirect('/projectlist/search/');
+
+    }
+
+    // 請求書情報CSV 検索ダウンロード
+    public function invoice_csvdown()
+    {
+
+    	// 件数(max1000件)を取得。とりあえず制限をかけておきます
+    	$tmp_offset   = 0;
+    	$tmp_per_page = 1000;
+
+    	// セッションからフラッシュデータ読み込み
+    	$tmp_inputpost = array(
+    			'iv_slip_no'    => $_SESSION['c_iv_slip_no'],
+    			'iv_cm_seq'     => $_SESSION['c_iv_cm_seq'],
+    			'iv_company'    => $_SESSION['c_iv_company'],
+    			'iv_status'     => $_SESSION['c_iv_status'],
+    			'iv_issue_yymm' => $_SESSION['c_iv_issue_yymm'],
+    			'orderid'       => $_SESSION['c_orderid']
+    	);
+
+    	// 請求書情報の取得
+    	$this->load->model('Invoice', 'iv', TRUE);
+    	$query = $this->iv->get_csvdl_invoicelist($tmp_inputpost, $tmp_per_page, $tmp_offset);
+
+    	// 作成したヘルパーを読み込む
+    	$this->load->helper(array('download', 'csvdata'));
+
+    	// ヘルパーに追加した関数を呼び出し、CSVデータ取得
+    	$get_dl_csv = csv_from_result($query);
+
+    	$file_name = 'dlcsv_invoicelist_' . date('YmdHis') . '.csv';
+    	force_download($file_name, $get_dl_csv);
+
+    	//     	$this->view('data_csvup/customer_csvup.tpl');
+    	redirect('/invoicelist/search/');
+
+    }
+
+
+
+
+
+
+
+
+
+
     // 入金データCSVのアップロード処理TOP
     public function receive()
     {

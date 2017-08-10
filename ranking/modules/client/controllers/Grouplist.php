@@ -25,10 +25,8 @@ class Grouplist extends MY_Controller
     {
 
     	// セッションデータをクリア
-    	$this->load->library('lib_auth');
-    	$this->lib_auth->delete_session('client');
-//     	$this->load->model('comm_auth', 'comm_auth', TRUE);
-//     	$this->comm_auth->delete_session('client');
+//     	$this->load->library('lib_auth');
+//     	$this->lib_auth->delete_session('client');
 
     	// バリデーション・チェック
     	$this->_set_validation();												// バリデーション設定
@@ -396,19 +394,17 @@ class Grouplist extends MY_Controller
     {
 
     	// セッションデータをクリア
-    	$this->load->library('lib_auth');
-    	$this->lib_auth->delete_session('client');
+//     	$this->load->library('lib_auth');
+//     	$this->lib_auth->delete_session('client');
 
     	// バリデーション設定
     	$this->_set_validation();
 
-    	// 設定グループのセット
-    	$this->load->library('lib_keyword');
-    	$this->lib_keyword->grouptag_set($_SESSION['c_memGrp'], NULL, 0);
-//     	$this->_group_set($_SESSION['c_memGrp'], NULL);
+//     	// 設定グループのセット
+//     	$this->load->library('lib_keyword');
+//     	$this->lib_keyword->grouptag_set($_SESSION['c_memGrp'], NULL, 0);
 
-
-    	$this->smarty->assign('disp01', FALSE);
+//     	$this->smarty->assign('disp01', FALSE);
     	$this->smarty->assign('tmp_new_memo', NULL);
 
     	$this->view('grouplist/add.tpl');
@@ -462,7 +458,7 @@ class Grouplist extends MY_Controller
     }
 
     // キーワード情報編集
-    public function chg_conf()
+    public function chg()
     {
 
     	$input_post = $this->input->post();
@@ -470,7 +466,7 @@ class Grouplist extends MY_Controller
 //     	if (!isset($input_post['gt_name']))
     	if ($input_post['gt_name'] == "")
     	{
-    		redirect('/grouplist/add/');
+    		redirect('/grouplist/chg/');
     	}
 
     	// バリデーション設定
@@ -479,7 +475,6 @@ class Grouplist extends MY_Controller
     	// 設定グループのセット
     	$this->load->library('lib_keyword');
     	$this->lib_keyword->grouptag_set($_SESSION['c_memGrp'], $input_post['gt_name'], 0);
-//     	$this->_group_set($_SESSION['c_memGrp'], $input_post['gt_name']);
 
     	// メモ欄読み込み
     	$this->load->model('Group_tag', 'gt', TRUE);
@@ -491,7 +486,7 @@ class Grouplist extends MY_Controller
     	$this->smarty->assign('tmp_memo', $get_gt_data[0]['gt_memo']);
     	$this->smarty->assign('tmp_new_memo', NULL);
 
-    	$this->view('grouplist/add.tpl');
+    	$this->view('grouplist/chg.tpl');
 
     }
 
@@ -538,7 +533,7 @@ class Grouplist extends MY_Controller
 	    			$set_rd_data['old_gt_name'] = "[" . $input_post['old_gt_name'] . "]";
 	    			$this->rd->update_rd_grp($set_rd_data);
 
-	    			$this->smarty->assign('mess01', "<font color=blue>グループ名が更新されました。</font>");
+	    			$this->smarty->assign('mess01', "<font color=blue>グループ名またはその内容が更新されました。</font>");
 
     			} else {
     				$set_kw_data['gt_name'] = $input_post['old_gt_name'];
@@ -564,7 +559,7 @@ class Grouplist extends MY_Controller
     			$set_rd_data['old_gt_name'] = "[" . $input_post['old_gt_name'] . "]";
     			$this->rd->update_rd_grp($set_rd_data);
 
-    			$this->smarty->assign('mess01', "<font color=blue>グループ名が削除されました。</font>");
+    			$this->smarty->assign('mess01', "<font color=blue>「" . $input_post['old_gt_name'] . "」グループ名が削除されました。</font>");
 
     		}else {
     			$set_kw_data['gt_name']     = $input_post['gt_name'];
@@ -584,7 +579,7 @@ class Grouplist extends MY_Controller
     	$this->smarty->assign('tmp_memo', $input_post['gt_memo']);
     	$this->smarty->assign('tmp_new_memo', NULL);
 
-    	$this->view('grouplist/add.tpl');
+    	$this->view('grouplist/chg.tpl');
 
     }
 

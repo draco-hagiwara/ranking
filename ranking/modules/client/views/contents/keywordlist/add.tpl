@@ -35,112 +35,111 @@
   <div class="form-group">
     <div class="col-md-offset-2 col-md-9">■ 対象URL<font color=red> *</font>：</div>
     <div class="col-md-offset-2 col-md-9">
-      {*form_input('kw_url' , set_value('kw_url', '') , 'id="set_url" class="form-control" placeholder="対象URLを入力してください。max.510文字。http://～"')*}
-      {form_input('kw_url' , set_value('kw_url', '') , 'class="form-control" placeholder="対象URLを入力してください。max.510文字。http://～"')}
-      {*form_input('kw_url' , set_value('kw_url', '') , 'id="id_url" class="form-control" placeholder="対象URLを入力してください。max.510文字。http://～"')*}
-      {*form_input('kw_url' , set_value('kw_url', '') , 'id="id_urlBox" class="form-control" placeholder="対象URLを入力してください。max.510文字。http://～"')*}
+      {form_input('kw_url' , set_value('kw_url', '') , 'id="set_url" class="form-control" placeholder="日本語URLの場合はエンコードしてから入力してください。http(s)://～ max.510文字。"')}
       {if form_error('kw_url')}<span class="label label-danger">Error : </span><label><font color=red>{form_error('kw_url')}</font></label>{/if}
     </div>
   </div>
 
 
-
 <script>
 $(function() {
-	  // 入力されたURLの存在有無をチェック
-	  $('#set_url').blur(function(e) {
-	    //console.log($('#set_url').val());
+  // 入力されたURLの存在有無をチェック
+  $('#set_url').blur(function(e) {
 
-	    var in_url = $("#set_url").val();
-	    //var in_url = "Origin: " + $("#id_urlBox").val();
-	    //console.log(in_url);
+    //var in_url = $("#set_url").val();
+    //var in_url = in_url.replace("https://", "");
+    //var in_url = in_url.replace("http://", "");
+    //var in_url_https = "https://" + in_url;
+    //var in_url_http  = in_url;
+    //console.log(in_url);
+    //console.log(in_url_https);
+    //console.log(in_url_http);
 
-	    $.ajax({
-	      url: "https://ranking.dev.local/index.php?url="+in_url,
-	      //url: "https://ranking.dev.local/client/check_url?url="+in_url,
-	      //url: in_url,
-	      type: 'GET',
-	      //async: true,
-	      //cache: false,
-	      dataType:'xml',
-	      //type: 'PATCH',
-	      //dataType: 'json',
-	      //headers: { 'X-Greeting': 'hello, world' },
-	      error: function(){
-		        console.log(in_url);
-	    	  alert('URLが存在しません');
-	      },
-	      success: function(xml){
-	        console.log(xml);
-	        alert('成功');
-	      },
-	    });
-	  });
+    $.ajax({
+        url: "/client/check_url/",
+        //url: "https://ranking.dev.local/client/check_url/",
+        type: 'POST',
+        timeout : 10000,																// タイムアウト:10秒
+        data: {
+            check_url: $("#set_url").val(),
+        },
+
+        /**
+         * Ajax通信が成功した場合に呼び出されるメソッド
+         */
+        success: function(data, dataType)
+        {
+            //successのブロック内は、Ajax通信が成功した場合に呼び出される
+            console.log(data);
+
+            //PHPから返ってきたデータの表示
+            http_code = data.split("/");
+
+            //console.log(http_code[0]);											// curl 実行時のステータスコード取得
+            //console.log(http_code[1]);											// http ステータスコード取得
+
+            // curl_code で判定
+            // https://curl.haxx.se/libcurl/c/libcurl-errors.html
+            if (http_code[0] != 0) {
+            	if (http_code[0] == 6) {
+            		alert("情報：入力された対象URLが見つかりません。\n　　　このままでよろしいですか？\n\ncurl_code : Couldn't resolve host. The given remote host was not resolved.");
+            	} else {
+            		alert("情報：入力された対象URLが見つかりません。\n　　　このままでよろしいですか？\n\ncurl_code : " + http_code[0]);
+            	}
+            }
+
+            // http_code で判定
+            if ((http_code[1] != 200) && (http_code[1] != 0)) {
+
+            	if (http_code[1] == 301) {
+            		alert("情報：入力された対象URLが見つかりません。\n　　　このままでよろしいですか？\n\n" + "301 Moved Permanently");
+            	} else if (http_code[1] == 302) {
+            		alert("情報：入力された対象URLが見つかりません。\n　　　このままでよろしいですか\n\n" + "302 Found");
+            	} else if (http_code[1] == 404) {
+            		alert("情報：入力された対象URLが見つかりません。\n　　　このままでよろしいですか？\n\n" + "404 Not Found");
+            	} else if (http_code[1] == 500) {
+            		alert("情報：入力された対象URLでエラーが発生しています。\n　　　このままでよろしいですか？\n\n" + "500 Internal Server Error");
+            	} else {
+            		alert("情報：入力された対象URLが見つかりません。\n　　　このままでよろしいですか？\n\nHTTPレスポンスコード : " + http_code[1]);
+            	}
+
+                //switch (http_code[1]) {
+			    //  case 301:
+			    //	    alert("情報：入力された対象URLが見つかりません。\n　　　このままでよろしいですか？\n" + "301 Moved Permanently");
+				//        break;
+			    //  case "302":
+			    //	    alert("情報：入力された対象URLが見つかりません。\n　　　このままでよろしいですか？\n" + "302 Found");
+				//        break;
+			    //  case 404:
+				//        alert("情報：入力された対象URLが見つかりません。\n　　　このままでよろしいですか？\n" + "404 Not Found");
+			    //    	  break;
+			    //  case 500:
+				//        alert("情報：入力された対象URLでエラーが発生しています。\n　　　このままでよろしいですか？\n" + "500 Internal Server Error");
+			    //    	  break;
+			    //  default:
+				//        // その他のステータスコードの時
+				//        alert("情報：入力された対象URLが見つかりません。\n　　　このままでよろしいですか？\n\n　HTTPレスポンスコード : " + http_code[1]);
+			    //    	  break;
+			    //}
+            }
+        },
+        /**
+         * Ajax通信が失敗した場合に呼び出されるメソッド
+         */
+        error: function(XMLHttpRequest, textStatus, errorThrown)
+        {
+            //通常はここでtextStatusやerrorThrownの値を見て処理を切り分けるか、単純に通信に失敗した際の処理を記述します。
+
+            //this;
+            //thisは他のコールバック関数同様にAJAX通信時のオプションを示します。
+
+            //エラーメッセージの表示
+            alert('Error : ' + errorThrown + "\n順位チェックツールサーバとの通信異常が発生しています。");
+        }
 	});
-</script>
-
-
-<script>
-$(function() {
-  // 入力されたURLの存在有無をチェック
-  $('#id_url').blur(function(e) {
-    console.log($('#id_url').val());
-
-    var in_url = $("#id_url").val();
-    console.log(in_url);
-
-    $.ajax({
-      url: in_url,
-      type:'GET',
-      dataType: 'jsonp',
-    }).done(function(data) {
-      alert("ok");
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-      $("#XMLHttpRequest").html("XMLHttpRequest : " + jqXHR.status);
-      $("#textStatus").html("textStatus : " + textStatus);
-      $("#errorThrown").html("errorThrown : " + errorThrown);
-    })
-    .always(function() {
-      alert("finishi");
-    })
-
   });
 });
 </script>
-
-<script>
-$(function() {
-  // 入力されたURLの存在有無をチェック
-  $('#id_urlBox').blur(function(e) {
-    console.log($('#id_urlBox').val());
-
-    var in_url = $("#id_urlBox").val();
-    //var in_url = "Origin: " + $("#id_urlBox").val();
-    console.log(in_url);
-
-    $.ajax({
-      url: in_url,
-      type: 'GET',
-      //type: 'PATCH',
-      //dataType: 'json',
-      //headers: { 'X-Greeting': 'hello, world' },
-      success: function(data){
-        console.log(data);
-        alert('成功');
-      },
-      error: function(){
-    	  alert('URLが存在しません');
-      }
-    });
-  });
-});
-</script>
-
-
-
-
-
 
 
   <div class="form-group">

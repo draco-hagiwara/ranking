@@ -205,7 +205,8 @@ class Group_tag extends CI_Model
 
     	// UPDATE
     	$where = array(
-		    			'gt_cl_seq' => $setdata['gt_cl_seq'],
+    					'gt_seq'    => $setdata['gt_seq'],
+    			 		'gt_cl_seq' => $setdata['gt_cl_seq'],
 		    			'gt_name'   => $setdata['gt_name'],
     	 );
 

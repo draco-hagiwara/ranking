@@ -111,9 +111,18 @@ array(
 );
 
 
+
+
+// メール送信：管理者
+$config['MAIL_ADMIN_ADDR'] = 's_hagiwara@dracoexpress.com';
+$config['MAIL_SEND_ADDR']  = 'auto-reply@ranking.dev.local';
+
+
+
+
 // Pagination 設定:1ページ当たりの表示件数
 // ※ ～/system/libraries/Pagination.php に不具合あり
-$config['PAGINATION_PER_PAGE'] = '25';
+$config['PAGINATION_PER_PAGE'] = '10';
 
 
 /* End of file config_comm.php */

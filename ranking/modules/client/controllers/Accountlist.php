@@ -37,10 +37,8 @@ class Accountlist extends MY_Controller
     {
 
     	// セッションデータをクリア
-    	$this->load->library('lib_auth');
-    	$this->lib_auth->delete_session('client');
-//     	$this->load->model('comm_auth', 'comm_auth', TRUE);
-//     	$this->comm_auth->delete_session('client');
+//     	$this->load->library('lib_auth');
+//     	$this->lib_auth->delete_session('client');
 
         // バリデーション・チェック
         $this->_set_validation();												// バリデーション設定
@@ -197,12 +195,20 @@ class Accountlist extends MY_Controller
 
     	// バリデーション・チェック
     	// 本人確認
-    	if ($_SESSION['c_memType'] == 1)
+    	if ($_SESSION['c_memType'] == 1 && ($_SESSION['c_memSeq'] != $input_post['ac_seq']))
     	{
     		$this->_set_validation02();									// 管理者
     	} else {
     		$this->_set_validation03();
     	}
+
+
+
+//     	print_r($_SESSION);
+//     	print("<br><br>");
+//     	print_r($input_post);
+//     	print("<br><br>");
+
 
     	if ($this->form_validation->run() == TRUE)
     	{
@@ -220,6 +226,15 @@ class Accountlist extends MY_Controller
 	    		$pw = TRUE;
 	    	}
 	    	unset($input_post["submit"]) ;
+
+
+
+
+// 	    	print_r($_SESSION['c_memSeq']);
+// 	    	print("<br>");
+// 	    	print_r($input_post['ac_seq']);
+// 	    	print("<br>");
+
 
 	    	if ($_SESSION['c_memSeq'] == $input_post['ac_seq'])
 	    	{
@@ -361,16 +376,16 @@ class Accountlist extends MY_Controller
      private function _set_validation02()
      {
      	$rule_set = array(
-		     	array(
-		     			'field'   => 'ac_type',
-		     			'label'   => '管理種類選択',
-		     			'rules'   => 'trim|required|is_numeric|max_length[2]'
-		     	),
-		     	array(
-		     			'field'   => 'ac_status',
-		     			'label'   => 'ステータス選択',
-		     			'rules'   => 'trim|required|is_numeric|max_length[2]'
-		     	),
+// 		     	array(
+// 		     			'field'   => 'ac_type',
+// 		     			'label'   => '管理種類選択',
+// 		     			'rules'   => 'trim|required|is_numeric|max_length[2]'
+// 		     	),
+// 		     	array(
+// 		     			'field'   => 'ac_status',
+// 		     			'label'   => 'ステータス選択',
+// 		     			'rules'   => 'trim|required|is_numeric|max_length[2]'
+// 		     	),
 		     	array(
 		     			'field'   => 'ac_department',
 		     			'label'   => '所属部署',
@@ -391,11 +406,11 @@ class Accountlist extends MY_Controller
 		     			'label'   => 'ログインID',
 		     			'rules'   => 'trim|required|max_length[50]|valid_email'
 		     	),
-		     	array(
-		     			'field'   => 'ac_pw',
-		     			'label'   => 'パスワード',
-		     			'rules'   => 'trim|regex_match[/^[\x21-\x7e]+$/]|min_length[8]|max_length[50]'
-		     	),
+// 		     	array(
+// 		     			'field'   => 'ac_pw',
+// 		     			'label'   => 'パスワード',
+// 		     			'rules'   => 'trim|required|regex_match[/^[\x21-\x7e]+$/]|min_length[8]|max_length[50]'
+// 		     	),
 		     	array(
 		     			'field'   => 'ac_keyword',
 		     			'label'   => 'キーワード',
@@ -443,7 +458,7 @@ class Accountlist extends MY_Controller
     			array(
     					'field'   => 'ac_pw',
     					'label'   => 'パスワード',
-    					'rules'   => 'trim|regex_match[/^[\x21-\x7e]+$/]|min_length[8]|max_length[50]'
+    					'rules'   => 'trim|required|regex_match[/^[\x21-\x7e]+$/]|min_length[8]|max_length[50]'
     			),
     	);
 

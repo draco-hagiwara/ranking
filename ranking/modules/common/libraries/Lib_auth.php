@@ -234,6 +234,9 @@ class Lib_auth
             case 'admin':
 
             	// 管理者のみログインを許可
+            	/*
+            	 * 「cl_status:99,info@seo.com.dev」のみを許可中
+            	 */
             	$sql = 'SELECT cl_seq, cl_status, cl_id, cl_pw, cl_login_cnt, cl_login_lock, cl_login_time '
             			. 'FROM mt_client '
             			. 'WHERE cl_status  = 99 '

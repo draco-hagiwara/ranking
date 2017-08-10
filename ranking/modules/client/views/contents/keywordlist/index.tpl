@@ -3,11 +3,30 @@
 
   <link href="{base_url()}../../css/my/keywordlist.css" rel="stylesheet">
 
+<style>
+.popover {
+    max-width: 500px;
+}
+</style>
+
+
 <body>
 {* ヘッダー部分　END *}
 
   <script src="{base_url()}../../js/my/fmsubmit.js"></script>
-  <script src="{base_url()}../../js/my/toggleslide.js"></script>
+  {* <script src="{base_url()}../../js/my/toggleslide.js"></script> *}
+
+{* POP-Over *}
+<script src="{base_url()}../../js/my/popover.js"></script>
+
+<script>
+$(function(){
+    $("#kwMenu dt").on("click", function() {
+        $(this).next().slideToggle();
+        $(this).toggleClass("active");//追加部分
+    });
+});
+</script>
 
 <div id="contents" class="container">
 
@@ -33,7 +52,7 @@
         <td class="col-md-2  btn-md">
           {form_dropdown('kw_status', $options_kw_status, set_value('kw_status', {$seach_kw_status}))}
         </td>
-        <td class="col-md-1">ID並び替え</td>
+        <td class="col-md-1">並び替え</td>
         <td class="col-md-2  btn-md">
           {form_dropdown('orderid', $options_orderid, set_value('orderid', {$seach_orderid}))}
         </td>
@@ -61,41 +80,45 @@
 {form_open('/keywordlist/detail/' , 'name="detailForm" class="form-horizontal"')}
 
 
-  <dl id="acMenu">
+  <dl id="kwMenu">
 
   {$old_rootdomain = ""}
   {foreach from=$list item=kw}
   {if $old_rootdomain != $kw.kw_rootdomain}
     {$old_rootdomain = $kw.kw_rootdomain}
-    </dd><dt style="font-size:24px;color:#000000;">　{$kw.kw_rootdomain}</dt><dd>
+    </dd><dt style="font-size:16px;color:#000000;">&emsp; {$kw.kw_rootdomain}</dt><dd>
   {/if}
     <div class="row">
-      <div class="col-md-1">
+      <div class="col-md-10">
         {if $kw.kw_status == "1"}<span class="label label-primary">有効</span>
         {elseif $kw.kw_status == "0"}<span class="label label-default">無効</span>
         {else}エラー
         {/if}
-     </div>
-     <div class="col-md-11 text-right">
-        <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/keyworddetail/detail/', 'POST', '{$kw.kw_seq}', 'chg_seq');">詳　細</button>
+        {if $kw.kw_searchengine==0}<span class="label" style="background-color:#0000ff;">Google</span>{elseif $kw.kw_searchengine==1}<span class="label" style="background-color:#dc143c;">Yahoo!</span>{else}error{/if}
+        ID:{$kw.kw_seq} ,【{$kw.kw_keyword}】
+        <button type="button" class="btn btn-default  btn-xs" data-container="body" data-toggle="popover" data-placement="right"
+          data-content="<b>【ルートドメイン】</b>{$kw.kw_rootdomain}<br>
+                        <b>【URL一致方式】</b>{if $kw.kw_matchtype==0}完全一致{elseif $kw.kw_matchtype==1}前方一致{elseif $kw.kw_matchtype==2}ドメイン一致{elseif $kw.kw_matchtype==3}ルートドメイン一致{else}error{/if}<br>
+                        <b>【デバイス】</b>{if $kw.kw_device==0}PC{elseif $kw.kw_device==1}Mobile{else}error{/if}<br>
+                        <b>【ロケーション】</b>{$kw.kw_location_name}<br>
+                        <b>【最大取得順位】</b>{if $kw.kw_maxposition==0}100件{elseif $kw.kw_maxposition==1}200件{elseif $kw.kw_maxposition==2}300件{else}error{/if}<br>
+                        <b>【データ取得回数】</b>{if $kw.kw_trytimes==0}1回{elseif $kw.kw_trytimes==1}2回{elseif $kw.kw_trytimes==2}3回{else}error{/if}<br>
+                        <b>【設定グループ】</b>{$kw.kw_group}<br>
+                        <b>【設定タグ】</b>{$kw.kw_tag}<br>
+                        <b>【メモ】</b>{if isset($me_list[$kw.kw_seq])}{foreach from=$me_list[$kw.kw_seq] item=me}<tbody><tr><td><br>{$me}</td></tr></tbody>{/foreach}{/if}<br>
+                       ">
+          詳細表示
+        </button>
+      </div>
+     <div class="col-md-2 text-right">
         {*
+        <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/keyworddetail/detail/', 'POST', '{$kw.kw_seq}', 'chg_seq');">詳　細</button>
         <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/keyworddetail/report/', 'POST', '{$kw.kw_seq}', 'chg_seq');">report</button>
         <button type="button" class="btn {if $kw.wt_seq}btn-warning{else}btn-success{/if} btn-xs" onclick="fmSubmit('detailForm', '/client/keywordlist/watchlist/', 'POST', '{$kw.kw_seq}', 'chg_seq');">☆ウォッチ</button>
         *}
         {if $smarty.session.c_memKw==1}
           <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/keywordlist/chg/', 'POST', '{$kw.kw_seq}', 'chg_seq');">編　集</button>
         {/if}
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-        ID:{$kw.kw_seq}
-        , 【{$kw.kw_keyword}】
-        , {if $kw.kw_matchtype==0}完全一致{elseif $kw.kw_matchtype==1}前方一致{elseif $kw.kw_matchtype==2}ドメイン一致{elseif $kw.kw_matchtype==3}ルートドメイン一致{else}error{/if}
-        , {if $kw.kw_searchengine==0}<font color="#0000ff">Google</font>{elseif $kw.kw_searchengine==1}<font color="#dc143c">Yahoo!</font>{else}error{/if}
-        , {if $kw.kw_device==0}PC{elseif $kw.kw_device==1}Mobile{else}error{/if}
-        , 【{$kw.kw_location_name}】
-
       </div>
     </div>
     <div class="row">
@@ -116,12 +139,12 @@
 
       <tbody>
         <tr>
-          <td>
+          <td class="text-center">
             rank
           </td>
           {foreach from=$tbl_y_data{$kw.kw_seq} item=y_data}
-            <td class="text-right">
-              {$y_data}
+            <td class="text-center">
+              <small>{$y_data}</small>
             </td>
           {/foreach}
         </tr>

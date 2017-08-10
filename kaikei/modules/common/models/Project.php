@@ -312,6 +312,197 @@ class Project extends CI_Model
         return array($project_list, $project_countall);
     }
 
+
+
+
+
+
+
+
+    /**
+     * CSVダウンロード：受注案件情報の取得
+     *
+     * @param    array() : 検索項目値
+     * @param    int     : 1ページ当たりの表示件数(LIMIT値)
+     * @param    int     : オフセット値(ページ番号)
+     * @param    int     : クライアントSEQ（接続先テーブルを切替）
+     * @param    char    : 接続先DB
+     * @return   array()
+     */
+    public function get_csvdl_projectlist($get_post, $tmp_per_page, $tmp_offset=0, $client_no, $db_name='default')
+    {
+
+    	// 各SQL項目へセット
+    	// WHERE
+    	$set_select_like["pj_seq"]        = $get_post['pj_seq'];
+    	$set_select_like["pj_cm_seq"]     = $get_post['pj_cm_seq'];
+    	$set_select_like["pj_cm_company"] = $get_post['pj_cm_company'];
+
+    	$set_select["pj_status"]          = $get_post['pj_status'];
+    	$set_select["pj_invoice_status"]  = $get_post['pj_invoice_status'];
+    	$set_select["pj_accounting"]      = $get_post['pj_accounting'];
+    	$set_select["pj_salesman"]        = $get_post['pj_salesman'];
+
+    	// ORDER BY
+    	if ($get_post['orderid'] == 'ASC')
+    	{
+    		$set_orderby["pj_seq"] = $get_post['orderid'];
+    	}else {
+    		$set_orderby["pj_seq"] = 'DESC';
+    	}
+
+    	// 対象受注案件情報の取得
+    	$query = $this->_select_dlprojectlist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset, $client_no, $db_name);
+
+    	return $query;
+
+    }
+
+    /**
+     * CSVダウンロード：受注案件情報の取得
+     *
+     * @param    array() : WHERE句項目
+     * @param    array() : ORDER BY句項目
+     * @param    int     : 1ページ当たりの表示件数
+     * @param    int     : オフセット値(ページ番号)
+     * @param    int     : クライアントSEQ（接続先テーブルを切替）
+     * @param    char    : 接続先DB
+     * @return   array()
+     */
+    public function _select_dlprojectlist($set_select, $set_select_like, $set_orderby, $tmp_per_page, $tmp_offset=0, $client_no, $db_name)
+    {
+
+    	$tb_name1 = 'tb_project_' . $client_no;
+    	$tb_name2 = 'tb_project_detail_' . $client_no;
+
+    	$sql = 'SELECT
+                  pj_seq,
+                  pj_status as "ステータス",
+                  pj_invoice_status as "発行ステータス",
+                  pj_start_date as "契約開始日",
+                  pj_end_date as "契約終了日",
+                  pj_renew_chk as "契約延長",
+                  pj_keyword as "検索キーワード",
+                  pj_url as "対象URL",
+                  pj_target as "順位取得対象",
+                  pj_language as "対象言語",
+                  pj_accounting as "課金方式",
+                  pj_url_match as "URL一致方式",
+                  pj_billing as "固定請求金額",
+                  pj_cm_seq as "顧客番号",
+                  pj_cm_company as "会社名",
+                  pj_salesman as "担当営業",
+				  T1.pjd_order_no as "成功：1～10の連番キー",
+				  T1.pjd_rank_str as "開始順位",
+				  T1.pjd_rank_end as "終了順位",
+				  T1.pjd_billing as "請求金額"
+                FROM ' . $tb_name1 . ' LEFT JOIN ' . $tb_name2 . ' AS T1 on (`pj_seq` = `pjd_pj_seq`) WHERE '
+        ;
+
+        // pj_status 判定
+        if ($set_select["pj_status"] == 2)
+        {
+        	$sql .= ' pj_delflg = 1 ';
+        } else {
+        	$sql .= ' pj_delflg = 0 ';
+        }
+
+        if ($set_select["pj_status"] != '')                                                 // 受注案件ステータス
+        {
+        	$sql .= ' AND `pj_status`  = ' . $set_select["pj_status"];
+        }
+        if ($set_select["pj_invoice_status"] != '')                                         // 請求書発行ステータス
+        {
+        	$sql .= ' AND `pj_invoice_status`  = ' . $set_select["pj_invoice_status"];
+        }
+        if ($set_select["pj_accounting"] != '')                                             // 課金方式
+        {
+        	$sql .= ' AND `pj_accounting`  = ' . $set_select["pj_accounting"];
+        }
+        if ($set_select["pj_salesman"] != '')                                               // 担当営業
+        {
+        	$sql .= ' AND `pj_salesman`  = ' . $set_select["pj_salesman"];
+        }
+
+        // WHERE文 作成
+        foreach ($set_select_like as $key => $val)
+        {
+        	if (isset($val) && $val != '')
+        	{
+        		$sql .= ' AND ' . $key . ' LIKE \'%' . $this->db->escape_like_str($val) . '%\'';
+        	}
+        }
+
+        // ORDER BY文 作成
+        $tmp_firstitem = FALSE;
+        foreach ($set_orderby as $key => $val)
+        {
+        	if (isset($val) && $val != '')
+        	{
+        		if ($tmp_firstitem == FALSE)
+        		{
+        			$sql .= ' ORDER BY ' . $key . ' ' . $val;
+        			$tmp_firstitem = TRUE;
+        		} else {
+        			$sql .= ' , ' . $key . ' ' . $val;
+        		}
+        	}
+        }
+        if ($tmp_firstitem == FALSE)
+        {
+        	$sql .= ' ORDER BY pj_seq DESC';                                    // デフォルト
+        }
+        $sql .= ' , pjd_order_no ASC';
+
+        // 対象全件数を取得
+        // 接続先DBを選択 ＆ クエリー実行
+        if ($db_name == 'default')
+        {
+
+        	$query = $this->db->query($sql);
+
+        	// LIMIT ＆ OFFSET 値をセット
+        	$sql .= ' LIMIT ' . $tmp_per_page . ' OFFSET ' . $tmp_offset;
+
+        	// クエリー実行
+        	$query = $this->db->query($sql);
+
+        } else {
+
+        	$slave_db = $this->load->database($db_name, TRUE);                      // 順位チェックツールDBへ接続
+
+        	// LIMIT ＆ OFFSET 値をセット
+        	$sql .= ' LIMIT ' . $tmp_per_page . ' OFFSET ' . $tmp_offset;
+
+
+
+
+
+//         	print($sql);
+//         	print("<br><br>");
+//         	exit;
+
+
+
+
+
+
+        	// クエリー実行
+        	$query = $slave_db->query($sql);
+        }
+
+        return $query;
+
+
+    }
+
+
+
+
+
+
+
+
     /**
      * 受注案件情報データの件数を取得する
      *

@@ -10,7 +10,15 @@ dirpath='/var/www/ranking/backup'
 #filename1=db_mysqldump_`date +%Y%m%d-%H%M%S`
 #filename2=invoice_mysqldump_`date +%Y%m%d`
 #filename4=projects_mysqldump_`date +%Y%m%d`
-filename3=seorank_mysqldump_`date +%Y%m%d`
+#filename3=seorank_mysqldump_`date +%Y%m%d`
+
+# 手動バックアップを判定
+if [ $1 = 1 ]; then
+  filename3=seorank_mysqldump_`date +%Y%m%d%H%M%S`
+else
+  filename3=seorank_mysqldump_`date +%Y%m%d`
+fi
+
 
 # mysqldump実行（ファイルサイズ圧縮の為gzで圧縮しておきます。）
 #/opt/lampp/bin/mysqldump --opt --all-databases --events --default-character-set=binary -u root --password=db!mp | gzip > $dirpath/$filename1.sql.gz

@@ -77,7 +77,7 @@
 
 <!-- </form> -->
 
-
+{*
 {form_open("rootdomainlist/search/{$seach_page_no}/" , 'name="detailForm" class="form-horizontal"')}
 
     <div class="col-sm-offset-5 col-sm-1">
@@ -88,7 +88,7 @@
   </div>
 
 {form_close()}
-
+*}
 
 
 <br><br>

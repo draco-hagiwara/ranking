@@ -1,0 +1,38 @@
+/*<style>*/
+.textOverflow {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.textOverflow {
+  text-overflow: ellipsis;
+  -webkit-text-overflow: ellipsis;  /* Safari */
+  -o-text-overflow: ellipsis;       /* Opera */
+}
+
+#acMenu dt{
+  display:block;
+  cursor:pointer;
+  background:url(../../images/user/plusminus01-001.gif) 1px 2px no-repeat;
+  /* background:url({base_url()}../../images/user/plusminus01-001.gif) 1px 10px no-repeat; */
+}
+#acMenu dd{
+  background:#f2f2f2;
+  display:none;
+}
+#acMenu dt.active{
+  background:url(../../images/user/plusminus01-021.gif) 1px 2px no-repeat;
+  /* background:url({base_url()}../../images/user/plusminus01-021.gif) 1px 10px no-repeat; */
+}
+
+#kwMenu dt{
+  cursor:pointer;
+  background:url(../../images/user/plusminus01-021.gif) 0px 2px no-repeat;
+}
+#kwMenu dd{
+  background:#f2f2f2;
+}
+#kwMenu dt.active{
+  display:block;
+  background:url(../../images/user/plusminus01-001.gif) 1px 2px no-repeat;
+}
+/*</style>*/

@@ -87,6 +87,12 @@ class Pdf_create extends MY_Controller
         // 更新対象データの取得
         $input_post = $this->input->post();
 
+
+//         print_r($input_post);
+//         exit;
+
+
+
         // 「キャンセル」ボタンで更新＆一覧表示！
         if ($input_post['_submit'] == 'submit')
         {

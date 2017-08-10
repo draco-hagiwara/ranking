@@ -79,29 +79,28 @@
       </tr>
     </thead>
 
-
     {foreach from=$list item=rd}
-      <tbody>
-        <tr>
-          <td>
-            {$rd.rd_seq}
-          </td>
-          <td class="text-left">
-            {$rd.rd_rootdomain}
-          </td>
-          <td class="text-left">
-            {$rd.rd_sitename}
-          </td>
-          <td class="text-center">
-            {$rd.rd_keyword_cnt|number_format}
-          </td>
-          <td class="text-right">
-            <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/rootdomainlist/detail/', 'POST', '{$rd.rd_seq}', 'chg_seq');">一 覧</button>
-            <button type="button" class="btn {if $rd.wt_seq}btn-warning{else}btn-success{/if} btn-xs" onclick="fmSubmit('detailForm', '/client/rootdomainlist/watchlist/', 'POST', '{$rd.rd_seq}', 'chg_seq');">★ウォッチ</button>
-            <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/rootdomainlist/chg/', 'POST', '{$rd.rd_seq}', 'chg_seq');">編　集</button>
-          </td>
-        </tr>
-      </tbody>
+    <tbody>
+      <tr>
+        <td>
+          {$rd.rd_seq}
+        </td>
+        <td class="text-left">
+          {$rd.rd_rootdomain}
+        </td>
+        <td class="text-left">
+          {$rd.rd_sitename}
+        </td>
+        <td class="text-center">
+          {$rd.rd_keyword_cnt|number_format}
+        </td>
+        <td class="text-right">
+          <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/top/search/', 'POST', '{$rd.rd_rootdomain}', 'sel_rdname');">一 覧</button>
+          <button type="button" class="btn {if $rd.wt_ac_seq==$smarty.session.c_memSeq}btn-warning{else}btn-success{/if} btn-xs" onclick="fmSubmit('detailForm', '/client/rootdomainlist/watchlist/', 'POST', '{$rd.rd_seq}', 'chg_seq');">★ウォッチ</button>
+          <button type="button" class="btn btn-success btn-xs" onclick="fmSubmit('detailForm', '/client/rootdomainlist/chg/', 'POST', '{$rd.rd_seq}', 'chg_seq');">編 集</button>
+        </td>
+      </tr>
+    </tbody>
     {foreachelse}
       検索結果はありませんでした。
     {/foreach}

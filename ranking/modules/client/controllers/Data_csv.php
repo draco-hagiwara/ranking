@@ -346,12 +346,39 @@ class Data_csv extends MY_Controller
     public function kwlist_csvup()
     {
 
-    	set_time_limit(0);
+
+
+    	require_once '/var/www/ranking/vendor/autoload.php';
+    	//require_once '/var/www/ranking/vendor/zendframework/zend-validator/src/Hostname.php';
+    	//require_once '/var/www/ranking/vendor/zendframework/zend-validator/src/AbstractValidator.php';
+    	//require_once '/var/www/ranking/vendor/zendframework/zend-stdlib/src/StringUtils.php';
+    	//$validator = new Zend_Validate_Hostname();
+    	//$validator = new Hostname();
+    	$validator = new Zend\Validator\Hostname();
+
+
+
+
+
+
+    	/*
+    	 * ベンチマーク
+    	 * https://github.com/devster/ubench
+    	 */
+    	require_once '/var/www/ranking/vendor/ubench/Ubench.php';
+    	$bench = new Ubench;
+
+    	//処理時間の計測開始
+    	$bench->start();
+
+
+
+    	//set_time_limit(0);
     	/*
     	 * /opt/lampp/etc/php.ini
     	 *   memory_limit=1024M
     	 */
-    	ini_set('memory_limit', '1024M');
+    	ini_set('memory_limit', '128M');
 
 
     	$input_post = $this->input->post();
@@ -376,7 +403,7 @@ class Data_csv extends MY_Controller
     		$up_mess .= "<br><font color=blue>>> CSVファイルのバリデーションチェックを開始しました。</font><br><br>";
     		$_upload_data = $this->upload->data();
     	} else {
-    		$up_mess .= "<br><font color=red>>> CSVファイルの読み込みに失敗しました。</font><br><br>";
+    		$up_mess .= "<br><font color=red>>> ERROR:CSVファイルの読み込みに失敗しました。</font><br><br>";
     		$up_mess .= $this->upload->display_errors(' <p style="color:red;">', '</p>');
 
     		$this->smarty->assign('up_mess02', $up_mess);
@@ -390,6 +417,19 @@ class Data_csv extends MY_Controller
     		$_csv_data = $this->lib_csvparser->parse();
     	} catch (Exception $e){
     		$up_mess .= "<font color=red>エラー発生:" . $e->getMessage() . '</font><br><br>';
+
+    		$this->smarty->assign('up_mess02', $up_mess);
+    		$this->view('data_csv/project_csvup.tpl');
+    		return;
+    	}
+
+    	/*
+    	 * アップロード件数を100件に制限
+    	 */
+    	if (count($_csv_data) >= 101)
+    	{
+    		$up_mess .= "<br><font color=red>>> ERROR:対象レコード件数が100件を超えています。</font><br><br>";
+    		$up_mess .= $this->upload->display_errors(' <p style="color:red;">', '</p>');
 
     		$this->smarty->assign('up_mess02', $up_mess);
     		$this->view('data_csv/project_csvup.tpl');
@@ -410,7 +450,7 @@ class Data_csv extends MY_Controller
     				if ($val02 != "")
     				{
 	    				// 数字型＆文字列の長さチェック
-	    				if ($this->lib_validator->checkRange($val02, 0, 9999999999))
+	    				if ($this->lib_validator->checkRange($val02, 0, 4294967295))
 	    				{
 	    				} else {
 	    					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
@@ -419,18 +459,43 @@ class Data_csv extends MY_Controller
     				}
     			}
 
-    			if ($j === 1)	// ステータス : kw_status
+    			if ($j === 1)	// seq : kw_cl_seq
     			{
-    				// 数字型＆文字列の長さチェック
-    				if ($this->lib_validator->checkRange($val02, 0, 2))
+    				if ($val02 != "")
     				{
-    				} else {
-    					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
-    					$up_errflg = TRUE;
+    					// 数字型＆文字列の長さチェック
+    					if ($this->lib_validator->checkRange($val02, 0, 4294967295))
+    					{
+    					} else {
+    						$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
+    						$up_errflg = TRUE;
+    					}
     				}
     			}
 
-    			if ($j === 2)	// 対象URL : kw_url
+    			if ($j === 2)	// ステータス : kw_status
+    			{
+    				// 入力文字のチェック＆変換
+    				if ($val02 == "無効")
+    				{
+    					$_csv_data[$key01]['ステータス'] = 0;
+    				} elseif ($val02 == "有効") {
+    					$_csv_data[$key01]['ステータス'] = 1;
+    				} else {
+    					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で入力文字指定エラー。<br>";
+    					$up_errflg = TRUE;
+    				}
+
+//     				// 数字型＆文字列の長さチェック
+//     				if ($this->lib_validator->checkRange($val02, 0, 2))
+//     				{
+//     				} else {
+//     					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
+//     					$up_errflg = TRUE;
+//     				}
+    			}
+
+    			if ($j === 3)	// 対象URL : kw_url
     			{
     				// 文字列の長さチェック : max510
     				if ($this->lib_validator->checkLength($val02, 0, 510))
@@ -438,6 +503,21 @@ class Data_csv extends MY_Controller
     					// URLチェック
     					if ($this->lib_validator->checkUri($val02))
     					{
+
+    						/*
+    						 * 国際化ドメイン対応チェック
+    						 * zendframework/zend-validator を使用
+    						 */
+    						$chk_domain = preg_replace("/^https?:\/\/(www\.)?|\/(.*)/i", "", $val02);
+    						if ($validator->isValid($chk_domain)) {
+    							// ホスト名は正しい形式のようです
+    						} else {
+    							// 不正な形式なので、理由を表示します
+    							foreach ($validator->getMessages() as $message) {
+    								$up_mess .= $_line_no . "行目:「" . $key02 . "」項目でエラー。" . $message . "<br>";
+    								$up_errflg = TRUE;
+    							}
+    						}
 
     					} else {
     						$up_mess .= $_line_no . "行目:「" . $key02 . "」項目でURL形式エラー。<br>";
@@ -450,29 +530,43 @@ class Data_csv extends MY_Controller
     				}
     			}
 
-    			if ($j === 3)	// ドメイン : kw_domain
+    			if ($j === 4)	// ドメイン : kw_domain
     			{
     				// 文字列の長さチェック : max100
     				if ($this->lib_validator->checkLength($val02, 0, 255))
     				{
+
+    					/*
+    					 * ここは未使用。
+    					 * 上記「kw_url」から「kw_domain」求めている。
+    					 * zendframework/zend-validator
+    					 */
+
     				} else {
     					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で文字数(max.255)エラー。<br>";
     					$up_errflg = TRUE;
     				}
     			}
 
-    			if ($j === 4)	// ルートドメイン : kw_rootdomain
+    			if ($j === 5)	// ルートドメイン : kw_rootdomain
     			{
     				// 文字列の長さチェック : max100
     				if ($this->lib_validator->checkLength($val02, 0, 255))
     				{
+
+    					/*
+    					 * ここは未使用。
+    					 * 上記「kw_url」から「kw_rootdomain」求めている。
+    					 * zendframework/zend-validator
+    					 */
+
     				} else {
     					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で文字数(max.255)エラー。<br>";
     					$up_errflg = TRUE;
     				}
     			}
 
-    			if ($j === 5)	// 検索キーワード : kw_keyword
+    			if ($j === 6)	// 検索キーワード : kw_keyword
     			{
     				// 文字列の長さチェック : max100
     				if ($this->lib_validator->checkLength($val02, 0, 100))
@@ -483,40 +577,91 @@ class Data_csv extends MY_Controller
     				}
     			}
 
-    			if ($j === 6)	// URL一致方式 : kw_matchtype
+    			if ($j === 7)	// URL一致方式 : kw_matchtype
     			{
-    				// 数字型＆文字列の長さチェック
-    				if ($this->lib_validator->checkRange($val02, 0, 3))
+    				// 入力文字のチェック＆変換
+    				if ($val02 == "完全一致")
     				{
+    					$_csv_data[$key01]['URL一致方式'] = 0;
+    				} elseif ($val02 == "前方一致") {
+    					$_csv_data[$key01]['URL一致方式'] = 1;
+    				} elseif ($val02 == "ドメイン一致") {
+    					$_csv_data[$key01]['URL一致方式'] = 2;
+    				} elseif ($val02 == "ルートドメイン一致") {
+    					$_csv_data[$key01]['URL一致方式'] = 3;
     				} else {
-    					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
+    					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で入力文字指定エラー。<br>";
     					$up_errflg = TRUE;
+    				}
+
+//     				// 数字型＆文字列の長さチェック
+//     				if ($this->lib_validator->checkRange($val02, 0, 3))
+//     				{
+//     				} else {
+//     					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
+//     					$up_errflg = TRUE;
+//     				}
+    			}
+
+    			if ($j === 8)	// 検索エンジン選択 : kw_searchengine
+    			{
+    				// 入力文字のチェック＆変換
+    				if ($val02 == "Google")
+    				{
+    					$_csv_data[$key01]['検索エンジン選択'] = 0;
+    				} elseif ($val02 == "Yahoo!") {
+    					$_csv_data[$key01]['検索エンジン選択'] = 1;
+    				} else {
+    					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で入力文字指定エラー。<br>";
+    					$up_errflg = TRUE;
+    				}
+
+//     				// 数字型＆文字列の長さチェック
+//     				if ($this->lib_validator->checkRange($val02, 0, 1))
+//     				{
+//     				} else {
+//     					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
+//     					$up_errflg = TRUE;
+//     				}
+    			}
+
+    			if ($j === 9)	// デバイス選択 : kw_device
+    			{
+    				// 入力文字のチェック＆変換
+    				if ($val02 == "ＰＣ版")
+    				{
+    					$_csv_data[$key01]['デバイス選択'] = 0;
+    				} elseif ($val02 == "モバイル版") {
+    					$_csv_data[$key01]['デバイス選択'] = 1;
+    				} else {
+    					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で入力文字指定エラー。<br>";
+    					$up_errflg = TRUE;
+    				}
+
+//     				// 数字型＆文字列の長さチェック
+//     				if ($this->lib_validator->checkRange($val02, 0, 1))
+//     				{
+//     				} else {
+//     					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
+//     					$up_errflg = TRUE;
+//     				}
+    			}
+
+    			if ($j === 10)	// seq : kw_location_id
+    			{
+    				if ($val02 != "")
+    				{
+    					// 数字型＆文字列の長さチェック
+    					if ($this->lib_validator->checkRange($val02, 0, 4294967295))
+    					{
+    					} else {
+    						$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
+    						$up_errflg = TRUE;
+    					}
     				}
     			}
 
-    			if ($j === 7)	// 検索エンジン選択 : kw_searchengine
-    			{
-    				// 数字型＆文字列の長さチェック
-    				if ($this->lib_validator->checkRange($val02, 0, 1))
-    				{
-    				} else {
-    					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
-    					$up_errflg = TRUE;
-    				}
-    			}
-
-    			if ($j === 8)	// デバイス選択 : kw_device
-    			{
-    				// 数字型＆文字列の長さチェック
-    				if ($this->lib_validator->checkRange($val02, 0, 1))
-    				{
-    				} else {
-    					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
-    					$up_errflg = TRUE;
-    				}
-    			}
-
-    			if ($j === 9)	// Canonical Name : kw_location_name
+    			if ($j === 11)	// Canonical Name : kw_location_name
     			{
     				// 文字列の長さチェック : max100
     				if ($this->lib_validator->checkLength($val02, 0, 100))
@@ -527,7 +672,7 @@ class Data_csv extends MY_Controller
     				}
     			}
 
-    			if ($j === 10)	// 最大取得順位 : kw_maxposition
+    			if ($j === 12)	// 最大取得順位 : kw_maxposition
     			{
     				// 数字型＆文字列の長さチェック
     				if ($this->lib_validator->checkRange($val02, 0, 2))
@@ -538,7 +683,7 @@ class Data_csv extends MY_Controller
     				}
     			}
 
-    			if ($j === 11)	// データ取得回数 : kw_trytimes
+    			if ($j === 13)	// データ取得回数 : kw_trytimes
     			{
     				// 数字型＆文字列の長さチェック
     				if ($this->lib_validator->checkRange($val02, 0, 2))
@@ -549,7 +694,7 @@ class Data_csv extends MY_Controller
     				}
     			}
 
-    			if ($j === 12)	// 設定グループ : kw_group
+    			if ($j === 14)	// 設定グループ : kw_group
     			{
     				// 文字列の長さチェック : max100
     				if ($this->lib_validator->checkLength($val02, 0, 50))
@@ -560,7 +705,7 @@ class Data_csv extends MY_Controller
     				}
     			}
 
-    			if ($j === 13)	// 設定タグ : kw_tag
+    			if ($j === 15)	// 設定タグ : kw_tag
     			{
     				// 文字列の長さチェック : max100
     				if ($this->lib_validator->checkLength($val02, 0, 1000))
@@ -568,6 +713,49 @@ class Data_csv extends MY_Controller
     				} else {
     					$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で文字数(max.1000)エラー。<br>";
     					$up_errflg = TRUE;
+    				}
+    			}
+
+//     			if ($j === 16)	// seq : wt_seq
+//     			{
+//     				if ($val02 != "")
+//     				{
+//     					// 数字型＆文字列の長さチェック
+//     					if ($this->lib_validator->checkRange($val02, 0, 4294967295))
+//     					{
+//     					} else {
+//     						$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
+//     						$up_errflg = TRUE;
+//     					}
+//     				}
+//     			}
+
+//     			if ($j === 17)	// seq : wt_ac_seq
+//     			{
+//     				if ($val02 != "")
+//     				{
+//     					// 数字型＆文字列の長さチェック
+//     					if ($this->lib_validator->checkRange($val02, 0, 4294967295))
+//     					{
+//     					} else {
+//     						$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
+//     						$up_errflg = TRUE;
+//     					}
+//     				}
+//     			}
+
+// 				if ($j === 18)	// seq : rd_seq
+				if ($j === 16)	// seq : rd_seq
+    			{
+    				if ($val02 != "")
+    				{
+    					// 数字型＆文字列の長さチェック
+    					if ($this->lib_validator->checkRange($val02, 0, 4294967295))
+    					{
+    					} else {
+    						$up_mess .= $_line_no . "行目:「" . $key02 . "」項目で数字または範囲指定エラー。<br>";
+    						$up_errflg = TRUE;
+    					}
     				}
     			}
 
@@ -579,7 +767,7 @@ class Data_csv extends MY_Controller
 
     	if ($up_errflg == TRUE)
     	{
-    		$up_mess .= "<br><font color=red>>> CSVファイルのバリデーションチェックに失敗しました。</font><br>";
+    		$up_mess .= "<br><font color=red>>> ERROR:CSVファイルのバリデーションチェックに失敗しました。</font><br>";
 
     		$this->smarty->assign('up_mess02', $up_mess);
     		$this->view('data_csv/project_csvup.tpl');
@@ -587,6 +775,29 @@ class Data_csv extends MY_Controller
     	} else {
     		$up_mess .= "<font color=blue>>> CSVファイルのバリデーションチェックに成功しました。</font><br>";
     	}
+
+
+//     	echo memory_get_usage(true);
+
+    	//処理時間の計測終了
+    	$bench->end();
+    	//処理時間
+    	print("処理時間・・・");
+    	echo $bench->getTime();
+    	print("<br>メモリ使用量・・・");
+    	//メモリ使用量(memory_get_usage(true))
+    	echo $bench->getMemoryUsage();
+    	print("<br>メモリ最大値・・・");
+    	//最大値(memory_get_peak_usage(true))
+    	echo $bench->getMemoryPeak();
+    	print("<br><br>");
+
+
+
+    	//処理時間の計測開始
+    	$bench->start();
+
+
 
     	// CSVファイルでのUPDATE
     	$this->load->model('Location',  'lc', TRUE);
@@ -628,7 +839,7 @@ class Data_csv extends MY_Controller
     		$get_location_data = $this->lc->get_location_name($value['Canonical Name']);
     		if (empty($get_location_data))
     		{
-    			$up_mess .= "<br><font color=red>>> ロケーション名が見つかりませんでした。 　：　" . $line_cnt . " => " . $set_csv_data['kw_url'] . "</font>";
+    			$up_mess .= "<br><font color=red>>> ERROR:ロケーション名が見つかりませんでした。 　：　" . $line_cnt . "行目 => " . $value['Canonical Name'] . "</font>";
     			++$line_cnt;
     			continue;
     		} else {
@@ -640,13 +851,8 @@ class Data_csv extends MY_Controller
     		$set_csv_data['kw_trytimes']    = $value['データ取得回数'];
     		$set_csv_data['kw_group']       = $value['設定グループ'];
 
-
-
-
-
-
-    		$set_csv_data['kw_tag'] = "";
     		// タグ入力情報を分解＆生成＆セット
+    		$set_csv_data['kw_tag'] = "";
     		if ($value['設定タグ'] != "")
     		{
 
@@ -663,26 +869,55 @@ class Data_csv extends MY_Controller
     			//preg_match("/\[.+?\]/", $value['設定タグ'], $cnt_match);
     		}
 
-
-
-
-
-
     		$set_csv_data['kw_cl_seq']      = $_SESSION['c_memGrp'];
     		$set_csv_data['kw_ac_seq']      = $_SESSION['c_memSeq'];
 
-
-
     		if ($value['seq'] == "")
     		{
+    			// 新規作成
     			$result = $this->kw->up_insert_keyword($set_csv_data, "");
     		} else {
+				// 更新
     			$set_csv_data['kw_seq'] = $value['seq'];
+
+
+
+
+
+
+
+
+    			// 同一URLのチェック
+    			$get_kw_check = $this->kw->check_url($set_csv_data, $old_seq=NULL, $status=1);
+    			if (count($get_kw_check) >= 1)
+    			{
+    				/*
+    				 * 旧kw_seq が存在する場合もチェックが入るので、その場合は画面から更新をかけてください。
+    				 */
+    				$up_mess .= "<br><font color=red>>> ERROR:同一URLが存在します。 　：　" . $line_cnt . "行目 => " . $set_csv_data['kw_url'] . "</font>";
+    				++$line_cnt;
+    				continue;
+    			}
+
+
+
+
+
+
+
+
+
+
+
+    			// ** 旧URL情報を別レコードとして保存 → ルートドメインの削除
+    			$get_old_kw_data =$this->kw->get_kw_seq($value['seq']);
+
+    			// UPDATE
     			$result = $this->kw->update_keyword($set_csv_data);
     		}
     		if ($result == FALSE)
     		{
-    			$up_mess .= "<br><font color=red>>> データの追加または更新に失敗しました。 　：　" . $line_cnt . " => " . $set_csv_data['kw_url'] . "</font>";
+    			$up_mess .= "<br><font color=red>>> ERROR:データの追加または更新に失敗しました。 　：　" . $line_cnt . "行目 => " . $set_csv_data['kw_url'] . "</font>";
     			++$line_cnt;
     			continue;
     		} else {
@@ -702,6 +937,29 @@ class Data_csv extends MY_Controller
 
     		// ルートドメイン数のカウント＆更新
     		$this->lib_rootdomain->get_rootdomain_chg($set_csv_data['kw_cl_seq'], $set_csv_data['kw_rootdomain']);
+    		if (!empty($get_old_kw_data))
+    		{
+    			// ルートドメインの削除有無
+    			$this->lib_rootdomain->get_rootdomain_del($get_old_kw_data[0]['kw_cl_seq'], $get_old_kw_data[0]['kw_rootdomain']);
+    		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     		/*
     		 * ここは変えた方がいいかも？
@@ -722,9 +980,12 @@ class Data_csv extends MY_Controller
     				$this->gt->insert_group_tag($set_gt_data);
     			}
 
-    			// 全タグ　を　tb_group_tag　へ INSERT or UPDATE (rootdomain , keyword数)
-    			$this->lib_keyword->update_group_info_all($set_csv_data['kw_cl_seq'], 0);
+    			// 全グループ　を　tb_group_tag　へ INSERT or UPDATE (rootdomain , keyword数)
+//     			$this->lib_keyword->update_group_info_all($set_csv_data['kw_cl_seq'], 0);
     		}
+    		// 全グループ　を　tb_group_tag　へ INSERT or UPDATE (rootdomain , keyword数)
+    		$this->lib_keyword->update_group_info_all($set_csv_data['kw_cl_seq'], 0);
+
 
 
     		// 新規に追加された設定タグをレコード追加
@@ -746,16 +1007,58 @@ class Data_csv extends MY_Controller
     			}
 
     			// 全タグ　を　tb_group_tag　へ INSERT or UPDATE (rootdomain , keyword数)
-    			$this->lib_keyword->update_tag_info_all($set_csv_data['kw_cl_seq'], 1);
+//     			$this->lib_keyword->update_tag_info_all($set_csv_data['kw_cl_seq'], 1);
     		}
+    		// 全タグ　を　tb_group_tag　へ INSERT or UPDATE (rootdomain , keyword数)
+    		$this->lib_keyword->update_tag_info_all($set_csv_data['kw_cl_seq'], 1);
 
 
+
+    		unset($set_gt_data);
     		unset($set_csv_data);
+    		unset($get_gt_name);
+    		unset($value);
+    		unset($val01);
+    		unset($val02);
+    		unset($_tmp_tag);
+
+
+
+
+    		// 512M のように M で指定されている前提なのでアレでごめんなさい
+    		list($max) = sscanf(ini_get('memory_limit'), '%dM');
+    		$peak = memory_get_peak_usage(true) / 1024 / 1024;
+    		$used = ((int) $max !== 0)? round((int) $peak / (int) $max * 100, 2): '--';
+    		if ($used > 80) {
+    			$message = sprintf("[%s] Memory peak usage warning: %s %% used. (max: %sM, now: %sM)\n", date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']), $used, $max, $peak);
+    			log_message('error', $message);
+    			break;
+    		}
 
 
 
 
     	}
+
+
+
+//     	echo memory_get_usage(true);
+
+    	//処理時間の計測終了
+    	$bench->end();
+    	//処理時間
+    	print("処理時間・・・");
+    	echo $bench->getTime();
+    	print("<br>メモリ使用量・・・");
+    	 //メモリ使用量(memory_get_usage(true))
+    	echo $bench->getMemoryUsage();
+    	print("<br>メモリ最大値・・・");
+    	//最大値(memory_get_peak_usage(true))
+    	echo $bench->getMemoryPeak();
+    	print("<br><br>");
+
+
+
 
     	$up_mess .= "<br><font color=blue>>> CSVファイルによる更新が完了しました。 　　　：　" . $cnt .  " 件</font>";
     	log_message('info', 'client::[Data_csv->kwlist_csvup()]キーワード情報データのCSV取込 CSVファイルによる更新が完了しました');
@@ -900,6 +1203,118 @@ class Data_csv extends MY_Controller
 
         $this->view('keywordlist/index.tpl');
 //         redirect('/keywordlist/');
+
+    }
+
+    // キーワード情報CSV ダウンロード
+    public function toplist_csvdown()
+    {
+
+    	// 件数(max1000件)を取得。とりあえず制限をかけておきます
+    	$tmp_offset   = 0;
+    	$tmp_per_page = 1000;
+
+    	// セッションからフラッシュデータ読み込み
+    	$tmp_inputpost = array(
+    			'free_keyword'      => $_SESSION['c_free_keyword'],
+
+    			'kw_keyword'        => $_SESSION['c_kw_keyword'],
+    			'kw_domain'         => $_SESSION['c_kw_domain'],
+    			'kw_group'          => $_SESSION['c_kw_group'],
+    			'kw_tag'            => $_SESSION['c_kw_tag'],
+
+    			'kw_matchtype'      => $_SESSION['c_kw_matchtype'],
+    			'kw_searchengine'   => $_SESSION['c_kw_searchengine'],
+    			'kw_device'         => $_SESSION['c_kw_device'],
+    			'kw_status'         => $_SESSION['c_kw_status'],
+    			'orderid'           => $_SESSION['c_orderid'],
+    			'watch_kw'          => $_SESSION['c_watch_kw'],
+    			'watch_domain'      => $_SESSION['c_watch_domain'],
+    	);
+
+
+    	// TOP:検索キーワード情報の取得
+    	$this->load->model('Keyword', 'kw', TRUE);
+    	$query = $this->kw->get_csvdl_toplist($tmp_inputpost, $tmp_per_page, $tmp_offset, $_SESSION['c_memGrp']);
+
+
+    	// 作成したヘルパーを読み込む
+    	$this->load->helper(array('download', 'csvdata'));
+
+    	// ヘルパーに追加した関数を呼び出し、CSVデータ取得
+    	$get_dl_csv = csv_toplist_result($query);
+
+    	$file_name = 'dlcsv_toplist_' . date('YmdHis') . '.csv';
+    	//force_download($file_name, $get_dl_csv);
+
+    	// S-JIS変換を行う場合
+    	$get_sjis_csv = mb_convert_encoding($get_dl_csv,"SJIS", "UTF-8");
+    	force_download($file_name, $get_sjis_csv);
+
+    	redirect('/top/search/');
+
+    }
+
+    // レポート：キーワード情報CSV ダウンロード
+    public function report_csvdown()
+    {
+
+    	$input_post = $this->input->post();
+
+    	$_searchengine = $input_post['kw_searchengine'];
+    	$_url = preg_replace("/^https?:\/\/(www\.)?|/i", "", $input_post['kw_url']);
+    	$_url = str_replace("/", "_", $_url);
+    	$_url = str_replace(".", "_", $_url);
+
+    	$this->load->model('Keyword', 'kw', TRUE);
+
+    	// グラフ＆テーブルデータの取得 (Google & Yahoo!) 同時の場合
+    	$kw_seq01 = $input_post['kw_seq'];
+    	if ($input_post['gp_kind'] == 1)
+    	{
+    		$get_kw_data = $this->kw->get_kw_seq($kw_seq01);
+
+
+    		// 同一キーワードの存在チェックから、もう片方のkw_seqを求める
+    		$set_kw_data = array();
+    		$set_kw_data['kw_cl_seq']       = $get_kw_data[0]['kw_cl_seq'];
+    		$set_kw_data['kw_url']          = $get_kw_data[0]['kw_url'];
+    		$set_kw_data['kw_keyword']      = $get_kw_data[0]['kw_keyword'];
+    		$set_kw_data['kw_matchtype']    = $get_kw_data[0]['kw_matchtype'];
+    		$set_kw_data['kw_device']       = $get_kw_data[0]['kw_device'];
+    		$set_kw_data['kw_location_id']  = $get_kw_data[0]['kw_location_id'];
+    		$set_kw_data['kw_searchengine'] = 0;
+    		if ($get_kw_data[0]['kw_searchengine'] == 0)
+    		{
+    			$set_kw_data['kw_searchengine'] = 1;
+    		}
+
+    		$get_kw_row = $this->kw->get_kw_url($set_kw_data);
+    		if (!empty($get_kw_row))
+    		{
+    			$kw_seq02 = $get_kw_row[0]['kw_seq'];
+    		} else {
+    			$kw_seq02 = NULL;
+    		}
+
+    		$_searchengine = "";
+    	}
+
+    	// キーワード情報の取得
+    	$query = $this->kw->get_csvdl_report($input_post, $kw_seq01, $kw_seq02);
+
+    	// 作成したヘルパーを読み込む
+    	$this->load->helper(array('download', 'csvdata'));
+
+    	// ヘルパーに追加した関数を呼び出し、CSVデータ取得
+    	$get_dl_csv = csv_from_result($query);
+
+    	$file_name = 'dlcsv_' . $input_post['kw_keyword'] . $_searchengine . '_' . $_url . date('YmdHis') . '.csv';
+    	//$file_name = 'dlcsv_report_' . date('YmdHis') . '.csv';
+    	force_download($file_name, $get_dl_csv);
+
+    	redirect('/topdetail/report/' . $input_post['term']);
+//     	$this->view('keywordlist/index.tpl');
 
     }
 

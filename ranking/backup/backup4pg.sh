@@ -17,7 +17,14 @@ dirpath='/var/www/ranking/backup'
 
 #filename3=kaikei_backup_`date +%Y%m%d`
 #filename4=projects_backup_`date +%Y%m%d`
-filename5=ranking_backup_`date +%Y%m%d`
+#filename5=ranking_backup_`date +%Y%m%d`
+
+# 手動バックアップを判定
+if [ $1 = 1 ]; then
+  filename5=ranking_backup_`date +%Y%m%d%H%M%S`
+else
+  filename5=ranking_backup_`date +%Y%m%d`
+fi
 
 #tar cfz $dirpath/$filename3.tar.gz /var/www/kaikei/modules/
 #tar cfz $dirpath/$filename4.tar.gz /var/www/projects/modules/

@@ -24,8 +24,8 @@ class System extends MY_Controller
     {
 
         // セッションデータをクリア
-        $this->load->library('lib_auth');
-        $this->lib_auth->delete_session('client');
+//         $this->load->library('lib_auth');
+//         $this->lib_auth->delete_session('client');
 
         $this->view('system/index.tpl');
 
@@ -36,15 +36,18 @@ class System extends MY_Controller
     {
 
         // sh に記述
+    	$arg = 1;													// 判定用に引数を渡す
 
         // DBのバックアップ
         $app_path = "/var/www/ranking/backup/";
-        $strCommand = $app_path . 'backup4mysql.sh';
+        $strCommand = $app_path . 'backup4mysql.sh  "'.$arg.'"';
+        //$strCommand = $app_path . 'backup4mysql.sh';
         exec( $strCommand );
 
-        // システムのバックアップ
+        // システムのバックアップ (手動データ作成)
         $app_path = "/var/www/ranking/backup/";
-        $strCommand = $app_path . 'backup4pg.sh';
+        $strCommand = $app_path . 'backup4pg.sh  "'.$arg.'"';
+        //$strCommand = $app_path . 'backup4pg.sh';
         exec( $strCommand );
 
         $this->view('system/index.tpl');

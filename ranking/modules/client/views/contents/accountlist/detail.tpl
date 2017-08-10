@@ -123,6 +123,11 @@
   <div class="form-group">
     <div class="col-md-offset-3 col-md-3">■&emsp;タ&emsp;&emsp;グ&emsp;：{if $info.ac_tag==1}権限あり{else}権限なし{/if}</div>
   </div>
+
+  {form_hidden('ac_keyword', $info.ac_keyword)}
+  {form_hidden('ac_group', $info.ac_group)}
+  {form_hidden('ac_tag', $info.ac_tag)}
+
   {/if}
 
   <br><br>

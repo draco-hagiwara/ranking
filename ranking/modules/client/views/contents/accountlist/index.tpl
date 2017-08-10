@@ -32,7 +32,7 @@
       </thead>
 
     {foreach from=$list item=ac}
-      {if ($smarty.session.c_memType==1)||($smarty.session.c_memSeq==$ac.ac_seq)}
+      {if ($smarty.session.c_memType==1)||($smarty.session.c_memType==9)||($smarty.session.c_memSeq==$ac.ac_seq)}
       <tbody>
         <tr>
           <td>
